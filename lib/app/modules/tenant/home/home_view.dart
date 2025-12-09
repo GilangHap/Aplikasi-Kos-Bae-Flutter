@@ -1,22 +1,22 @@
 // FILE: lib/app/modules/tenant/home/home_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'dart:ui';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../theme/app_theme.dart';
 import 'home_controller.dart';
 import '../tenant_nav/tenant_nav_controller.dart';
 
-/// Modern Tenant Dashboard
+/// Minimalist Tenant Dashboard - Aesthetic & Clean UI
 class TenantHomeView extends GetView<HomeController> {
   const TenantHomeView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.softGrey,
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
+          return _buildPremiumLoader();
         }
 
         if (controller.errorMessage.value.isNotEmpty) {
@@ -24,7 +24,15 @@ class TenantHomeView extends GetView<HomeController> {
         }
 
         if (controller.tenant.value == null) {
-          return const Center(child: Text('Data penghuni tidak ditemukan'));
+          return Center(
+            child: Text(
+              'Data penghuni tidak ditemukan',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                color: AppTheme.charcoal.withOpacity(0.6),
+              ),
+            ),
+          );
         }
 
         // Status-based View
@@ -33,323 +41,349 @@ class TenantHomeView extends GetView<HomeController> {
         } else if (controller.hasLeft) {
           return _buildLeftView();
         } else {
-          return _buildModernDashboard(context);
+          return _buildMinimalistDashboard();
         }
       }),
     );
   }
 
-  Widget _buildModernDashboard(BuildContext context) {
-    final tenant = controller.tenant.value!;
-    
-    return Stack(
-      children: [
-        // Background Decoration
-        Positioned(
-          top: -100,
-          right: -100,
-          child: Container(
-            width: 300,
-            height: 300,
+  /// Premium animated loader
+  Widget _buildPremiumLoader() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  AppTheme.pastelBlue.withOpacity(0.4),
-                  Colors.transparent,
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryBlue.withOpacity(0.15),
+                  blurRadius: 30,
+                  spreadRadius: 5,
+                ),
+              ],
+            ),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(AppTheme.primaryBlue),
+                  ),
+                ),
+                Icon(Icons.home_rounded,
+                    color: AppTheme.primaryBlue, size: 24),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            'Loading Dashboard...',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.charcoal.withOpacity(0.6),
+              letterSpacing: 1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMinimalistDashboard() {
+    final tenant = controller.tenant.value!;
+
+    return RefreshIndicator(
+      onRefresh: controller.refreshData,
+      color: AppTheme.primaryBlue,
+      backgroundColor: Colors.white,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Premium Header with gradient
+            _buildPremiumHeader(tenant),
+
+            // Main content
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+
+                  // Room Status Card - Main Focus
+                  _buildRoomStatusCard(tenant),
+
+                  const SizedBox(height: 28),
+
+                  // Quick Stats
+                  _buildQuickStats(),
+
+                  const SizedBox(height: 28),
+
+                  // Quick Actions
+                  _buildQuickActionsSection(),
+
+                  const SizedBox(height: 40),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Premium header with gradient and clean design
+  Widget _buildPremiumHeader(dynamic tenant) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.deepBlue,
+            AppTheme.primaryBlue,
+            AppTheme.lightBlue.withOpacity(0.8),
+          ],
+          stops: const [0.0, 0.5, 1.0],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Decorative circles
+          Positioned(
+            top: -50,
+            right: -50,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.05),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -30,
+            left: -30,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppTheme.gold.withOpacity(0.1),
+              ),
+            ),
+          ),
+
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Greeting
+                  Text(
+                    _getGreeting(DateTime.now().hour),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.cream,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        tenant.name.split(' ').first,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text('👋', style: TextStyle(fontSize: 24)),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Room info mini summary
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.15),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.apartment_rounded,
+                            color: AppTheme.cream,
+                            size: 20,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Kamar Anda',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white.withOpacity(0.7),
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                tenant.roomNumber ?? 'Belum Ada',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
-        ),
-        
-        // Main Content
-        CustomScrollView(
-          slivers: [
-            // App Bar & Header
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 60, 24, 24),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Selamat Datang,',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              tenant.name.split(' ').first,
-                              style: const TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 2),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 10,
-                              ),
-                            ],
-                          ),
-                          child: CircleAvatar(
-                            radius: 24,
-                            backgroundImage: tenant.photoUrl != null
-                                ? NetworkImage(tenant.photoUrl!)
-                                : null,
-                            backgroundColor: AppTheme.pastelBlue,
-                            child: tenant.photoUrl == null
-                                ? Text(
-                                    tenant.initials,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Main Status Card
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: _buildMainStatusCard(tenant),
-              ),
-            ),
-
-            // Quick Stats / Alerts
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatCard(
-                        'Tagihan',
-                        controller.unpaidBillsCount.value.toString(),
-                        'Belum Dibayar',
-                        Icons.receipt_long,
-                        controller.unpaidBillsCount.value > 0 
-                            ? Colors.orange 
-                            : AppTheme.softGreen,
-                        () => Get.find<TenantNavController>().changeIndex(1),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildStatCard(
-                        'Keluhan',
-                        controller.activeComplaintsCount.value.toString(),
-                        'Sedang Proses',
-                        Icons.report_problem_outlined,
-                        AppTheme.pastelBlue,
-                        () => Get.find<TenantNavController>().changeIndex(2),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Quick Actions Grid
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Menu Cepat',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    GridView.count(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisCount: 4,
-                      mainAxisSpacing: 16,
-                      crossAxisSpacing: 16,
-                      children: [
-                        _buildMenuButton(
-                          'Bayar',
-                          Icons.payment_rounded,
-                          AppTheme.softGreen,
-                          () => Get.find<TenantNavController>().changeIndex(1),
-                        ),
-                        _buildMenuButton(
-                          'Lapor',
-                          Icons.build_rounded,
-                          Colors.orange,
-                          () => Get.find<TenantNavController>().changeIndex(2),
-                        ),
-                        _buildMenuButton(
-                          'Profil',
-                          Icons.person_rounded,
-                          AppTheme.pastelBlue,
-                          () => Get.find<TenantNavController>().changeIndex(3),
-                        ),
-                        _buildMenuButton(
-                          'Bantuan',
-                          Icons.help_outline_rounded,
-                          AppTheme.softPink,
-                          () => controller.showHelpPage(),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            
-            // Bottom Spacing
-            const SliverToBoxAdapter(child: SizedBox(height: 80)),
-          ],
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildMainStatusCard(dynamic tenant) {
+  /// Room Status Card - Main focus
+  Widget _buildRoomStatusCard(dynamic tenant) {
     return Container(
       width: double.infinity,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF6B8EFF), Color(0xFF4A6FFF)],
-        ),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF4A6FFF).withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: AppTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
           ),
         ],
       ),
-      child: Stack(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Decorative Circles
-          Positioned(
-            top: -20,
-            right: -20,
-            child: Container(
-              width: 150,
-              height: 150,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Status Penghuni',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.charcoal,
+                ),
               ),
-            ),
-          ),
-          
-          Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.green.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.green.shade200),
+                ),
+                child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.verified, color: Colors.white, size: 16),
-                          SizedBox(width: 4),
-                          Text(
-                            'Penghuni Aktif',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
+                    Icon(Icons.check_circle_rounded,
+                        color: Colors.green.shade600, size: 14),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Aktif',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.green.shade700,
                       ),
                     ),
-                    const Icon(Icons.apartment, color: Colors.white70),
                   ],
                 ),
-                const SizedBox(height: 24),
-                const Text(
-                  'Kamar Anda',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  tenant.roomNumber ?? 'Belum Ada',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 24),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          // Contract End Date
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppTheme.softGrey,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Row(
+              children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
+                    color: AppTheme.primaryBlue.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Row(
+                  child: Icon(Icons.calendar_today_rounded,
+                      color: AppTheme.primaryBlue, size: 18),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.calendar_today, color: Colors.white70, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Masa Sewa Berakhir',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
-                            Text(
-                              tenant.contractEndDate != null
-                                  ? _formatDate(tenant.contractEndDate!)
-                                  : '-',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                      Text(
+                        'Masa Sewa Berakhir',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.charcoal.withOpacity(0.6),
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        tenant.contractEndDate != null
+                            ? _formatDate(tenant.contractEndDate!)
+                            : '-',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.charcoal,
                         ),
                       ),
                     ],
@@ -363,7 +397,47 @@ class TenantHomeView extends GetView<HomeController> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, String subtitle, IconData icon, Color color, VoidCallback onTap) {
+  /// Quick Stats Section
+  Widget _buildQuickStats() {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildStatCard(
+            icon: Icons.receipt_long_rounded,
+            label: 'Tagihan',
+            value: controller.unpaidBillsCount.value.toString(),
+            subtitle: 'Belum Dibayar',
+            color: controller.unpaidBillsCount.value > 0
+                ? Colors.orange
+                : Colors.green,
+            onTap: () =>
+                Get.find<TenantNavController>().changeIndex(1),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          child: _buildStatCard(
+            icon: Icons.report_problem_rounded,
+            label: 'Keluhan',
+            value: controller.activeComplaintsCount.value.toString(),
+            subtitle: 'Sedang Proses',
+            color: AppTheme.primaryBlue,
+            onTap: () =>
+                Get.find<TenantNavController>().changeIndex(2),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard({
+    required IconData icon,
+    required String label,
+    required String value,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(20),
@@ -384,7 +458,7 @@ class TenantHomeView extends GetView<HomeController> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: color.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -394,26 +468,28 @@ class TenantHomeView extends GetView<HomeController> {
             const SizedBox(height: 12),
             Text(
               value,
-              style: TextStyle(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 24,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w800,
                 color: color,
-              ),
-            ),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
               ),
             ),
             const SizedBox(height: 4),
             Text(
+              label,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.charcoal,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
               subtitle,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade500,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoal.withOpacity(0.6),
               ),
             ),
           ],
@@ -422,109 +498,247 @@ class TenantHomeView extends GetView<HomeController> {
     );
   }
 
-  Widget _buildMenuButton(String label, IconData icon, Color color, VoidCallback onTap) {
+  /// Quick Actions Section
+  Widget _buildQuickActionsSection() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    AppTheme.primaryBlue.withOpacity(0.1),
+                    AppTheme.lightBlue.withOpacity(0.05),
+                  ],
                 ),
-              ],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(Icons.flash_on_rounded,
+                  color: AppTheme.primaryBlue, size: 20),
             ),
-            child: Icon(icon, color: color, size: 28),
-          ),
+            const SizedBox(width: 12),
+            Text(
+              'Menu Cepat',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
+                letterSpacing: -0.3,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: Colors.black87,
-          ),
+        const SizedBox(height: 16),
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 4,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          children: [
+            _buildMenuButton(
+              'Bayar',
+              Icons.payment_rounded,
+              AppTheme.gold,
+              () => Get.find<TenantNavController>().changeIndex(1),
+            ),
+            _buildMenuButton(
+              'Lapor',
+              Icons.build_rounded,
+              Colors.orange,
+              () => Get.find<TenantNavController>().changeIndex(2),
+            ),
+            _buildMenuButton(
+              'Profil',
+              Icons.person_rounded,
+              AppTheme.primaryBlue,
+              () => Get.find<TenantNavController>().changeIndex(3),
+            ),
+            _buildMenuButton(
+              'Bantuan',
+              Icons.help_outline_rounded,
+              Colors.pink,
+              () => controller.showHelpPage(),
+            ),
+          ],
         ),
       ],
     );
   }
 
-  Widget _buildErrorState() {
-    return Center(
+  Widget _buildMenuButton(
+      String label, IconData icon, Color color, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
-          const SizedBox(height: 16),
-          Text(
-            controller.errorMessage.value,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.black54),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: color, size: 24),
           ),
-          const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: controller.refreshData,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Coba Lagi'),
+          const SizedBox(height: 6),
+          Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.charcoal,
+            ),
           ),
         ],
       ),
     );
   }
 
+  Widget _buildErrorState() {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.red.withOpacity(0.1),
+              blurRadius: 20,
+              spreadRadius: 5,
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.error_outline_rounded,
+                size: 48,
+                color: Colors.red.shade400,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Oops! Terjadi Kesalahan',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              controller.errorMessage.value,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: AppTheme.charcoal.withOpacity(0.6),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: controller.refreshData,
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Coba Lagi'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildInactiveView() {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
+      child: Container(
+        margin: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.orange.withOpacity(0.1),
+              blurRadius: 20,
+              spreadRadius: 5,
+            ),
+          ],
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: Colors.orange.withOpacity(0.1),
+                color: Colors.orange.shade50,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.hourglass_top_rounded,
-                size: 80,
-                color: Colors.orange,
+                size: 64,
+                color: Colors.orange.shade400,
               ),
             ),
-            const SizedBox(height: 32),
-            const Text(
+            const SizedBox(height: 24),
+            Text(
               'Menunggu Aktivasi',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
               ),
             ),
-            const SizedBox(height: 16),
-            const Text(
+            const SizedBox(height: 12),
+            Text(
               'Akun Anda sedang dalam proses verifikasi. Silakan hubungi admin jika butuh bantuan.',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: AppTheme.charcoal.withOpacity(0.6),
                 height: 1.5,
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 32),
             ElevatedButton.icon(
               onPressed: controller.refreshData,
-              icon: const Icon(Icons.refresh),
+              icon: const Icon(Icons.refresh_rounded),
               label: const Text('Cek Status'),
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                backgroundColor: Colors.orange.shade400,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 12,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -538,39 +752,51 @@ class TenantHomeView extends GetView<HomeController> {
 
   Widget _buildLeftView() {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32.0),
+      child: Container(
+        margin: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.red.withOpacity(0.1),
+              blurRadius: 20,
+              spreadRadius: 5,
+            ),
+          ],
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
+                color: Colors.red.shade50,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.waving_hand_rounded,
-                size: 80,
-                color: Colors.red,
+                size: 64,
+                color: Colors.red.shade400,
               ),
             ),
-            const SizedBox(height: 32),
-            const Text(
+            const SizedBox(height: 24),
+            Text(
               'Sampai Jumpa!',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
               ),
             ),
-            const SizedBox(height: 16),
-            const Text(
+            const SizedBox(height: 12),
+            Text(
               'Terima kasih telah menjadi bagian dari Kos Bae. Semoga sukses selalu!',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: AppTheme.charcoal.withOpacity(0.6),
                 height: 1.5,
               ),
             ),
@@ -578,6 +804,13 @@ class TenantHomeView extends GetView<HomeController> {
         ),
       ),
     );
+  }
+
+  String _getGreeting(int hour) {
+    if (hour < 12) return '☀️ Selamat Pagi';
+    if (hour < 15) return '🌤️ Selamat Siang';
+    if (hour < 18) return '🌅 Selamat Sore';
+    return '🌙 Selamat Malam';
   }
 
   String _formatDate(DateTime date) {
