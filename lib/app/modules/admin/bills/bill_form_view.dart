@@ -13,7 +13,7 @@ class BillFormView extends GetView<BillFormController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.softGrey,
       appBar: _buildAppBar(),
       body: Obx(() {
         if (controller.isLoading.value && controller.tenants.isEmpty) {

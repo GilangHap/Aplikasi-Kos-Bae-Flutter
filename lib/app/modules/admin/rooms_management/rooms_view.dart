@@ -3,18 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'rooms_controller.dart';
-import '../../../widgets/room_card.dart';
 import '../../../theme/app_theme.dart';
 
-/// Main Rooms Management View dengan UI yang lebih menarik
+/// Premium Rooms Management View - Luxury Design
 class RoomsView extends GetView<RoomsController> {
   const RoomsView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.softGrey,
       body: Obx(() {
         if (controller.isLoading.value && controller.rooms.isEmpty) {
           return _buildLoadingShimmer();
@@ -22,13 +22,17 @@ class RoomsView extends GetView<RoomsController> {
 
         return RefreshIndicator(
           onRefresh: controller.refresh,
-          color: AppTheme.pastelBlue,
+          color: AppTheme.primaryBlue,
+          backgroundColor: Colors.white,
           child: CustomScrollView(
             slivers: [
-              // Statistics Cards (scrollable)
+              // Premium Header
+              SliverToBoxAdapter(child: _buildPremiumHeader()),
+
+              // Statistics Cards
               SliverToBoxAdapter(child: _buildStatisticsCards()),
 
-              // Filter & Search Bar (scrollable)
+              // Filter & Search Bar
               SliverToBoxAdapter(child: _buildFilterSearchBar()),
 
               // Room List
@@ -52,49 +56,155 @@ class RoomsView extends GetView<RoomsController> {
     );
   }
 
-  Widget _buildStatisticsCards() {
+  /// Premium Header Section
+  Widget _buildPremiumHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppTheme.deepBlue, AppTheme.primaryBlue],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryBlue.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with total rooms and sort button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Obx(
-                () => Text(
-                  '${controller.totalRooms} Kamar Terdaftar',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey.shade700,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Kelola Kamar',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                    ),
                   ),
+                  const SizedBox(height: 4),
+                  Obx(
+                    () => Text(
+                      '${controller.totalRooms} kamar terdaftar',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.8),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withOpacity(0.2)),
+                ),
+                child: Icon(
+                  Icons.door_front_door_rounded,
+                  color: AppTheme.cream,
+                  size: 28,
                 ),
               ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatisticsCards() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+      child: Column(
+        children: [
+          // Stats cards - Premium horizontal scrollable
+          SizedBox(
+            height: 130,
+            child: Obx(
+              () => ListView(
+                scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
+                children: [
+                  _buildStatCard(
+                    'Tersedia',
+                    controller.emptyRooms.toString(),
+                    [Colors.green.shade400, Colors.green.shade600],
+                    Icons.check_circle_rounded,
+                  ),
+                  const SizedBox(width: 12),
+                  _buildStatCard(
+                    'Terisi',
+                    controller.occupiedRooms.toString(),
+                    [AppTheme.primaryBlue, AppTheme.deepBlue],
+                    Icons.person_rounded,
+                  ),
+                  const SizedBox(width: 12),
+                  _buildStatCard(
+                    'Perbaikan',
+                    controller.maintenanceRooms.toString(),
+                    [Colors.orange.shade400, Colors.orange.shade700],
+                    Icons.build_rounded,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Sort button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
               InkWell(
                 onTap: () => _showSortBottomSheet(),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                    horizontal: 16,
+                    vertical: 10,
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: Colors.grey.shade200),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.sort, size: 16, color: AppTheme.pastelBlue),
-                      const SizedBox(width: 6),
+                      Icon(
+                        Icons.sort_rounded,
+                        size: 18,
+                        color: AppTheme.primaryBlue,
+                      ),
+                      const SizedBox(width: 8),
                       Text(
                         'Urutkan',
-                        style: TextStyle(
+                        style: GoogleFonts.plusJakartaSans(
                           fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: AppTheme.pastelBlue,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.primaryBlue,
                         ),
                       ),
                     ],
@@ -103,35 +213,6 @@ class RoomsView extends GetView<RoomsController> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          // Stats cards
-          Obx(
-            () => Row(
-              children: [
-                _buildStatCard(
-                  'Kosong',
-                  controller.emptyRooms.toString(),
-                  const Color(0xFF4CAF50),
-                  Icons.check_circle_outline,
-                ),
-                const SizedBox(width: 12),
-                _buildStatCard(
-                  'Terisi',
-                  controller.occupiedRooms.toString(),
-                  const Color(0xFFE91E63),
-                  Icons.person,
-                ),
-                const SizedBox(width: 12),
-                _buildStatCard(
-                  'Perbaikan',
-                  controller.maintenanceRooms.toString(),
-                  const Color(0xFFFF9800),
-                  Icons.build,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 16),
         ],
       ),
     );
@@ -140,48 +221,62 @@ class RoomsView extends GetView<RoomsController> {
   Widget _buildStatCard(
     String label,
     String value,
-    Color color,
+    List<Color> gradient,
     IconData icon,
   ) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: color.withOpacity(0.15),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+    return Container(
+      width: 120,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradient,
         ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, color: color, size: 20),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: gradient[0].withOpacity(0.4),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+            spreadRadius: -3,
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              borderRadius: BorderRadius.circular(10),
             ),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
+            child: Icon(icon, color: Colors.white, size: 18),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              color: Colors.white,
+              height: 1.0,
             ),
-            Text(
-              label,
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: Colors.white.withOpacity(0.9),
             ),
-          ],
-        ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
@@ -191,32 +286,56 @@ class RoomsView extends GetView<RoomsController> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
-          // Search field
+          const SizedBox(height: 16),
+          // Premium Search field
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
+                  color: AppTheme.primaryBlue.withOpacity(0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: TextField(
               onChanged: controller.setSearch,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
               decoration: InputDecoration(
                 hintText: 'Cari kamar...',
-                hintStyle: TextStyle(color: Colors.grey.shade400),
-                prefixIcon: Icon(Icons.search, color: AppTheme.pastelBlue),
+                hintStyle: GoogleFonts.plusJakartaSans(
+                  color: AppTheme.charcoal.withOpacity(0.4),
+                  fontWeight: FontWeight.w500,
+                ),
+                prefixIcon: Container(
+                  padding: const EdgeInsets.all(12),
+                  child: Icon(
+                    Icons.search_rounded,
+                    color: AppTheme.primaryBlue,
+                    size: 24,
+                  ),
+                ),
                 suffixIcon: Obx(
                   () => controller.searchQuery.value.isNotEmpty
                       ? IconButton(
-                          icon: Icon(Icons.clear, color: Colors.grey.shade400),
-                          onPressed: () {
-                            controller.setSearch('');
-                          },
+                          icon: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppTheme.mediumGrey.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.close_rounded,
+                              color: AppTheme.charcoal.withOpacity(0.5),
+                              size: 16,
+                            ),
+                          ),
+                          onPressed: () => controller.setSearch(''),
                         )
                       : const SizedBox.shrink(),
                 ),
@@ -229,28 +348,37 @@ class RoomsView extends GetView<RoomsController> {
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
-          // Filter chips
+          // Premium Filter chips
           SizedBox(
-            height: 40,
+            height: 44,
             child: Obx(
               () => ListView(
                 scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
                 children: [
-                  _buildFilterChip('all', 'Semua', Icons.apps),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('kosong', 'Kosong', Icons.check_circle),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('terisi', 'Terisi', Icons.person),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('maintenance', 'Perbaikan', Icons.build),
+                  _buildFilterChip('all', 'Semua', Icons.apps_rounded),
+                  const SizedBox(width: 10),
+                  _buildFilterChip(
+                    'kosong',
+                    'Tersedia',
+                    Icons.check_circle_rounded,
+                  ),
+                  const SizedBox(width: 10),
+                  _buildFilterChip('terisi', 'Terisi', Icons.person_rounded),
+                  const SizedBox(width: 10),
+                  _buildFilterChip(
+                    'maintenance',
+                    'Perbaikan',
+                    Icons.build_rounded,
+                  ),
                 ],
               ),
             ),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
         ],
       ),
     );
@@ -259,44 +387,48 @@ class RoomsView extends GetView<RoomsController> {
   Widget _buildFilterChip(String value, String label, IconData icon) {
     final isSelected = controller.filterStatus.value == value;
 
-    return InkWell(
+    return GestureDetector(
       onTap: () => controller.setFilter(value),
-      borderRadius: BorderRadius.circular(20),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         decoration: BoxDecoration(
-          gradient: isSelected ? AppTheme.selectedGradient : null,
-          color: isSelected ? null : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? Colors.transparent : Colors.grey.shade300,
-          ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppTheme.pastelBlue.withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [AppTheme.primaryBlue, AppTheme.deepBlue],
+                )
               : null,
+          color: isSelected ? null : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: isSelected
+                  ? AppTheme.primaryBlue.withOpacity(0.3)
+                  : Colors.black.withOpacity(0.05),
+              blurRadius: isSelected ? 12 : 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
-              size: 16,
-              color: isSelected ? Colors.white : Colors.grey.shade600,
+              size: 18,
+              color: isSelected
+                  ? Colors.white
+                  : AppTheme.charcoal.withOpacity(0.6),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
             Text(
               label,
-              style: TextStyle(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: isSelected ? Colors.white : Colors.grey.shade700,
+                color: isSelected
+                    ? Colors.white
+                    : AppTheme.charcoal.withOpacity(0.7),
               ),
             ),
           ],
@@ -316,18 +448,19 @@ class RoomsView extends GetView<RoomsController> {
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+            color: AppTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
           ),
         ],
       ),
       child: InkWell(
         onTap: () => controller.openDetail(room),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -336,12 +469,12 @@ class RoomsView extends GetView<RoomsController> {
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20),
+                    top: Radius.circular(24),
                   ),
                   child: room.photos.isNotEmpty
                       ? Image.network(
                           room.photos.first,
-                          height: 160,
+                          height: 180,
                           width: double.infinity,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
@@ -350,39 +483,62 @@ class RoomsView extends GetView<RoomsController> {
                       : _buildImagePlaceholder(),
                 ),
 
+                // Gradient overlay
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    height: 60,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.3),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
                 // Status Badge
                 Positioned(
-                  top: 12,
-                  left: 12,
+                  top: 14,
+                  left: 14,
                   child: _buildStatusBadge(room.status),
                 ),
 
                 // Photo count
                 if (room.photos.length > 1)
                   Positioned(
-                    top: 12,
-                    right: 12,
+                    top: 14,
+                    right: 14,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 6,
+                        horizontal: 12,
+                        vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
-                        borderRadius: BorderRadius.circular(20),
+                        color: Colors.black.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Icon(
-                            Icons.photo_library,
+                            Icons.photo_library_rounded,
                             color: Colors.white,
                             size: 14,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 6),
                           Text(
                             '${room.photos.length}',
-                            style: const TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               color: Colors.white,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -392,12 +548,45 @@ class RoomsView extends GetView<RoomsController> {
                       ),
                     ),
                   ),
+
+                // Price tag
+                Positioned(
+                  bottom: 14,
+                  left: 14,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [AppTheme.gold, Color(0xFFB8860B)],
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppTheme.gold.withOpacity(0.4),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      currencyFormat.format(room.price),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
 
             // Info Section
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -405,27 +594,14 @@ class RoomsView extends GetView<RoomsController> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Kamar ${room.roomNumber}',
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              currencyFormat.format(room.price),
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.pastelBlue,
-                              ),
-                            ),
-                          ],
+                        child: Text(
+                          'Kamar ${room.roomNumber}',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: AppTheme.charcoal,
+                            letterSpacing: -0.3,
+                          ),
                         ),
                       ),
 
@@ -433,14 +609,14 @@ class RoomsView extends GetView<RoomsController> {
                       Row(
                         children: [
                           _buildActionButton(
-                            Icons.edit,
-                            const Color(0xFFA9C9FF),
+                            Icons.edit_rounded,
+                            AppTheme.primaryBlue,
                             () => controller.openEditRoom(room),
                           ),
                           const SizedBox(width: 8),
                           _buildActionButton(
-                            Icons.delete,
-                            const Color(0xFFFF6B6B),
+                            Icons.delete_rounded,
+                            Colors.red.shade400,
                             () => controller.deleteRoom(room),
                           ),
                         ],
@@ -449,31 +625,46 @@ class RoomsView extends GetView<RoomsController> {
                   ),
 
                   if (room.currentTenantName != null) ...[
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 14),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                        horizontal: 14,
+                        vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF7C4D4).withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.primaryBlue.withOpacity(0.1),
+                            AppTheme.lightBlue.withOpacity(0.05),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppTheme.primaryBlue.withOpacity(0.15),
+                        ),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
-                            Icons.person,
-                            size: 16,
-                            color: Color(0xFFE91E63),
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryBlue.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.person_rounded,
+                              size: 16,
+                              color: AppTheme.primaryBlue,
+                            ),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 10),
                           Text(
                             room.currentTenantName!,
-                            style: const TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFFE91E63),
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.primaryBlue,
                             ),
                           ),
                         ],
@@ -482,27 +673,28 @@ class RoomsView extends GetView<RoomsController> {
                   ],
 
                   if (room.facilities.isNotEmpty) ...[
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     Wrap(
-                      spacing: 6,
-                      runSpacing: 6,
+                      spacing: 8,
+                      runSpacing: 8,
                       children: room.facilities
                           .take(4)
                           .map<Widget>(
                             (f) => Container(
                               padding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 5,
+                                horizontal: 12,
+                                vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFF1F5F9),
+                                color: AppTheme.cream.withOpacity(0.5),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
                                 f,
-                                style: TextStyle(
+                                style: GoogleFonts.plusJakartaSans(
                                   fontSize: 11,
-                                  color: Colors.grey.shade700,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppTheme.charcoal.withOpacity(0.7),
                                 ),
                               ),
                             ),
@@ -521,19 +713,42 @@ class RoomsView extends GetView<RoomsController> {
 
   Widget _buildImagePlaceholder() {
     return Container(
-      height: 160,
+      height: 180,
       width: double.infinity,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Colors.grey.shade200, Colors.grey.shade100],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.cream.withOpacity(0.5),
+            AppTheme.mediumGrey.withOpacity(0.3),
+          ],
         ),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.image, size: 48, color: Colors.grey.shade400),
-          const SizedBox(height: 8),
-          Text('Tidak ada foto', style: TextStyle(color: Colors.grey.shade500)),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.5),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.image_rounded,
+              size: 40,
+              color: AppTheme.charcoal.withOpacity(0.3),
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Tidak ada foto',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.charcoal.withOpacity(0.4),
+            ),
+          ),
         ],
       ),
     );
@@ -547,44 +762,45 @@ class RoomsView extends GetView<RoomsController> {
 
     switch (status) {
       case 'kosong':
-        bgColor = const Color(0xFFE8F5E9);
-        textColor = const Color(0xFF2E7D32);
-        label = 'Kosong';
-        icon = Icons.check_circle;
+        bgColor = Colors.green.shade50;
+        textColor = Colors.green.shade700;
+        label = 'Tersedia';
+        icon = Icons.check_circle_rounded;
         break;
       case 'terisi':
-        bgColor = const Color(0xFFFCE4EC);
-        textColor = const Color(0xFFC2185B);
+        bgColor = AppTheme.primaryBlue.withOpacity(0.1);
+        textColor = AppTheme.primaryBlue;
         label = 'Terisi';
-        icon = Icons.person;
+        icon = Icons.person_rounded;
         break;
       case 'maintenance':
-        bgColor = const Color(0xFFFFF3E0);
-        textColor = const Color(0xFFE65100);
+        bgColor = Colors.orange.shade50;
+        textColor = Colors.orange.shade700;
         label = 'Perbaikan';
-        icon = Icons.build;
+        icon = Icons.build_rounded;
         break;
       default:
-        bgColor = Colors.grey.shade200;
-        textColor = Colors.grey.shade700;
+        bgColor = AppTheme.mediumGrey;
+        textColor = AppTheme.charcoal;
         label = status;
-        icon = Icons.info;
+        icon = Icons.info_rounded;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: textColor.withOpacity(0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: textColor),
-          const SizedBox(width: 4),
+          const SizedBox(width: 6),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 12,
               fontWeight: FontWeight.w600,
               color: textColor,
@@ -596,14 +812,14 @@ class RoomsView extends GetView<RoomsController> {
   }
 
   Widget _buildActionButton(IconData icon, Color color, VoidCallback onTap) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: color.withOpacity(0.2)),
         ),
         child: Icon(icon, size: 18, color: color),
       ),
@@ -612,36 +828,36 @@ class RoomsView extends GetView<RoomsController> {
 
   Widget _buildLoadingShimmer() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: AppTheme.mediumGrey,
+      highlightColor: Colors.white,
       child: ListView.builder(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
+        padding: const EdgeInsets.fromLTRB(20, 120, 20, 100),
         itemCount: 3,
         itemBuilder: (context, index) => Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
           ),
           child: Column(
             children: [
               Container(
-                height: 160,
+                height: 180,
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(height: 20, width: 120, color: Colors.white),
-                    const SizedBox(height: 8),
+                    Container(height: 22, width: 140, color: Colors.white),
+                    const SizedBox(height: 10),
                     Container(height: 16, width: 100, color: Colors.white),
-                    const SizedBox(height: 12),
-                    Container(height: 24, width: 200, color: Colors.white),
+                    const SizedBox(height: 14),
+                    Container(height: 36, width: 200, color: Colors.white),
                   ],
                 ),
               ),
@@ -660,39 +876,40 @@ class RoomsView extends GetView<RoomsController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    AppTheme.pastelBlue.withOpacity(0.2),
-                    AppTheme.softGreen.withOpacity(0.2),
+                    AppTheme.primaryBlue.withOpacity(0.1),
+                    AppTheme.cream.withOpacity(0.2),
                   ],
                 ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.meeting_room_outlined,
+                Icons.door_front_door_rounded,
                 size: 64,
-                color: AppTheme.pastelBlue,
+                color: AppTheme.primaryBlue,
               ),
             ),
-            const SizedBox(height: 24),
-            const Text(
+            const SizedBox(height: 28),
+            Text(
               'Belum Ada Kamar',
-              style: TextStyle(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
               'Tambahkan kamar pertama Anda\ndengan menekan tombol + di bawah',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 14,
-                color: Colors.grey.shade600,
-                height: 1.5,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoal.withOpacity(0.6),
+                height: 1.6,
               ),
             ),
           ],
@@ -704,25 +921,30 @@ class RoomsView extends GetView<RoomsController> {
   Widget _buildFAB() {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFA9C9FF), Color(0xFFB9F3CC)],
+        gradient: LinearGradient(
+          colors: [AppTheme.primaryBlue, AppTheme.deepBlue],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFA9C9FF).withOpacity(0.4),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: AppTheme.primaryBlue.withOpacity(0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+            spreadRadius: -2,
           ),
         ],
       ),
       child: FloatingActionButton.extended(
-        heroTag: 'rooms_fab', // Unique hero tag to prevent conflict
+        heroTag: 'rooms_fab',
         onPressed: controller.openAddRoom,
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
+        icon: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+        label: Text(
           'Tambah Kamar',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: GoogleFonts.plusJakartaSans(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: 14,
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -734,9 +956,9 @@ class RoomsView extends GetView<RoomsController> {
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -744,25 +966,33 @@ class RoomsView extends GetView<RoomsController> {
           children: [
             Center(
               child: Container(
-                width: 40,
-                height: 4,
+                width: 48,
+                height: 5,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
+                  color: AppTheme.mediumGrey,
+                  borderRadius: BorderRadius.circular(3),
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-            const Text(
+            const SizedBox(height: 24),
+            Text(
               'Urutkan Berdasarkan',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             Obx(
               () => Column(
                 children: [
-                  _buildSortOption('room_number', 'Nomor Kamar', Icons.tag),
-                  _buildSortOption('price', 'Harga', Icons.attach_money),
+                  _buildSortOption(
+                    'room_number',
+                    'Nomor Kamar',
+                    Icons.tag_rounded,
+                  ),
+                  _buildSortOption('price', 'Harga', Icons.payments_rounded),
                 ],
               ),
             ),
@@ -776,38 +1006,72 @@ class RoomsView extends GetView<RoomsController> {
   Widget _buildSortOption(String value, String label, IconData icon) {
     final isSelected = controller.sortBy.value == value;
 
-    return InkWell(
+    return GestureDetector(
       onTap: () {
         controller.setSort(value);
         Get.back();
       },
-      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(18),
+        margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppTheme.pastelBlue.withOpacity(0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [
+                    AppTheme.primaryBlue.withOpacity(0.1),
+                    AppTheme.lightBlue.withOpacity(0.05),
+                  ],
+                )
+              : null,
+          color: isSelected ? null : AppTheme.softGrey,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppTheme.pastelBlue : Colors.grey.shade200,
+            color: isSelected
+                ? AppTheme.primaryBlue.withOpacity(0.3)
+                : Colors.transparent,
           ),
         ),
         child: Row(
           children: [
-            Icon(icon, color: isSelected ? AppTheme.pastelBlue : Colors.grey),
-            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppTheme.primaryBlue.withOpacity(0.15)
+                    : AppTheme.mediumGrey.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: isSelected
+                    ? AppTheme.primaryBlue
+                    : AppTheme.charcoal.withOpacity(0.5),
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 14),
             Text(
               label,
-              style: TextStyle(
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                color: isSelected ? AppTheme.pastelBlue : Colors.black87,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 15,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? AppTheme.primaryBlue : AppTheme.charcoal,
               ),
             ),
             const Spacer(),
             if (isSelected)
-              Icon(Icons.check_circle, color: AppTheme.pastelBlue),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryBlue,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_rounded,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
           ],
         ),
       ),

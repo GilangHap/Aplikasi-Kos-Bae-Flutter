@@ -23,7 +23,7 @@ class _TenantDetailViewState extends State<TenantDetailView> {
   static const Color warmPeach = Color(0xFFFFD6A5);
   static const Color softPink = Color(0xFFF7C4D4);
   static const Color lightLavender = Color(0xFFE2CFEA);
-  static const Color creamWhite = Color(0xFFFFFDF7);
+  static const Color softGrey = Color(0xFFF7F8FC);
   static const Color darkText = Color(0xFF2D3748);
   static const Color grayText = Color(0xFF718096);
 
@@ -88,7 +88,7 @@ class _TenantDetailViewState extends State<TenantDetailView> {
     final t = tenant!;
 
     return Scaffold(
-      backgroundColor: creamWhite,
+      backgroundColor: softGrey,
       body: CustomScrollView(
         slivers: [
           // App Bar with Photo
@@ -137,7 +137,8 @@ class _TenantDetailViewState extends State<TenantDetailView> {
                       future: _fetchContractInfo(t.contractId!),
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          final contract = snapshot.data as Map<String, dynamic>;
+                          final contract =
+                              snapshot.data as Map<String, dynamic>;
                           return _buildContractInfoCard(contract);
                         }
                         return const SizedBox.shrink();
@@ -180,7 +181,10 @@ class _TenantDetailViewState extends State<TenantDetailView> {
                       _buildInfoRow(
                         Icons.timelapse_rounded,
                         'Durasi Tinggal',
-                        _calculateDuration(t.contractStartDate, t.contractEndDate),
+                        _calculateDuration(
+                          t.contractStartDate,
+                          t.contractEndDate,
+                        ),
                       ),
                     ],
                   ),
@@ -415,7 +419,10 @@ class _TenantDetailViewState extends State<TenantDetailView> {
           child: _buildQuickStatItem(
             icon: Icons.timelapse_rounded,
             label: 'Durasi',
-            value: _calculateDuration(tenant.contractStartDate, tenant.contractEndDate),
+            value: _calculateDuration(
+              tenant.contractStartDate,
+              tenant.contractEndDate,
+            ),
             color: warmPeach,
           ),
         ),
@@ -824,7 +831,11 @@ class _TenantDetailViewState extends State<TenantDetailView> {
                         color: pastelBlue,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Icon(Icons.description_rounded, color: darkText, size: 20),
+                      child: Icon(
+                        Icons.description_rounded,
+                        color: darkText,
+                        size: 20,
+                      ),
                     ),
                     const SizedBox(width: 12),
                     const Text(
@@ -838,7 +849,10 @@ class _TenantDetailViewState extends State<TenantDetailView> {
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor,
                     borderRadius: BorderRadius.circular(20),
@@ -881,7 +895,10 @@ class _TenantDetailViewState extends State<TenantDetailView> {
                     // Convert contract Map to Contract model for proper navigation
                     try {
                       final contractModel = Contract.fromJson(contract);
-                      Get.toNamed('/admin/contracts/detail', arguments: contractModel);
+                      Get.toNamed(
+                        '/admin/contracts/detail',
+                        arguments: contractModel,
+                      );
                     } catch (e) {
                       print('Error navigating to contract detail: $e');
                       Get.snackbar(
@@ -902,7 +919,11 @@ class _TenantDetailViewState extends State<TenantDetailView> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.open_in_new_rounded, size: 16, color: pastelBlue),
+                        Icon(
+                          Icons.open_in_new_rounded,
+                          size: 16,
+                          color: pastelBlue,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Lihat Detail Kontrak',

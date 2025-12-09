@@ -82,12 +82,13 @@ class ContractsController extends GetxController {
 
       print('📥 Fetching contracts...');
 
+      // Simplified query to avoid embedding conflicts
       final response = await _supabaseService.client
           .from('contracts')
           .select('''
             *,
-            tenants(id, name, phone, photo_url, rooms(room_number)),
-            rooms(id, room_number, price)
+            tenants:tenant_id(id, name, phone, photo_url),
+            rooms:room_id(id, room_number, price)
           ''')
           .order('created_at', ascending: false);
 
@@ -127,7 +128,10 @@ class ContractsController extends GetxController {
     try {
       await _supabaseService.client
           .from('contracts')
-          .update({'status': status, 'updated_at': DateTime.now().toIso8601String()})
+          .update({
+            'status': status,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
           .eq('id', id);
     } catch (e) {
       print('❌ Error updating contract status: $e');
@@ -255,13 +259,18 @@ class ContractsController extends GetxController {
         throw Exception('Kamar tidak ditemukan');
       }
       if (room.status != 'kosong') {
-        throw Exception('Kamar sudah terisi. Hanya kamar kosong yang bisa dibuat kontrak.');
+        throw Exception(
+          'Kamar sudah terisi. Hanya kamar kosong yang bisa dibuat kontrak.',
+        );
       }
 
       // Upload document if provided
       String? documentUrl;
       if (document != null) {
-        documentUrl = await _supabaseService.uploadFile(document, folder: 'contracts');
+        documentUrl = await _supabaseService.uploadFile(
+          document,
+          folder: 'contracts',
+        );
       }
 
       // Calculate initial status
@@ -272,28 +281,35 @@ class ContractsController extends GetxController {
       }
 
       // Insert contract
-      final contractResponse = await _supabaseService.client.from('contracts').insert({
-        'tenant_id': tenantId,
-        'room_id': roomId,
-        'monthly_rent': monthlyRent,
-        'start_date': startDate.toIso8601String().split('T').first,
-        'end_date': endDate.toIso8601String().split('T').first,
-        'document_url': documentUrl,
-        'status': status,
-        'notes': notes,
-        'created_at': DateTime.now().toIso8601String(),
-        'created_by': _supabaseService.auth.currentUser?.id,
-      }).select().single();
+      final contractResponse = await _supabaseService.client
+          .from('contracts')
+          .insert({
+            'tenant_id': tenantId,
+            'room_id': roomId,
+            'monthly_rent': monthlyRent,
+            'start_date': startDate.toIso8601String().split('T').first,
+            'end_date': endDate.toIso8601String().split('T').first,
+            'document_url': documentUrl,
+            'status': status,
+            'notes': notes,
+            'created_at': DateTime.now().toIso8601String(),
+            'created_by': _supabaseService.auth.currentUser?.id,
+          })
+          .select()
+          .single();
 
       final contractId = contractResponse['id'] as String;
 
       // Update room status to 'terisi'
       final tenant = await _supabaseService.getTenantById(tenantId);
-      await _supabaseService.client.from('rooms').update({
-        'status': 'terisi',
-        'current_tenant_name': tenant?.name,
-        'updated_at': DateTime.now().toIso8601String(),
-      }).eq('id', roomId);
+      await _supabaseService.client
+          .from('rooms')
+          .update({
+            'status': 'terisi',
+            'current_tenant_name': tenant?.name,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', roomId);
 
       // Generate monthly bills
       await _generateMonthlyBills(
@@ -344,13 +360,17 @@ class ContractsController extends GetxController {
       // Calculate number of months
       DateTime current = DateTime(startDate.year, startDate.month, 1);
       final end = DateTime(endDate.year, endDate.month, 1);
-      
+
       List<Map<String, dynamic>> bills = [];
 
       while (current.isBefore(end) || current.isAtSameMomentAs(end)) {
         // Billing period
         final periodStart = DateTime(current.year, current.month, 1);
-        final periodEnd = DateTime(current.year, current.month + 1, 0); // Last day of month
+        final periodEnd = DateTime(
+          current.year,
+          current.month + 1,
+          0,
+        ); // Last day of month
 
         // Due date is the 10th of the month
         final dueDate = DateTime(current.year, current.month, 10);
@@ -363,9 +383,13 @@ class ContractsController extends GetxController {
           'type': 'sewa',
           'status': 'pending',
           'due_date': dueDate.toIso8601String().split('T').first,
-          'billing_period_start': periodStart.toIso8601String().split('T').first,
+          'billing_period_start': periodStart
+              .toIso8601String()
+              .split('T')
+              .first,
           'billing_period_end': periodEnd.toIso8601String().split('T').first,
-          'notes': 'Tagihan sewa bulan ${_getMonthName(current.month)} ${current.year}',
+          'notes':
+              'Tagihan sewa bulan ${_getMonthName(current.month)} ${current.year}',
           'created_at': DateTime.now().toIso8601String(),
           'created_by': _supabaseService.auth.currentUser?.id,
         });
@@ -388,8 +412,18 @@ class ContractsController extends GetxController {
   /// Get month name in Indonesian
   String _getMonthName(int month) {
     const months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
     return months[month - 1];
   }
@@ -407,14 +441,20 @@ class ContractsController extends GetxController {
       // Upload new document if provided
       String? documentUrl = oldContract.documentUrl;
       if (newDocument != null) {
-        documentUrl = await _supabaseService.uploadFile(newDocument, folder: 'contracts');
+        documentUrl = await _supabaseService.uploadFile(
+          newDocument,
+          folder: 'contracts',
+        );
       }
 
       // Mark old contract as ended
-      await _supabaseService.client.from('contracts').update({
-        'status': 'berakhir',
-        'updated_at': DateTime.now().toIso8601String(),
-      }).eq('id', oldContract.id);
+      await _supabaseService.client
+          .from('contracts')
+          .update({
+            'status': 'berakhir',
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', oldContract.id);
 
       // New start date is the day after old end date
       final newStartDate = oldContract.endDate.add(const Duration(days: 1));
@@ -427,19 +467,25 @@ class ContractsController extends GetxController {
       }
 
       // Insert new contract
-      final contractResponse = await _supabaseService.client.from('contracts').insert({
-        'tenant_id': oldContract.tenantId,
-        'room_id': oldContract.roomId,
-        'monthly_rent': oldContract.monthlyRent,
-        'start_date': newStartDate.toIso8601String().split('T').first,
-        'end_date': newEndDate.toIso8601String().split('T').first,
-        'document_url': documentUrl,
-        'status': status,
-        'notes': notes ?? 'Perpanjangan kontrak dari ${oldContract.formattedStartDate}',
-        'parent_contract_id': oldContract.id,
-        'created_at': DateTime.now().toIso8601String(),
-        'created_by': _supabaseService.auth.currentUser?.id,
-      }).select().single();
+      final contractResponse = await _supabaseService.client
+          .from('contracts')
+          .insert({
+            'tenant_id': oldContract.tenantId,
+            'room_id': oldContract.roomId,
+            'monthly_rent': oldContract.monthlyRent,
+            'start_date': newStartDate.toIso8601String().split('T').first,
+            'end_date': newEndDate.toIso8601String().split('T').first,
+            'document_url': documentUrl,
+            'status': status,
+            'notes':
+                notes ??
+                'Perpanjangan kontrak dari ${oldContract.formattedStartDate}',
+            'parent_contract_id': oldContract.id,
+            'created_at': DateTime.now().toIso8601String(),
+            'created_by': _supabaseService.auth.currentUser?.id,
+          })
+          .select()
+          .single();
 
       final contractId = contractResponse['id'] as String;
 
@@ -487,13 +533,19 @@ class ContractsController extends GetxController {
       isSaving.value = true;
 
       // Upload new document
-      final documentUrl = await _supabaseService.uploadFile(newDocument, folder: 'contracts');
+      final documentUrl = await _supabaseService.uploadFile(
+        newDocument,
+        folder: 'contracts',
+      );
 
       // Update contract
-      await _supabaseService.client.from('contracts').update({
-        'document_url': documentUrl,
-        'updated_at': DateTime.now().toIso8601String(),
-      }).eq('id', contractId);
+      await _supabaseService.client
+          .from('contracts')
+          .update({
+            'document_url': documentUrl,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', contractId);
 
       await fetchContracts();
 
@@ -529,11 +581,14 @@ class ContractsController extends GetxController {
 
       // Update room status back to 'kosong' if room exists
       if (contract.roomId != null) {
-        await _supabaseService.client.from('rooms').update({
-          'status': 'kosong',
-          'current_tenant_name': null,
-          'updated_at': DateTime.now().toIso8601String(),
-        }).eq('id', contract.roomId!);
+        await _supabaseService.client
+            .from('rooms')
+            .update({
+              'status': 'kosong',
+              'current_tenant_name': null,
+              'updated_at': DateTime.now().toIso8601String(),
+            })
+            .eq('id', contract.roomId!);
       }
 
       // Delete contract (bills with contract_id will be cascade deleted or kept based on FK)
@@ -577,7 +632,9 @@ class ContractsController extends GetxController {
   Contract? getActiveContractForTenant(String tenantId) {
     try {
       return contracts.firstWhere(
-        (c) => c.tenantId == tenantId && (c.status == 'aktif' || c.status == 'akan_habis'),
+        (c) =>
+            c.tenantId == tenantId &&
+            (c.status == 'aktif' || c.status == 'akan_habis'),
       );
     } catch (e) {
       return null;
@@ -586,9 +643,9 @@ class ContractsController extends GetxController {
 
   /// Filter options
   List<Map<String, String>> get filterOptions => [
-        {'value': 'all', 'label': 'Semua'},
-        {'value': 'aktif', 'label': 'Aktif'},
-        {'value': 'akan_habis', 'label': 'Akan Habis'},
-        {'value': 'berakhir', 'label': 'Berakhir'},
-      ];
+    {'value': 'all', 'label': 'Semua'},
+    {'value': 'aktif', 'label': 'Aktif'},
+    {'value': 'akan_habis', 'label': 'Akan Habis'},
+    {'value': 'berakhir', 'label': 'Berakhir'},
+  ];
 }

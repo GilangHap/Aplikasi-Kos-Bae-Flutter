@@ -1,6 +1,7 @@
 // FILE: lib/app/modules/admin/admin_layout/admin_layout_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../admin_drawer/admin_drawer_controller.dart';
 import '../admin_drawer/admin_drawer_view.dart';
 import '../dashboard/dashboard_view.dart';
@@ -74,7 +75,7 @@ class AdminLayoutView extends GetView<AdminLayoutController> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.softGrey,
       appBar: _buildAppBar(drawerController),
       drawer: const AdminDrawerView(),
       body: Obx(() {
@@ -100,86 +101,159 @@ class AdminLayoutView extends GetView<AdminLayoutController> {
     );
   }
 
-  /// Build custom AppBar with logo and title
+  /// Build premium AppBar with logo and title
   PreferredSizeWidget _buildAppBar(AdminDrawerController drawerController) {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0,
-      shadowColor: Colors.black.withOpacity(0.1),
+      shadowColor: Colors.black.withOpacity(0.05),
       surfaceTintColor: Colors.transparent,
+      toolbarHeight: 70,
       leading: Builder(
         builder: (context) => IconButton(
           icon: Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(10),
+              color: AppTheme.softGrey,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppTheme.mediumGrey.withOpacity(0.5),
+                width: 1,
+              ),
             ),
-            child: const Icon(Icons.menu, size: 20, color: Colors.black87),
+            child: const Icon(
+              Icons.menu_rounded,
+              size: 22,
+              color: AppTheme.charcoal,
+            ),
           ),
           onPressed: () => Scaffold.of(context).openDrawer(),
         ),
       ),
       title: Row(
         children: [
-          // Brand Logo
+          // Premium Brand Logo with subtle shadow
           Container(
-            width: 36,
-            height: 36,
+            width: 42,
+            height: 42,
             decoration: BoxDecoration(
-              gradient: AppTheme.primaryGradient,
-              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(13),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryBlue.withOpacity(0.12),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+              border: Border.all(
+                color: AppTheme.primaryBlue.withOpacity(0.15),
+                width: 1.5,
+              ),
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
               child: Image.asset(
-                'assets/image/logo_kos_bae.png',
+                'assets/image/logo_new.png',
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => const Icon(
-                  Icons.home_rounded,
-                  color: Colors.white,
-                  size: 20,
+                errorBuilder: (context, error, stackTrace) => Container(
+                  decoration: BoxDecoration(gradient: AppTheme.primaryGradient),
+                  child: const Icon(
+                    Icons.home_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
                 ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
-          // Title
+          const SizedBox(width: 14),
+          // Premium Title with accent
           Obx(() {
             final index = drawerController.selectedIndex.value;
             final title = index < drawerController.menuItems.length
                 ? drawerController.menuItems[index].label
                 : 'Admin';
-            return Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 19,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.charcoal,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primaryBlue.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'Premium Panel',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.primaryBlue,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ],
             );
           }),
         ],
       ),
       actions: [
+        // Premium notification button
         IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F5F9),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(
-              Icons.notifications_outlined,
-              size: 20,
-              color: Colors.black87,
-            ),
+          icon: Stack(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.softGrey,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppTheme.mediumGrey.withOpacity(0.5),
+                    width: 1,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.notifications_outlined,
+                  size: 22,
+                  color: AppTheme.charcoal,
+                ),
+              ),
+              // Badge indicator
+              Positioned(
+                right: 8,
+                top: 8,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: BoxDecoration(
+                    color: AppTheme.gold,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 1.5),
+                  ),
+                ),
+              ),
+            ],
           ),
           onPressed: () {
             // TODO: Show notifications
           },
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 12),
       ],
     );
   }

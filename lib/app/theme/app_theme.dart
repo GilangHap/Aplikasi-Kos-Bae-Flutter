@@ -1,111 +1,120 @@
 // FILE: lib/app/theme/app_theme.dart
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// Kos Bae App Theme
-/// Pastel gradient colors inspired by logo
+/// Premium Blue & Cream color palette inspired by logo
 class AppTheme {
   AppTheme._();
-  
-  // Kos Bae pastel color palette
-  static const Color pastelBlue = Color(0xFFADD8E6);
+
+  // Premium Blue & Cream color palette - Inspired by logo
+  static const Color primaryBlue = Color(0xFF5B8DB8); // Main blue from logo
+  static const Color deepBlue = Color(0xFF2C3E50); // Dark blue for contrast
+  static const Color lightBlue = Color(0xFF7BA9CC); // Light blue accent
+  static const Color skyBlue = Color(0xFFADD8E6); // Soft sky blue
+  static const Color cream = Color(0xFFF5E6D3); // Warm cream from logo
+  static const Color darkCream = Color(0xFFE8D4BA); // Darker cream shade
+  static const Color gold = Color(0xFFD4AF37); // Premium gold accent
+  static const Color charcoal = Color(0xFF2D3436); // Premium dark gray
+  static const Color softGrey = Color(0xFFF8F9FA); // Background gray
+  static const Color mediumGrey = Color(0xFFDFE6E9); // Border gray
+
+  // Legacy colors for backward compatibility (will be phased out)
+  static const Color pastelBlue = primaryBlue;
   static const Color softGreen = Color(0xFFB8E6B8);
-  static const Color warmPeach = Color(0xFFFFCBA4);
+  static const Color warmPeach = cream;
   static const Color lightYellow = Color(0xFFFFF4B8);
   static const Color softPink = Color(0xFFFFB8D1);
-  static const Color softGrey = Color(0xFFB0BEC5);
-  
-  // Gradient definitions
+
+  // Premium Gradient definitions
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [pastelBlue, softGreen, warmPeach, softPink],
+    colors: [primaryBlue, deepBlue],
   );
-  
+
   static const LinearGradient selectedGradient = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
-    colors: [pastelBlue, softGreen],
+    colors: [primaryBlue, lightBlue],
   );
-  
+
+  static const LinearGradient creamGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [cream, darkCream],
+  );
+
+  static const LinearGradient premiumGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [primaryBlue, deepBlue, gold],
+  );
+
   static const LinearGradient bottomNavGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [
-      Color(0xFFFAFAFA),
-      Color(0xFFFFFFFF),
-    ],
+    colors: [softGrey, Colors.white],
   );
-  
-  /// Get MaterialApp theme
+
+  /// Get MaterialApp theme with premium fonts
   static ThemeData getTheme() {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: pastelBlue,
+        seedColor: primaryBlue,
         brightness: Brightness.light,
+        primary: primaryBlue,
+        secondary: cream,
       ),
-      scaffoldBackgroundColor: Colors.white,
-      fontFamily: 'Poppins', // TODO: Add to pubspec.yaml
-      
-      // AppBar theme
-      appBarTheme: const AppBarTheme(
+      scaffoldBackgroundColor: softGrey,
+      textTheme: GoogleFonts.interTextTheme(),
+
+      // AppBar theme - Premium style
+      appBarTheme: AppBarTheme(
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black87),
-        titleTextStyle: TextStyle(
-          color: Colors.black87,
+        shadowColor: Colors.black.withOpacity(0.1),
+        iconTheme: const IconThemeData(color: charcoal),
+        titleTextStyle: GoogleFonts.inter(
+          color: charcoal,
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          fontFamily: 'Poppins',
+          letterSpacing: -0.5,
         ),
       ),
-      
-      // Card theme
+
+      // Card theme - Premium elevated cards
       cardTheme: CardThemeData(
-        elevation: 2,
+        elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: mediumGrey.withOpacity(0.3), width: 1),
         ),
-        shadowColor: Colors.black12,
+        shadowColor: Colors.black.withOpacity(0.08),
+        color: Colors.white,
       ),
-      
-      // Button theme
+
+      // Button theme - Premium style
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          backgroundColor: primaryBlue,
+          foregroundColor: Colors.white,
+          textStyle: GoogleFonts.inter(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
           ),
         ),
       ),
-      
-      // Text theme
-      textTheme: const TextTheme(
-        headlineLarge: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: Colors.black87,
-        ),
-        headlineMedium: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.w600,
-          color: Colors.black87,
-        ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          color: Colors.black87,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: Colors.black54,
-        ),
-      ),
-      
+
       // Icon theme
-      iconTheme: const IconThemeData(
-        color: Colors.black54,
-      ),
+      iconTheme: const IconThemeData(color: Colors.black54),
     );
   }
 }

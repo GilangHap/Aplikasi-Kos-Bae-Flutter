@@ -17,7 +17,7 @@ class RoomFormView extends GetView<RoomFormController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.softGrey,
       appBar: _buildAppBar(),
       body: Form(
         key: controller.formKey,

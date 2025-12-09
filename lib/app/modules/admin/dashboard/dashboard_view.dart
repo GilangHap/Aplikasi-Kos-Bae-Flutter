@@ -2,12 +2,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'dart:math' as math;
 import '../../../theme/app_theme.dart';
-import '../../../routes/app_pages.dart';
 import '../../../routes/app_routes.dart';
 import 'dashboard_controller.dart';
 
-/// Modern Admin Dashboard View for Kosan Management
+/// Premium Admin Dashboard View - Luxury Kos Management
+/// Unique, modern, and sophisticated design
 class AdminDashboardView extends GetView<DashboardController> {
   const AdminDashboardView({Key? key}) : super(key: key);
 
@@ -15,48 +17,81 @@ class AdminDashboardView extends GetView<DashboardController> {
   Widget build(BuildContext context) {
     return Obx(() {
       if (controller.isLoading.value) {
-        return const Center(
-          child: CircularProgressIndicator(color: AppTheme.pastelBlue),
-        );
-      }
-
-      if (controller.errorMessage.value.isNotEmpty) {
         return Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline, size: 64, color: Colors.red),
-              const SizedBox(height: 16),
-              Text(controller.errorMessage.value),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: controller.refreshData,
-                child: const Text('Retry'),
+              _buildPremiumLoader(),
+              const SizedBox(height: 24),
+              Text(
+                'Loading Dashboard...',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.charcoal.withOpacity(0.6),
+                  letterSpacing: 1,
+                ),
               ),
             ],
           ),
         );
       }
 
+      if (controller.errorMessage.value.isNotEmpty) {
+        return _buildErrorState();
+      }
+
       return RefreshIndicator(
         onRefresh: controller.refreshData,
-        color: AppTheme.pastelBlue,
+        color: AppTheme.primaryBlue,
+        backgroundColor: Colors.white,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(),
-              const SizedBox(height: 24),
-              _buildKeyMetricsGrid(),
-              const SizedBox(height: 24),
-              _buildOccupancyAndRevenue(),
-              const SizedBox(height: 24),
-              _buildQuickActions(),
-              const SizedBox(height: 24),
-              _buildBillsOverview(),
-              const SizedBox(height: 32),
+              // Premium Header with glassmorphism effect
+              _buildPremiumHeader(),
+
+              // Main content with proper spacing
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 24),
+
+                    // Stats Overview - Horizontal scrollable cards
+                    _buildStatsOverview(),
+
+                    const SizedBox(height: 28),
+
+                    // Analytics Section
+                    _buildSectionTitle('Analytics', Icons.analytics_rounded),
+                    const SizedBox(height: 16),
+                    _buildAnalyticsCards(),
+
+                    const SizedBox(height: 28),
+
+                    // Quick Actions - Modern grid
+                    _buildSectionTitle('Quick Actions', Icons.flash_on_rounded),
+                    const SizedBox(height: 16),
+                    _buildQuickActionsGrid(),
+
+                    const SizedBox(height: 28),
+
+                    // Billing Overview with animated progress
+                    _buildSectionTitle(
+                      'Billing Overview',
+                      Icons.account_balance_wallet_rounded,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildBillingCard(),
+
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -64,64 +99,326 @@ class AdminDashboardView extends GetView<DashboardController> {
     });
   }
 
-  /// Header with welcome message and date
-  Widget _buildHeader() {
-    final now = DateTime.now();
-    final dateFormat = DateFormat('EEEE, dd MMMM yyyy', 'id_ID');
-    final timeFormat = DateFormat('HH:mm');
-
+  /// Premium animated loader
+  Widget _buildPremiumLoader() {
     return Container(
-      padding: const EdgeInsets.all(20),
+      width: 80,
+      height: 80,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppTheme.pastelBlue, AppTheme.softGreen],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.pastelBlue.withOpacity(0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+            color: AppTheme.primaryBlue.withOpacity(0.15),
+            blurRadius: 30,
+            spreadRadius: 5,
           ),
         ],
       ),
-      child: Row(
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  '👋 Selamat Datang, Admin!',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '📅 ${dateFormat.format(now)} • ${timeFormat.format(now)}',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white.withOpacity(0.9),
-                  ),
-                ),
-              ],
+          SizedBox(
+            width: 50,
+            height: 50,
+            child: CircularProgressIndicator(
+              strokeWidth: 3,
+              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryBlue),
             ),
           ),
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(12),
+          Image.asset(
+            'assets/image/logo_new.png',
+            width: 30,
+            height: 30,
+            errorBuilder: (_, __, ___) =>
+                Icon(Icons.home_rounded, color: AppTheme.primaryBlue, size: 24),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Error state with retry
+  Widget _buildErrorState() {
+    return Center(
+      child: Container(
+        margin: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.red.withOpacity(0.1),
+              blurRadius: 20,
+              spreadRadius: 5,
             ),
-            child: const Icon(
-              Icons.dashboard,
-              size: 32,
-              color: Colors.white,
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.error_outline_rounded,
+                size: 48,
+                color: Colors.red.shade400,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Oops! Something went wrong',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              controller.errorMessage.value,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                color: AppTheme.charcoal.withOpacity(0.6),
+              ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: controller.refreshData,
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Try Again'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryBlue,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 16,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Premium header with glassmorphism
+  Widget _buildPremiumHeader() {
+    final now = DateTime.now();
+    final greeting = _getGreeting(now.hour);
+    final dateFormat = DateFormat('EEEE, dd MMM', 'id_ID');
+
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.deepBlue,
+            AppTheme.primaryBlue,
+            AppTheme.lightBlue.withOpacity(0.8),
+          ],
+          stops: const [0.0, 0.5, 1.0],
+        ),
+      ),
+      child: Stack(
+        children: [
+          // Decorative circles
+          Positioned(
+            top: -50,
+            right: -50,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.05),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -30,
+            left: -30,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppTheme.gold.withOpacity(0.1),
+              ),
+            ),
+          ),
+
+          // Main content
+          SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Top row with logo and notification
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Logo with glow effect
+                      Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.white.withOpacity(0.8),
+                              AppTheme.cream.withOpacity(0.6),
+                            ],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppTheme.gold.withOpacity(0.3),
+                              blurRadius: 20,
+                              spreadRadius: 2,
+                            ),
+                          ],
+                        ),
+                        child: Container(
+                          width: 52,
+                          height: 52,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(15),
+                            child: Image.asset(
+                              'assets/image/logo_new.png',
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => Container(
+                                decoration: BoxDecoration(
+                                  gradient: AppTheme.creamGradient,
+                                ),
+                                child: Icon(
+                                  Icons.home_rounded,
+                                  color: AppTheme.primaryBlue,
+                                  size: 28,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Date badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.15),
+                          borderRadius: BorderRadius.circular(30),
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.calendar_today_rounded,
+                              size: 14,
+                              color: AppTheme.cream,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              dateFormat.format(now),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 28),
+
+                  // Greeting section
+                  Text(
+                    greeting,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.cream,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        'Admin',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text('👋', style: TextStyle(fontSize: 26)),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Property summary mini card
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.15),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        _buildMiniStat(
+                          '${controller.occupiedRooms.value}',
+                          'Terisi',
+                          Icons.check_circle_rounded,
+                        ),
+                        _buildVerticalDivider(),
+                        _buildMiniStat(
+                          '${controller.availableRooms.value}',
+                          'Tersedia',
+                          Icons.door_front_door_rounded,
+                        ),
+                        _buildVerticalDivider(),
+                        _buildMiniStat(
+                          '${controller.activeTenants.value}',
+                          'Penghuni',
+                          Icons.people_rounded,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
@@ -129,75 +426,162 @@ class AdminDashboardView extends GetView<DashboardController> {
     );
   }
 
-  /// Key metrics in grid layout
-  Widget _buildKeyMetricsGrid() {
-    return GridView.count(
-      crossAxisCount: 2,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 1.0,
+  Widget _buildMiniStat(String value, String label, IconData icon) {
+    return Expanded(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: AppTheme.cream, size: 18),
+          ),
+          const SizedBox(width: 10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                label,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.7),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerticalDivider() {
+    return Container(
+      width: 1,
+      height: 40,
+      color: Colors.white.withOpacity(0.2),
+    );
+  }
+
+  String _getGreeting(int hour) {
+    if (hour < 12) return '☀️ Selamat Pagi';
+    if (hour < 15) return '🌤️ Selamat Siang';
+    if (hour < 18) return '🌅 Selamat Sore';
+    return '🌙 Selamat Malam';
+  }
+
+  /// Section title with icon
+  Widget _buildSectionTitle(String title, IconData icon) {
+    return Row(
       children: [
-        _buildMetricCard(
-          title: 'Total Kamar',
-          value: '${controller.occupiedRooms.value}/${controller.totalRooms.value}',
-          subtitle: 'terisi',
-          icon: Icons.meeting_room,
-          color: AppTheme.pastelBlue,
-          percentage: controller.occupancyRate,
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppTheme.primaryBlue.withOpacity(0.1),
+                AppTheme.lightBlue.withOpacity(0.05),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: AppTheme.primaryBlue, size: 20),
         ),
-        _buildMetricCard(
-          title: 'Penghuni Aktif',
-          value: '${controller.activeTenants.value}',
-          subtitle: 'dari ${controller.totalTenants.value} total',
-          icon: Icons.people,
-          color: AppTheme.softGreen,
-        ),
-        _buildMetricCard(
-          title: 'Pendapatan Bulan Ini',
-          value: _formatCurrency(controller.monthlyRevenue.value),
-          subtitle: 'sudah terbayar',
-          icon: Icons.payments,
-          color: AppTheme.warmPeach,
-          isRevenue: true,
-        ),
-        _buildMetricCard(
-          title: 'Tagihan Pending',
-          value: '${controller.pendingBills.value}',
-          subtitle: '${controller.overdueBills.value} terlambat',
-          icon: Icons.receipt_long,
-          color: controller.overdueBills.value > 0 
-              ? AppTheme.softPink 
-              : AppTheme.lightYellow,
-          hasAlert: controller.overdueBills.value > 0,
+        const SizedBox(width: 12),
+        Text(
+          title,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.charcoal,
+            letterSpacing: -0.3,
+          ),
         ),
       ],
     );
   }
 
-  /// Metric card widget
-  Widget _buildMetricCard({
+  /// Horizontal scrollable stats overview
+  Widget _buildStatsOverview() {
+    return SizedBox(
+      height: 140,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        children: [
+          _buildStatCard(
+            title: 'Occupancy Rate',
+            value: '${controller.occupancyRate.toStringAsFixed(0)}%',
+            subtitle:
+                '${controller.occupiedRooms.value} of ${controller.totalRooms.value} rooms',
+            gradient: [AppTheme.primaryBlue, AppTheme.deepBlue],
+            icon: Icons.trending_up_rounded,
+          ),
+          const SizedBox(width: 16),
+          _buildStatCard(
+            title: 'Monthly Revenue',
+            value: _formatCompactCurrency(controller.monthlyRevenue.value),
+            subtitle: 'This month earnings',
+            gradient: [AppTheme.gold, Color(0xFFB8860B)],
+            icon: Icons.account_balance_wallet_rounded,
+          ),
+          const SizedBox(width: 16),
+          _buildStatCard(
+            title: 'Pending Bills',
+            value: '${controller.pendingBills.value}',
+            subtitle: '${controller.overdueBills.value} overdue',
+            gradient: controller.overdueBills.value > 0
+                ? [Colors.red.shade400, Colors.red.shade700]
+                : [Colors.orange.shade400, Colors.orange.shade700],
+            icon: Icons.receipt_long_rounded,
+          ),
+          const SizedBox(width: 16),
+          _buildStatCard(
+            title: 'Active Complaints',
+            value: '${controller.activeComplaints.value}',
+            subtitle: 'Need attention',
+            gradient: [AppTheme.lightBlue, AppTheme.primaryBlue],
+            icon: Icons.support_agent_rounded,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatCard({
     required String title,
     required String value,
     required String subtitle,
+    required List<Color> gradient,
     required IconData icon,
-    required Color color,
-    double? percentage,
-    bool isRevenue = false,
-    bool hasAlert = false,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: 180,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3), width: 2),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradient,
+        ),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: color.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: gradient[0].withOpacity(0.4),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+            spreadRadius: -5,
           ),
         ],
       ),
@@ -208,61 +592,47 @@ class AdminDashboardView extends GetView<DashboardController> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+              Flexible(
+                child: Text(
+                  title,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white.withOpacity(0.85),
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                child: Icon(icon, color: color, size: 24),
               ),
-              if (hasAlert)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.red.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    '⚠️',
-                    style: TextStyle(fontSize: 12),
-                  ),
-                ),
+              const SizedBox(width: 6),
+              Icon(icon, color: Colors.white.withOpacity(0.6), size: 20),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: isRevenue ? 16 : 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 4),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black54,
-                ),
-              ),
-              if (subtitle.isNotEmpty)
-                Text(
-                  subtitle,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: hasAlert ? Colors.red : Colors.black45,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  value,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                    letterSpacing: -1,
                   ),
                 ),
-              if (percentage != null) ...[
-                const SizedBox(height: 6),
-                _buildProgressBar(percentage, color),
-              ],
+              ),
+              const SizedBox(height: 2),
+              Text(
+                subtitle,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.7),
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
             ],
           ),
         ],
@@ -270,135 +640,143 @@ class AdminDashboardView extends GetView<DashboardController> {
     );
   }
 
-  /// Progress bar widget
-  Widget _buildProgressBar(double percentage, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '${percentage.toStringAsFixed(0)}%',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        const SizedBox(height: 4),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: LinearProgressIndicator(
-            value: percentage / 100,
-            backgroundColor: color.withOpacity(0.2),
-            valueColor: AlwaysStoppedAnimation<Color>(color),
-            minHeight: 6,
-          ),
-        ),
-      ],
-    );
-  }
-
-  /// Occupancy and Revenue visualizations
-  Widget _buildOccupancyAndRevenue() {
+  /// Analytics cards - Occupancy & Revenue
+  Widget _buildAnalyticsCards() {
     return Row(
       children: [
-        Expanded(
-          child: _buildOccupancyCard(),
-        ),
+        Expanded(child: _buildOccupancyAnalytics()),
         const SizedBox(width: 16),
-        Expanded(
-          child: _buildRevenueCard(),
-        ),
+        Expanded(child: _buildRevenueAnalytics()),
       ],
     );
   }
 
-  /// Occupancy visualization card
-  Widget _buildOccupancyCard() {
+  Widget _buildOccupancyAnalytics() {
     final occupied = controller.occupiedRooms.value;
-    final available = controller.availableRooms.value;
     final total = controller.totalRooms.value;
+    final percentage = total > 0 ? (occupied / total) : 0.0;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.pastelBlue.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppTheme.primaryBlue.withOpacity(0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Icons.pie_chart, color: AppTheme.pastelBlue, size: 20),
+              Flexible(
+                child: Text(
+                  'Occupancy',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.charcoal,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               const SizedBox(width: 8),
-              const Text(
-                'Status Kamar',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: percentage > 0.8
+                      ? Colors.green.shade50
+                      : percentage > 0.5
+                      ? Colors.orange.shade50
+                      : Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(
+                  percentage > 0.8
+                      ? 'Excellent'
+                      : percentage > 0.5
+                      ? 'Good'
+                      : 'Low',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 9,
+                    fontWeight: FontWeight.w700,
+                    color: percentage > 0.8
+                        ? Colors.green.shade700
+                        : percentage > 0.5
+                        ? Colors.orange.shade700
+                        : Colors.red.shade700,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          if (total > 0)
-            Center(
-              child: SizedBox(
-                width: 120,
-                height: 120,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    SizedBox(
-                      width: 120,
-                      height: 120,
-                      child: CircularProgressIndicator(
-                        value: occupied / total,
-                        strokeWidth: 12,
-                        backgroundColor: AppTheme.softGrey.withOpacity(0.2),
-                        valueColor: const AlwaysStoppedAnimation<Color>(
-                          AppTheme.pastelBlue,
-                        ),
-                      ),
+          SizedBox(
+            width: 100,
+            height: 100,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                // Background circle
+                SizedBox(
+                  width: 100,
+                  height: 100,
+                  child: CustomPaint(
+                    painter: _CircularProgressPainter(
+                      progress: percentage,
+                      backgroundColor: AppTheme.cream.withOpacity(0.5),
+                      progressColor: AppTheme.primaryBlue,
+                      strokeWidth: 10,
                     ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          '${controller.occupancyRate.toStringAsFixed(0)}%',
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: AppTheme.pastelBlue,
-                          ),
-                        ),
-                        const Text(
-                          'Terisi',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.black54,
-                          ),
-                        ),
-                      ],
+                  ),
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '${(percentage * 100).toStringAsFixed(0)}%',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: AppTheme.primaryBlue,
+                      ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
-          const SizedBox(height: 20),
+          ),
+          const SizedBox(height: 16),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildLegendItem('Terisi', occupied, AppTheme.pastelBlue),
-              _buildLegendItem('Kosong', available, AppTheme.softGrey),
+              _buildDot(AppTheme.primaryBlue),
+              const SizedBox(width: 6),
+              Text(
+                '$occupied Terisi',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoal.withOpacity(0.7),
+                ),
+              ),
+              const SizedBox(width: 16),
+              _buildDot(AppTheme.cream),
+              const SizedBox(width: 6),
+              Text(
+                '${total - occupied} Kosong',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoal.withOpacity(0.7),
+                ),
+              ),
             ],
           ),
         ],
@@ -406,21 +784,42 @@ class AdminDashboardView extends GetView<DashboardController> {
     );
   }
 
-  /// Revenue card
-  Widget _buildRevenueCard() {
+  Widget _buildDot(Color color) {
+    return Container(
+      width: 8,
+      height: 8,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.5),
+            blurRadius: 4,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRevenueAnalytics() {
     final collectionRate = controller.collectionRate;
 
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppTheme.warmPeach.withOpacity(0.3)),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppTheme.cream.withOpacity(0.4), Colors.white],
+        ),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppTheme.gold.withOpacity(0.1),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+            spreadRadius: 0,
           ),
         ],
       ),
@@ -428,71 +827,109 @@ class AdminDashboardView extends GetView<DashboardController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Icons.trending_up, color: AppTheme.warmPeach, size: 20),
-              const SizedBox(width: 8),
-              const Text(
-                'Pendapatan',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+              Text(
+                'Revenue',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.charcoal,
+                ),
+              ),
+              Icon(Icons.trending_up_rounded, color: AppTheme.gold, size: 20),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            _formatCurrency(controller.monthlyRevenue.value),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: AppTheme.gold,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Bulan ini',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.charcoal.withOpacity(0.5),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Collection rate bar
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Collection Rate',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.charcoal.withOpacity(0.6),
+                    ),
+                  ),
+                  Text(
+                    '${collectionRate.toStringAsFixed(0)}%',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: collectionRate > 80 ? Colors.green : Colors.orange,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Container(
+                height: 8,
+                decoration: BoxDecoration(
+                  color: AppTheme.mediumGrey.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: collectionRate / 100,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: collectionRate > 80
+                            ? [Colors.green.shade400, Colors.green.shade600]
+                            : [Colors.orange.shade400, Colors.orange.shade600],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          Center(
-            child: Column(
-              children: [
-                const Text(
-                  'Bulan Ini',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _formatCurrency(controller.monthlyRevenue.value),
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.warmPeach,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Total: ${_formatCurrency(controller.totalRevenue.value)}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.black54,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          const SizedBox(height: 12),
+          Divider(color: AppTheme.mediumGrey.withOpacity(0.5)),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Tingkat Penagihan: ${collectionRate.toStringAsFixed(0)}%',
-                style: const TextStyle(
-                  fontSize: 12,
+                'Total Semua',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
                   fontWeight: FontWeight.w500,
+                  color: AppTheme.charcoal.withOpacity(0.5),
                 ),
               ),
-              const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(10),
-                child: LinearProgressIndicator(
-                  value: collectionRate / 100,
-                  backgroundColor: Colors.grey.shade200,
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    collectionRate > 80 ? Colors.green : Colors.orange,
-                  ),
-                  minHeight: 8,
+              Text(
+                _formatCompactCurrency(controller.totalRevenue.value),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.charcoal,
                 ),
               ),
             ],
@@ -502,161 +939,131 @@ class AdminDashboardView extends GetView<DashboardController> {
     );
   }
 
-  /// Legend item for chart
-  Widget _buildLegendItem(String label, int count, Color color) {
-    return Row(
+  /// Quick actions grid - Modern design
+  Widget _buildQuickActionsGrid() {
+    return GridView.count(
+      crossAxisCount: 4,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      mainAxisSpacing: 12,
+      crossAxisSpacing: 12,
+      childAspectRatio: 0.9,
       children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(
-            color: color,
-            shape: BoxShape.circle,
-          ),
+        _buildActionItem(
+          icon: Icons.person_add_rounded,
+          label: 'Penghuni',
+          color: AppTheme.primaryBlue,
+          onTap: () => Get.toNamed(AppRoutes.ADMIN_TENANT_FORM),
         ),
-        const SizedBox(width: 6),
-        Text(
-          '$label ($count)',
-          style: const TextStyle(fontSize: 12, color: Colors.black54),
+        _buildActionItem(
+          icon: Icons.receipt_long_rounded,
+          label: 'Tagihan',
+          color: AppTheme.gold,
+          onTap: () => Get.toNamed(AppRoutes.ADMIN_BILL_FORM),
+        ),
+        _buildActionItem(
+          icon: Icons.door_front_door_rounded,
+          label: 'Kamar',
+          color: AppTheme.lightBlue,
+          onTap: () => Get.toNamed(AppRoutes.ADMIN_ROOMS),
+        ),
+        _buildActionItem(
+          icon: Icons.feedback_rounded,
+          label: 'Keluhan',
+          color: controller.activeComplaints.value > 0
+              ? Colors.red.shade400
+              : AppTheme.mediumGrey,
+          badge: controller.activeComplaints.value > 0
+              ? controller.activeComplaints.value.toString()
+              : null,
+          onTap: () => Get.toNamed(AppRoutes.ADMIN_COMPLAINTS),
         ),
       ],
     );
   }
 
-  /// Quick actions panel
-  Widget _buildQuickActions() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.flash_on, color: AppTheme.lightYellow, size: 20),
-              const SizedBox(width: 8),
-              const Text(
-                'Aksi Cepat',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              _buildQuickActionButton(
-                label: 'Tambah Penghuni',
-                icon: Icons.person_add,
-                color: AppTheme.softGreen,
-                onTap: () => Get.toNamed(AppRoutes.ADMIN_TENANT_FORM),
-              ),
-              _buildQuickActionButton(
-                label: 'Buat Tagihan',
-                icon: Icons.receipt_long_rounded,
-                color: AppTheme.warmPeach,
-                onTap: () => Get.toNamed(AppRoutes.ADMIN_BILL_FORM),
-              ),
-              _buildQuickActionButton(
-                label: 'Kelola Kamar',
-                icon: Icons.meeting_room_rounded,
-                color: AppTheme.pastelBlue,
-                onTap: () => Get.toNamed(AppRoutes.ADMIN_ROOMS),
-              ),
-              _buildQuickActionButton(
-                label: 'Lihat Keluhan',
-                icon: Icons.report_problem_rounded,
-                color: controller.activeComplaints.value > 0 
-                    ? AppTheme.softPink 
-                    : AppTheme.softGrey,
-                onTap: () => Get.toNamed(AppRoutes.ADMIN_COMPLAINTS),
-                badge: controller.activeComplaints.value > 0 
-                    ? controller.activeComplaints.value.toString() 
-                    : null,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// Quick action button
-  Widget _buildQuickActionButton({
-    required String label,
+  Widget _buildActionItem({
     required IconData icon,
+    required String label,
     required Color color,
     required VoidCallback onTap,
     String? badge,
   }) {
-    return InkWell(
+    return GestureDetector(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.3)),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: color.withOpacity(0.15),
+              blurRadius: 15,
+              offset: const Offset(0, 5),
+              spreadRadius: 0,
+            ),
+          ],
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Stack(
               clipBehavior: Clip.none,
               children: [
-                Icon(icon, color: color, size: 20),
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        color.withOpacity(0.15),
+                        color.withOpacity(0.05),
+                      ],
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(icon, color: color, size: 26),
+                ),
                 if (badge != null)
                   Positioned(
-                    top: -6,
-                    right: -6,
+                    top: -4,
+                    right: -4,
                     child: Container(
-                      padding: const EdgeInsets.all(4),
+                      padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
                         color: Colors.red,
                         shape: BoxShape.circle,
-                      ),
-                      constraints: const BoxConstraints(
-                        minWidth: 16,
-                        minHeight: 16,
-                      ),
-                      child: Center(
-                        child: Text(
-                          badge,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withOpacity(0.3),
+                            blurRadius: 8,
+                            spreadRadius: 0,
                           ),
+                        ],
+                      ),
+                      child: Text(
+                        badge,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
                         ),
                       ),
                     ),
                   ),
               ],
             ),
-            const SizedBox(width: 8),
+            const SizedBox(height: 10),
             Text(
               label,
-              style: TextStyle(
-                fontSize: 13,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: color,
+                color: AppTheme.charcoal.withOpacity(0.8),
               ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
@@ -664,143 +1071,264 @@ class AdminDashboardView extends GetView<DashboardController> {
     );
   }
 
-  /// Bills overview
-  Widget _buildBillsOverview() {
+  /// Billing card with detailed overview
+  Widget _buildBillingCard() {
     final pending = controller.pendingBills.value;
     final overdue = controller.overdueBills.value;
     final paid = controller.paidBills.value;
     final total = pending + overdue + paid;
 
     if (total == 0) {
-      return const SizedBox.shrink();
+      return Container(
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Column(
+            children: [
+              Icon(
+                Icons.check_circle_rounded,
+                size: 48,
+                color: Colors.green.shade400,
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Tidak ada tagihan',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.charcoal.withOpacity(0.6),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
     }
 
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 20,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Row(
                 children: [
-                  Icon(Icons.assessment, color: AppTheme.pastelBlue, size: 20),
+                  Text(
+                    '$total',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.charcoal,
+                    ),
+                  ),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Status Tagihan Bulan Ini',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                  Text(
+                    'Total Tagihan',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.charcoal.withOpacity(0.5),
                     ),
                   ),
                 ],
               ),
-              TextButton.icon(
+              TextButton(
                 onPressed: () => Get.toNamed(AppRoutes.ADMIN_BILLS),
-                icon: const Icon(Icons.arrow_forward, size: 16),
-                label: const Text('Lihat Semua'),
                 style: TextButton.styleFrom(
-                  foregroundColor: AppTheme.pastelBlue,
+                  backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      'Lihat',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.primaryBlue,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 14,
+                      color: AppTheme.primaryBlue,
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
-          _buildBillStatusBar(
+
+          const SizedBox(height: 24),
+
+          // Status bars
+          _buildBillingStatusRow(
             label: 'Lunas',
             count: paid,
             total: total,
             color: Colors.green,
+            icon: Icons.check_circle_rounded,
           ),
-          const SizedBox(height: 12),
-          _buildBillStatusBar(
+          const SizedBox(height: 16),
+          _buildBillingStatusRow(
             label: 'Pending',
             count: pending,
             total: total,
             color: Colors.orange,
+            icon: Icons.pending_rounded,
           ),
-          const SizedBox(height: 12),
-          _buildBillStatusBar(
+          const SizedBox(height: 16),
+          _buildBillingStatusRow(
             label: 'Terlambat',
             count: overdue,
             total: total,
             color: Colors.red,
+            icon: Icons.warning_rounded,
           ),
-          const SizedBox(height: 16),
-          Divider(color: Colors.grey.shade200),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Total belum dibayar:',
-                style: TextStyle(fontWeight: FontWeight.w500),
+
+          if (controller.pendingAmount.value > 0) ...[
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.red.shade100, width: 1),
               ),
-              Text(
-                _formatCurrency(controller.pendingAmount.value),
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.info_outline_rounded,
+                        color: Colors.red.shade400,
+                        size: 20,
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Belum dibayar',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.red.shade700,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Text(
+                    _formatCurrency(controller.pendingAmount.value),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.red.shade700,
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ],
       ),
     );
   }
 
-  /// Bill status bar
-  Widget _buildBillStatusBar({
+  Widget _buildBillingStatusRow({
     required String label,
     required int count,
     required int total,
     required Color color,
+    required IconData icon,
   }) {
-    final percentage = total > 0 ? (count / total) : 0.0;
+    final percentage = total > 0 ? count / total : 0.0;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(fontSize: 13),
-            ),
-            Text(
-              '$count tagihan',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-          ],
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color, size: 18),
         ),
-        const SizedBox(height: 6),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: LinearProgressIndicator(
-            value: percentage,
-            backgroundColor: Colors.grey.shade200,
-            valueColor: AlwaysStoppedAnimation<Color>(color),
-            minHeight: 8,
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    label,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.charcoal,
+                    ),
+                  ),
+                  Text(
+                    '$count tagihan',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: color,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Container(
+                height: 6,
+                decoration: BoxDecoration(
+                  color: AppTheme.mediumGrey.withOpacity(0.5),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: FractionallySizedBox(
+                  alignment: Alignment.centerLeft,
+                  widthFactor: percentage,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [color.withOpacity(0.8), color],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -815,5 +1343,70 @@ class AdminDashboardView extends GetView<DashboardController> {
       decimalDigits: 0,
     );
     return formatter.format(amount);
+  }
+
+  /// Format compact currency
+  String _formatCompactCurrency(double amount) {
+    if (amount >= 1000000000) {
+      return 'Rp ${(amount / 1000000000).toStringAsFixed(1)}M';
+    } else if (amount >= 1000000) {
+      return 'Rp ${(amount / 1000000).toStringAsFixed(1)}Jt';
+    } else if (amount >= 1000) {
+      return 'Rp ${(amount / 1000).toStringAsFixed(0)}K';
+    }
+    return 'Rp ${amount.toStringAsFixed(0)}';
+  }
+}
+
+/// Custom circular progress painter for analytics
+class _CircularProgressPainter extends CustomPainter {
+  final double progress;
+  final Color backgroundColor;
+  final Color progressColor;
+  final double strokeWidth;
+
+  _CircularProgressPainter({
+    required this.progress,
+    required this.backgroundColor,
+    required this.progressColor,
+    required this.strokeWidth,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = (size.width - strokeWidth) / 2;
+
+    // Background circle
+    final bgPaint = Paint()
+      ..color = backgroundColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    canvas.drawCircle(center, radius, bgPaint);
+
+    // Progress arc
+    final progressPaint = Paint()
+      ..color = progressColor
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth
+      ..strokeCap = StrokeCap.round;
+
+    final progressAngle = 2 * math.pi * progress;
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -math.pi / 2,
+      progressAngle,
+      false,
+      progressPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _CircularProgressPainter oldDelegate) {
+    return oldDelegate.progress != progress ||
+        oldDelegate.backgroundColor != backgroundColor ||
+        oldDelegate.progressColor != progressColor;
   }
 }

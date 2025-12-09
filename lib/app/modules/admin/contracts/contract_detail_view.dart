@@ -50,7 +50,7 @@ class _ContractDetailViewState extends State<ContractDetailView> {
     final contract = _contract!;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.softGrey,
       body: CustomScrollView(
         slivers: [
           // App Bar

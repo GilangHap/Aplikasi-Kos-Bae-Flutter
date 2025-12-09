@@ -1,6 +1,7 @@
 // FILE: lib/app/modules/admin/contracts/contracts_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../models/contract_model.dart';
 import '../../../theme/app_theme.dart';
@@ -20,58 +21,54 @@ class AdminContractsView extends StatelessWidget {
     final controller = Get.find<ContractsController>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.softGrey,
       body: RefreshIndicator(
         onRefresh: controller.refreshData,
-        color: AppTheme.pastelBlue,
+        color: AppTheme.primaryBlue,
         child: CustomScrollView(
           slivers: [
+            // Premium Header
+            SliverToBoxAdapter(child: _buildPremiumHeader(controller)),
+
             // Statistics Cards
-            SliverToBoxAdapter(
-              child: _buildStatisticsSection(controller),
-            ),
+            SliverToBoxAdapter(child: _buildStatisticsSection(controller)),
 
             // Search & Filter Bar
-            SliverToBoxAdapter(
-              child: _buildSearchBar(controller),
-            ),
+            SliverToBoxAdapter(child: _buildSearchBar(controller)),
 
             // Filter Chips
-            SliverToBoxAdapter(
-              child: _buildFilterChips(controller),
-            ),
+            SliverToBoxAdapter(child: _buildFilterChips(controller)),
 
             // Contracts List
             Obx(() {
               if (controller.isLoading.value && controller.contracts.isEmpty) {
-                return const SliverFillRemaining(
-                  child: Center(child: CircularProgressIndicator()),
+                return SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppTheme.primaryBlue,
+                      ),
+                    ),
+                  ),
                 );
               }
 
               if (controller.errorMessage.value.isNotEmpty &&
                   controller.contracts.isEmpty) {
-                return SliverFillRemaining(
-                  child: _buildErrorState(controller),
-                );
+                return SliverFillRemaining(child: _buildErrorState(controller));
               }
 
               if (controller.filteredContracts.isEmpty) {
-                return SliverFillRemaining(
-                  child: _buildEmptyState(controller),
-                );
+                return SliverFillRemaining(child: _buildEmptyState(controller));
               }
 
               return SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
                 sliver: SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final contract = controller.filteredContracts[index];
-                      return _buildContractCard(contract, controller);
-                    },
-                    childCount: controller.filteredContracts.length,
-                  ),
+                  delegate: SliverChildBuilderDelegate((context, index) {
+                    final contract = controller.filteredContracts[index];
+                    return _buildContractCard(contract, controller);
+                  }, childCount: controller.filteredContracts.length),
                 ),
               );
             }),
@@ -82,137 +79,119 @@ class AdminContractsView extends StatelessWidget {
     );
   }
 
-  Widget _buildStatisticsSection(ContractsController controller) {
-    return Obx(() {
-      final stats = controller.statistics;
-
-      return Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Manajemen Kontrak',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${stats['total']} total kontrak',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    gradient: AppTheme.primaryGradient,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(
-                    Icons.description,
-                    color: Colors.white,
-                    size: 28,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-
-            // Stats cards
-            Row(
-              children: [
-                _buildStatCard(
-                  'Aktif',
-                  '${stats['aktif']}',
-                  AppTheme.softGreen,
-                  Icons.check_circle,
-                ),
-                const SizedBox(width: 12),
-                _buildStatCard(
-                  'Akan Habis',
-                  '${stats['akanHabis']}',
-                  AppTheme.warmPeach,
-                  Icons.warning,
-                ),
-                const SizedBox(width: 12),
-                _buildStatCard(
-                  'Berakhir',
-                  '${stats['berakhir']}',
-                  AppTheme.softPink,
-                  Icons.cancel,
-                ),
-              ],
-            ),
+  Widget _buildPremiumHeader(ContractsController controller) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.primaryBlue,
+            AppTheme.lightBlue,
+            const Color(0xFF8BC6C8),
           ],
         ),
-      );
-    });
-  }
-
-  Widget _buildStatCard(
-    String title,
-    String count,
-    Color color,
-    IconData icon,
-  ) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
         ),
-        child: Row(
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryBlue.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Stack(
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
+            // Decorative circles
+            Positioned(
+              top: -30,
+              right: -30,
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.1),
+                ),
               ),
-              child: Icon(icon, color: color, size: 22),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Positioned(
+              bottom: 20,
+              left: -40,
+              child: Container(
+                width: 100,
+                height: 100,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.08),
+                ),
+              ),
+            ),
+            // Content
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+              child: Row(
                 children: [
-                  Text(
-                    count,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Manajemen',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white.withOpacity(0.9),
+                          ),
+                        ),
+                        Text(
+                          'Kontrak',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Obx(
+                          () => Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              '${controller.statistics['total']} total kontrak',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade600,
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(20),
                     ),
-                    overflow: TextOverflow.ellipsis,
+                    child: const Icon(
+                      Icons.description_rounded,
+                      color: Colors.white,
+                      size: 36,
+                    ),
                   ),
                 ],
               ),
@@ -223,32 +202,153 @@ class AdminContractsView extends StatelessWidget {
     );
   }
 
+  Widget _buildStatisticsSection(ContractsController controller) {
+    return Obx(() {
+      final stats = controller.statistics;
+
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              _buildStatCard(
+                'Aktif',
+                '${stats['aktif']}',
+                const Color(0xFF4CAF50),
+                const Color(0xFF81C784),
+                Icons.check_circle_rounded,
+              ),
+              const SizedBox(width: 14),
+              _buildStatCard(
+                'Akan Habis',
+                '${stats['akanHabis']}',
+                const Color(0xFFFF9800),
+                const Color(0xFFFFB74D),
+                Icons.warning_rounded,
+              ),
+              const SizedBox(width: 14),
+              _buildStatCard(
+                'Berakhir',
+                '${stats['berakhir']}',
+                const Color(0xFFE91E63),
+                const Color(0xFFF48FB1),
+                Icons.cancel_rounded,
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  Widget _buildStatCard(
+    String title,
+    String count,
+    Color startColor,
+    Color endColor,
+    IconData icon,
+  ) {
+    return Container(
+      width: 120,
+      height: 120,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [startColor, endColor],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: startColor.withOpacity(0.4),
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: Colors.white, size: 18),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                count,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  height: 1.0,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                title,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white.withOpacity(0.9),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildSearchBar(ContractsController controller) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+              color: AppTheme.charcoal.withOpacity(0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Row(
           children: [
-            Icon(Icons.search, color: Colors.grey.shade400),
-            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.all(14),
+              child: Icon(
+                Icons.search_rounded,
+                color: AppTheme.primaryBlue,
+                size: 22,
+              ),
+            ),
             Expanded(
               child: TextField(
                 controller: controller.searchController,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.charcoal,
+                ),
                 decoration: InputDecoration(
                   hintText: 'Cari berdasarkan nama penghuni...',
-                  hintStyle: TextStyle(color: Colors.grey.shade400),
+                  hintStyle: GoogleFonts.plusJakartaSans(
+                    color: AppTheme.charcoal.withOpacity(0.4),
+                    fontWeight: FontWeight.w500,
+                  ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 16),
                 ),
@@ -258,13 +358,24 @@ class AdminContractsView extends StatelessWidget {
             Obx(() {
               if (controller.searchQuery.value.isNotEmpty) {
                 return IconButton(
-                  icon: const Icon(Icons.close, size: 20),
-                  color: Colors.grey.shade400,
+                  icon: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppTheme.mediumGrey,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 16,
+                      color: AppTheme.charcoal.withOpacity(0.6),
+                    ),
+                  ),
                   onPressed: controller.clearSearch,
                 );
               }
               return const SizedBox.shrink();
             }),
+            const SizedBox(width: 8),
           ],
         ),
       ),
@@ -273,58 +384,97 @@ class AdminContractsView extends StatelessWidget {
 
   Widget _buildFilterChips(ContractsController controller) {
     return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Obx(() => SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: controller.filterOptions.map((option) {
-                final isSelected =
-                    controller.selectedFilter.value == option['value'];
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(option['label']!),
-                    selected: isSelected,
-                    onSelected: (_) =>
-                        controller.setFilter(option['value']!),
-                    backgroundColor: Colors.white,
-                    selectedColor: AppTheme.pastelBlue.withOpacity(0.2),
-                    labelStyle: TextStyle(
-                      color: isSelected ? AppTheme.pastelBlue : Colors.grey.shade700,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+      padding: const EdgeInsets.all(20),
+      child: Obx(
+        () => SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: controller.filterOptions.map((option) {
+              final isSelected =
+                  controller.selectedFilter.value == option['value'];
+              return Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: GestureDetector(
+                  onTap: () => controller.setFilter(option['value']!),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.easeOutCubic,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 18,
+                      vertical: 12,
                     ),
-                    side: BorderSide(
-                      color: isSelected
-                          ? AppTheme.pastelBlue
-                          : Colors.grey.shade300,
+                    decoration: BoxDecoration(
+                      gradient: isSelected
+                          ? LinearGradient(
+                              colors: [
+                                AppTheme.primaryBlue,
+                                AppTheme.lightBlue,
+                              ],
+                            )
+                          : null,
+                      color: isSelected ? null : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isSelected
+                            ? Colors.transparent
+                            : AppTheme.mediumGrey,
+                        width: 1.5,
+                      ),
+                      boxShadow: isSelected
+                          ? [
+                              BoxShadow(
+                                color: AppTheme.primaryBlue.withOpacity(0.35),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ]
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.04),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                    ),
+                    child: Text(
+                      option['label']!,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: isSelected
+                            ? Colors.white
+                            : AppTheme.charcoal.withOpacity(0.7),
+                      ),
                     ),
                   ),
-                );
-              }).toList(),
-            ),
-          )),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildContractCard(Contract contract, ContractsController controller) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: AppTheme.charcoal.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           onTap: () async {
             final result = await Get.toNamed(
               AppRoutes.ADMIN_CONTRACT_DETAIL,
@@ -335,7 +485,7 @@ class AdminContractsView extends StatelessWidget {
             }
           },
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -343,47 +493,94 @@ class AdminContractsView extends StatelessWidget {
                 Row(
                   children: [
                     // Tenant avatar
-                    CircleAvatar(
-                      radius: 24,
-                      backgroundColor: AppTheme.pastelBlue.withOpacity(0.2),
-                      backgroundImage: contract.tenantPhoto != null
-                          ? CachedNetworkImageProvider(contract.tenantPhoto!)
-                          : null,
-                      child: contract.tenantPhoto == null
-                          ? Text(
-                              contract.tenantName?.substring(0, 1).toUpperCase() ?? '?',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: AppTheme.pastelBlue,
-                                fontSize: 18,
+                    Container(
+                      width: 52,
+                      height: 52,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.primaryBlue.withOpacity(0.15),
+                            AppTheme.cream.withOpacity(0.3),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: contract.tenantPhoto != null
+                          ? ClipRRect(
+                              borderRadius: BorderRadius.circular(16),
+                              child: CachedNetworkImage(
+                                imageUrl: contract.tenantPhoto!,
+                                fit: BoxFit.cover,
+                                placeholder: (_, __) => Center(
+                                  child: Text(
+                                    contract.tenantName
+                                            ?.substring(0, 1)
+                                            .toUpperCase() ??
+                                        '?',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontWeight: FontWeight.w700,
+                                      color: AppTheme.primaryBlue,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (_, __, ___) => Center(
+                                  child: Text(
+                                    contract.tenantName
+                                            ?.substring(0, 1)
+                                            .toUpperCase() ??
+                                        '?',
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontWeight: FontWeight.w700,
+                                      color: AppTheme.primaryBlue,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ),
                               ),
                             )
-                          : null,
+                          : Center(
+                              child: Text(
+                                contract.tenantName
+                                        ?.substring(0, 1)
+                                        .toUpperCase() ??
+                                    '?',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontWeight: FontWeight.w700,
+                                  color: AppTheme.primaryBlue,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             contract.tenantName ?? 'Unknown',
-                            style: const TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.charcoal,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          const SizedBox(height: 4),
                           Row(
                             children: [
-                              Icon(Icons.meeting_room,
-                                  size: 14, color: Colors.grey.shade500),
+                              Icon(
+                                Icons.meeting_room_rounded,
+                                size: 14,
+                                color: AppTheme.charcoal.withOpacity(0.5),
+                              ),
                               const SizedBox(width: 4),
                               Text(
                                 'Kamar ${contract.roomNumber ?? '-'}',
-                                style: TextStyle(
+                                style: GoogleFonts.plusJakartaSans(
                                   fontSize: 13,
-                                  color: Colors.grey.shade600,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppTheme.charcoal.withOpacity(0.6),
                                 ),
                               ),
                             ],
@@ -395,30 +592,31 @@ class AdminContractsView extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 16),
-                const Divider(height: 1),
-                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: Divider(height: 1, color: AppTheme.mediumGrey),
+                ),
 
                 // Contract details
                 Row(
                   children: [
                     Expanded(
                       child: _buildInfoItem(
-                        Icons.calendar_today,
+                        Icons.calendar_today_rounded,
                         'Mulai',
                         contract.formattedStartDate,
                       ),
                     ),
                     Expanded(
                       child: _buildInfoItem(
-                        Icons.event,
+                        Icons.event_rounded,
                         'Berakhir',
                         contract.formattedEndDate,
                       ),
                     ),
                     Expanded(
                       child: _buildInfoItem(
-                        Icons.payments,
+                        Icons.payments_rounded,
                         'Sewa/Bulan',
                         contract.formattedMonthlyRent,
                       ),
@@ -428,24 +626,46 @@ class AdminContractsView extends StatelessWidget {
 
                 // Expiry warning
                 if (contract.status == 'akan_habis') ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
-                      color: AppTheme.warmPeach.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(8),
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFFFF9800).withOpacity(0.15),
+                          const Color(0xFFFFB74D).withOpacity(0.1),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: const Color(0xFFFF9800).withOpacity(0.3),
+                        width: 1,
+                      ),
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.warning_amber,
-                            size: 18, color: Colors.orange.shade700),
-                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFF9800).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.warning_amber_rounded,
+                            size: 16,
+                            color: Color(0xFFE65100),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
                         Text(
                           'Kontrak berakhir dalam ${contract.daysUntilExpiry} hari',
-                          style: TextStyle(
+                          style: GoogleFonts.plusJakartaSans(
                             fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                            color: Colors.orange.shade700,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFFE65100),
                           ),
                         ),
                       ],
@@ -454,35 +674,65 @@ class AdminContractsView extends StatelessWidget {
                 ],
 
                 // Document indicator
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 Row(
                   children: [
-                    Icon(
-                      contract.hasDocument ? Icons.picture_as_pdf : Icons.file_present,
-                      size: 16,
-                      color: contract.hasDocument
-                          ? Colors.red.shade400
-                          : Colors.grey.shade400,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      contract.hasDocument
-                          ? 'Dokumen tersedia'
-                          : 'Belum ada dokumen',
-                      style: TextStyle(
-                        fontSize: 12,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
                         color: contract.hasDocument
-                            ? Colors.red.shade400
-                            : Colors.grey.shade500,
+                            ? const Color(0xFFE74C3C).withOpacity(0.1)
+                            : AppTheme.softGrey,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            contract.hasDocument
+                                ? Icons.picture_as_pdf_rounded
+                                : Icons.file_present_rounded,
+                            size: 14,
+                            color: contract.hasDocument
+                                ? const Color(0xFFE74C3C)
+                                : AppTheme.charcoal.withOpacity(0.5),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            contract.hasDocument
+                                ? 'Dokumen tersedia'
+                                : 'Belum ada dokumen',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: contract.hasDocument
+                                  ? const Color(0xFFE74C3C)
+                                  : AppTheme.charcoal.withOpacity(0.5),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     const Spacer(),
-                    Text(
-                      '${contract.durationMonths} bulan',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.grey.shade600,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.softGrey,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '${contract.durationMonths} bulan',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.charcoal.withOpacity(0.6),
+                        ),
                       ),
                     ),
                   ],
@@ -501,13 +751,14 @@ class AdminContractsView extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(icon, size: 14, color: Colors.grey.shade400),
+            Icon(icon, size: 14, color: AppTheme.charcoal.withOpacity(0.4)),
             const SizedBox(width: 4),
             Text(
               label,
-              style: TextStyle(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 11,
-                color: Colors.grey.shade500,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoal.withOpacity(0.5),
               ),
             ),
           ],
@@ -515,10 +766,10 @@ class AdminContractsView extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           value,
-          style: const TextStyle(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
+            fontWeight: FontWeight.w700,
+            color: AppTheme.charcoal,
           ),
         ),
       ],
@@ -526,54 +777,61 @@ class AdminContractsView extends StatelessWidget {
   }
 
   Widget _buildStatusBadge(String status) {
-    Color bgColor;
-    Color textColor;
+    Color startColor;
+    Color endColor;
     String label;
     IconData icon;
 
     switch (status) {
       case 'aktif':
-        bgColor = AppTheme.softGreen.withOpacity(0.2);
-        textColor = Colors.green.shade700;
+        startColor = const Color(0xFF4CAF50);
+        endColor = const Color(0xFF81C784);
         label = 'Aktif';
-        icon = Icons.check_circle;
+        icon = Icons.check_circle_rounded;
         break;
       case 'akan_habis':
-        bgColor = AppTheme.warmPeach.withOpacity(0.2);
-        textColor = Colors.orange.shade700;
+        startColor = const Color(0xFFFF9800);
+        endColor = const Color(0xFFFFB74D);
         label = 'Akan Habis';
-        icon = Icons.warning;
+        icon = Icons.warning_rounded;
         break;
       case 'berakhir':
-        bgColor = AppTheme.softPink.withOpacity(0.2);
-        textColor = Colors.red.shade400;
+        startColor = const Color(0xFFE91E63);
+        endColor = const Color(0xFFF48FB1);
         label = 'Berakhir';
-        icon = Icons.cancel;
+        icon = Icons.cancel_rounded;
         break;
       default:
-        bgColor = Colors.grey.shade100;
-        textColor = Colors.grey.shade600;
+        startColor = AppTheme.primaryBlue;
+        endColor = AppTheme.lightBlue;
         label = status;
-        icon = Icons.help;
+        icon = Icons.help_rounded;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(colors: [startColor, endColor]),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: startColor.withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          ),
+        ],
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: textColor),
-          const SizedBox(width: 4),
+          Icon(icon, size: 14, color: Colors.white),
+          const SizedBox(width: 5),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: textColor,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
             ),
           ),
         ],
@@ -584,15 +842,15 @@ class AdminContractsView extends StatelessWidget {
   Widget _buildFAB() {
     return Container(
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFFA9C9FF), Color(0xFFB9F3CC)],
+        gradient: LinearGradient(
+          colors: [AppTheme.primaryBlue, AppTheme.lightBlue],
         ),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFA9C9FF).withOpacity(0.4),
-            blurRadius: 12,
-            offset: const Offset(0, 6),
+            color: AppTheme.primaryBlue.withOpacity(0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -604,10 +862,13 @@ class AdminContractsView extends StatelessWidget {
             Get.find<ContractsController>().refreshData();
           }
         },
-        icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text(
+        icon: const Icon(Icons.add_rounded, color: Colors.white),
+        label: Text(
           'Buat Kontrak',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: GoogleFonts.plusJakartaSans(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -620,27 +881,71 @@ class AdminContractsView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
-          const SizedBox(height: 16),
-          Text(
-            'Terjadi Kesalahan',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade700,
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE74C3C).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.error_outline_rounded,
+              size: 64,
+              color: Color(0xFFE74C3C),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 20),
+          Text(
+            'Terjadi Kesalahan',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.charcoal,
+            ),
+          ),
+          const SizedBox(height: 10),
           Text(
             controller.errorMessage.value,
-            style: TextStyle(color: Colors.grey.shade500),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.charcoal.withOpacity(0.6),
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: controller.refreshData,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Coba Lagi'),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppTheme.primaryBlue, AppTheme.lightBlue],
+              ),
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryBlue.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: ElevatedButton.icon(
+              onPressed: controller.refreshData,
+              icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+              label: Text(
+                'Coba Lagi',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -648,40 +953,71 @@ class AdminContractsView extends StatelessWidget {
   }
 
   Widget _buildEmptyState(ContractsController controller) {
-    final isFiltered = controller.selectedFilter.value != 'all' ||
+    final isFiltered =
+        controller.selectedFilter.value != 'all' ||
         controller.searchQuery.value.isNotEmpty;
 
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            isFiltered ? Icons.search_off : Icons.description_outlined,
-            size: 80,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            isFiltered ? 'Tidak ada hasil' : 'Belum ada kontrak',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade700,
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppTheme.primaryBlue.withOpacity(0.1),
+                  AppTheme.cream.withOpacity(0.2),
+                ],
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isFiltered
+                  ? Icons.search_off_rounded
+                  : Icons.description_outlined,
+              size: 64,
+              color: AppTheme.primaryBlue,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 28),
+          Text(
+            isFiltered ? 'Tidak ada hasil' : 'Belum ada kontrak',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.charcoal,
+            ),
+          ),
+          const SizedBox(height: 10),
           Text(
             isFiltered
                 ? 'Coba ubah filter atau kata kunci pencarian'
                 : 'Buat kontrak pertama untuk penghuni',
-            style: TextStyle(color: Colors.grey.shade500),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.charcoal.withOpacity(0.6),
+            ),
             textAlign: TextAlign.center,
           ),
           if (isFiltered) ...[
-            const SizedBox(height: 16),
-            TextButton(
-              onPressed: controller.clearFilters,
-              child: const Text('Reset Filter'),
+            const SizedBox(height: 24),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: AppTheme.primaryBlue, width: 2),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: TextButton(
+                onPressed: controller.clearFilters,
+                child: Text(
+                  'Reset Filter',
+                  style: GoogleFonts.plusJakartaSans(
+                    color: AppTheme.primaryBlue,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
             ),
           ],
         ],

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../models/bill_model.dart';
 import '../../../theme/app_theme.dart';
 import 'bills_controller.dart';
@@ -14,7 +15,7 @@ class BillsView extends GetView<BillsController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.softGrey,
       body: Obx(() {
         if (controller.isLoading.value && controller.bills.isEmpty) {
           return _buildLoadingShimmer();
@@ -27,9 +28,12 @@ class BillsView extends GetView<BillsController> {
 
         return RefreshIndicator(
           onRefresh: controller.refreshData,
-          color: AppTheme.pastelBlue,
+          color: AppTheme.primaryBlue,
           child: CustomScrollView(
             slivers: [
+              // Premium Header
+              SliverToBoxAdapter(child: _buildPremiumHeader()),
+
               // Statistics Cards
               SliverToBoxAdapter(child: _buildStatisticsCards()),
 
@@ -60,6 +64,100 @@ class BillsView extends GetView<BillsController> {
     );
   }
 
+  /// Premium Header
+  Widget _buildPremiumHeader() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 60, 24, 28),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppTheme.deepBlue, AppTheme.primaryBlue, AppTheme.lightBlue],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryBlue.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Decorative circles
+          Positioned(
+            top: -30,
+            right: -30,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -20,
+            left: -20,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.08),
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Manajemen Tagihan',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Kelola tagihan penghuni kos',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.85),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(
+                  Icons.receipt_long_rounded,
+                  color: Colors.white,
+                  size: 32,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Statistics cards
   Widget _buildStatisticsCards() {
     final currencyFormat = NumberFormat.currency(
@@ -69,24 +167,24 @@ class BillsView extends GetView<BillsController> {
     );
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Column(
         children: [
-          // Amount Statistics
+          // Amount Statistics - Premium Card
           Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFFA9C9FF), Color(0xFFB9F3CC)],
+              gradient: LinearGradient(
+                colors: [AppTheme.primaryBlue, AppTheme.deepBlue],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFA9C9FF).withOpacity(0.3),
-                  blurRadius: 15,
-                  offset: const Offset(0, 5),
+                  color: AppTheme.primaryBlue.withOpacity(0.35),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
                 ),
               ],
             ),
@@ -99,95 +197,112 @@ class BillsView extends GetView<BillsController> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Total Tagihan',
-                            style: TextStyle(
-                              color: Colors.white70,
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Colors.white.withOpacity(0.8),
                               fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 6),
                           Text(
                             currencyFormat.format(
                               controller.statistics['totalAmount'] ?? 0,
                             ),
-                            style: const TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 26,
+                              fontWeight: FontWeight.w800,
                             ),
                           ),
                         ],
                       ),
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(18),
                         ),
-                        child: const Icon(
-                          Icons.receipt_long,
-                          color: Colors.white,
+                        child: Icon(
+                          Icons.account_balance_wallet_rounded,
+                          color: AppTheme.gold,
                           size: 32,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildAmountStat(
-                          'Terbayar',
-                          currencyFormat.format(
-                            controller.statistics['totalPaid'] ?? 0,
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 16,
+                      horizontal: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _buildAmountStat(
+                            'Terbayar',
+                            currencyFormat.format(
+                              controller.statistics['totalPaid'] ?? 0,
+                            ),
+                            const Color(0xFF4CAF50),
                           ),
-                          Colors.white,
                         ),
-                      ),
-                      Container(width: 1, height: 40, color: Colors.white30),
-                      Expanded(
-                        child: _buildAmountStat(
-                          'Belum Bayar',
-                          currencyFormat.format(
-                            controller.statistics['totalPending'] ?? 0,
+                        Container(width: 1, height: 45, color: Colors.white24),
+                        Expanded(
+                          child: _buildAmountStat(
+                            'Belum Bayar',
+                            currencyFormat.format(
+                              controller.statistics['totalPending'] ?? 0,
+                            ),
+                            const Color(0xFFFF9800),
                           ),
-                          Colors.white,
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
 
-          // Status Statistics
-          Row(
-            children: [
-              _buildStatCard(
-                'Menunggu',
-                '${controller.statistics['pending'] ?? 0}',
-                const Color(0xFFFFD6A5),
-                Icons.hourglass_empty,
+          // Status Statistics - Horizontal Scroll
+          SizedBox(
+            height: 120,
+            child: Obx(
+              () => ListView(
+                scrollDirection: Axis.horizontal,
+                children: [
+                  _buildStatCard(
+                    'Menunggu',
+                    '${controller.statistics['pending'] ?? 0}',
+                    [const Color(0xFFFF9800), const Color(0xFFFFB74D)],
+                    Icons.hourglass_empty_rounded,
+                  ),
+                  const SizedBox(width: 14),
+                  _buildStatCard(
+                    'Lunas',
+                    '${controller.statistics['paid'] ?? 0}',
+                    [const Color(0xFF4CAF50), const Color(0xFF81C784)],
+                    Icons.check_circle_rounded,
+                  ),
+                  const SizedBox(width: 14),
+                  _buildStatCard(
+                    'Terlambat',
+                    '${controller.statistics['overdue'] ?? 0}',
+                    [const Color(0xFFE91E63), const Color(0xFFF06292)],
+                    Icons.warning_rounded,
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              _buildStatCard(
-                'Lunas',
-                '${controller.statistics['paid'] ?? 0}',
-                const Color(0xFFB9F3CC),
-                Icons.check_circle,
-              ),
-              const SizedBox(width: 12),
-              _buildStatCard(
-                'Terlambat',
-                '${controller.statistics['overdue'] ?? 0}',
-                const Color(0xFFF7C4D4),
-                Icons.warning,
-              ),
-            ],
+            ),
           ),
           const SizedBox(height: 16),
         ],
@@ -195,20 +310,24 @@ class BillsView extends GetView<BillsController> {
     );
   }
 
-  Widget _buildAmountStat(String label, String value, Color color) {
+  Widget _buildAmountStat(String label, String value, Color accentColor) {
     return Column(
       children: [
         Text(
           label,
-          style: TextStyle(color: color.withOpacity(0.8), fontSize: 12),
+          style: GoogleFonts.plusJakartaSans(
+            color: Colors.white.withOpacity(0.7),
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 6),
         Text(
           value,
-          style: TextStyle(
-            color: color,
+          style: GoogleFonts.plusJakartaSans(
+            color: Colors.white,
             fontSize: 14,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w700,
           ),
         ),
       ],
@@ -218,79 +337,101 @@ class BillsView extends GetView<BillsController> {
   Widget _buildStatCard(
     String label,
     String value,
-    Color color,
+    List<Color> gradientColors,
     IconData icon,
   ) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
-            ),
-          ],
+    return Container(
+      width: 115,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradientColors,
         ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: gradientColors[0].withOpacity(0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(7),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.25),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: Colors.white, size: 18),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  height: 1.0,
+                ),
               ),
-              child: Icon(icon, color: color, size: 20),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2D3748),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white.withOpacity(0.9),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-            Text(
-              label,
-              style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-            ),
-          ],
-        ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  /// Month selector
+  /// Month selector with premium styling
   Widget _buildMonthSelector() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            onPressed: () {
+          GestureDetector(
+            onTap: () {
               final current = controller.selectedMonth.value;
               controller.setMonthFilter(
                 DateTime(current.year, current.month - 1, 1),
               );
             },
-            icon: Container(
-              padding: const EdgeInsets.all(8),
+            child: Container(
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 5,
+                    color: AppTheme.charcoal.withOpacity(0.08),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child: const Icon(Icons.chevron_left, size: 20),
+              child: Icon(
+                Icons.chevron_left_rounded,
+                size: 22,
+                color: AppTheme.charcoal,
+              ),
             ),
           ),
           Obx(
@@ -298,29 +439,39 @@ class BillsView extends GetView<BillsController> {
               onTap: () => _showMonthPicker(),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
+                  horizontal: 24,
+                  vertical: 14,
                 ),
                 decoration: BoxDecoration(
-                  gradient: AppTheme.selectedGradient,
-                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    colors: [AppTheme.primaryBlue, AppTheme.lightBlue],
+                  ),
+                  borderRadius: BorderRadius.circular(18),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryBlue.withOpacity(0.35),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
                 ),
                 child: Row(
                   children: [
                     const Icon(
-                      Icons.calendar_today,
-                      size: 18,
+                      Icons.calendar_month_rounded,
+                      size: 20,
                       color: Colors.white,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     Text(
                       DateFormat(
                         'MMMM yyyy',
                         'id_ID',
                       ).format(controller.selectedMonth.value),
-                      style: const TextStyle(
+                      style: GoogleFonts.plusJakartaSans(
                         color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
                       ),
                     ),
                   ],
@@ -328,26 +479,31 @@ class BillsView extends GetView<BillsController> {
               ),
             ),
           ),
-          IconButton(
-            onPressed: () {
+          GestureDetector(
+            onTap: () {
               final current = controller.selectedMonth.value;
               controller.setMonthFilter(
                 DateTime(current.year, current.month + 1, 1),
               );
             },
-            icon: Container(
-              padding: const EdgeInsets.all(8),
+            child: Container(
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 5,
+                    color: AppTheme.charcoal.withOpacity(0.08),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
-              child: const Icon(Icons.chevron_right, size: 20),
+              child: Icon(
+                Icons.chevron_right_rounded,
+                size: 22,
+                color: AppTheme.charcoal,
+              ),
             ),
           ),
         ],
@@ -362,42 +518,81 @@ class BillsView extends GetView<BillsController> {
       firstDate: DateTime(2020),
       lastDate: DateTime(2030),
       initialDatePickerMode: DatePickerMode.year,
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: AppTheme.primaryBlue,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: AppTheme.charcoal,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (selected != null) {
       controller.setMonthFilter(DateTime(selected.year, selected.month, 1));
     }
   }
 
-  /// Filter & Search Bar
+  /// Filter & Search Bar with premium styling
   Widget _buildFilterSearchBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       child: Column(
         children: [
           // Search Bar
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(18),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.04),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
+                  color: AppTheme.charcoal.withOpacity(0.06),
+                  blurRadius: 16,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: TextField(
               controller: controller.searchController,
               onChanged: controller.onSearchChanged,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoal,
+              ),
               decoration: InputDecoration(
                 hintText: 'Cari nama penghuni atau kamar...',
-                hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 14),
-                prefixIcon: Icon(Icons.search, color: Colors.grey.shade400),
+                hintStyle: GoogleFonts.plusJakartaSans(
+                  color: AppTheme.charcoal.withOpacity(0.4),
+                  fontWeight: FontWeight.w500,
+                ),
+                prefixIcon: Container(
+                  padding: const EdgeInsets.all(14),
+                  child: Icon(
+                    Icons.search_rounded,
+                    color: AppTheme.primaryBlue,
+                    size: 22,
+                  ),
+                ),
                 suffixIcon: Obx(
                   () => controller.searchQuery.value.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear, size: 20),
+                          icon: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppTheme.mediumGrey,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.close_rounded,
+                              color: AppTheme.charcoal.withOpacity(0.6),
+                              size: 16,
+                            ),
+                          ),
                           onPressed: controller.clearSearch,
                         )
                       : const SizedBox.shrink(),
@@ -405,12 +600,12 @@ class BillsView extends GetView<BillsController> {
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 20,
-                  vertical: 16,
+                  vertical: 18,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
           // Status Filter Chips
           SingleChildScrollView(
@@ -418,45 +613,55 @@ class BillsView extends GetView<BillsController> {
             child: Obx(
               () => Row(
                 children: [
-                  _buildFilterChip('all', 'Semua', Icons.list),
-                  const SizedBox(width: 8),
+                  _buildFilterChip('all', 'Semua', Icons.list_rounded),
+                  const SizedBox(width: 10),
                   _buildFilterChip(
                     'pending',
                     'Menunggu',
-                    Icons.hourglass_empty,
+                    Icons.hourglass_empty_rounded,
                   ),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('paid', 'Lunas', Icons.check_circle),
-                  const SizedBox(width: 8),
-                  _buildFilterChip('overdue', 'Terlambat', Icons.warning),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 10),
+                  _buildFilterChip('paid', 'Lunas', Icons.check_circle_rounded),
+                  const SizedBox(width: 10),
+                  _buildFilterChip(
+                    'overdue',
+                    'Terlambat',
+                    Icons.warning_rounded,
+                  ),
+                  const SizedBox(width: 10),
                   // Sort button
-                  InkWell(
+                  GestureDetector(
                     onTap: _showSortBottomSheet,
-                    borderRadius: BorderRadius.circular(20),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 8,
+                        horizontal: 18,
+                        vertical: 10,
                       ),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.grey.shade200),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppTheme.mediumGrey),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.04),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
                           Icon(
-                            Icons.sort,
+                            Icons.sort_rounded,
                             size: 18,
-                            color: Colors.grey.shade600,
+                            color: AppTheme.charcoal.withOpacity(0.7),
                           ),
-                          const SizedBox(width: 6),
+                          const SizedBox(width: 8),
                           Text(
                             'Urutkan',
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontWeight: FontWeight.w500,
+                            style: GoogleFonts.plusJakartaSans(
+                              color: AppTheme.charcoal.withOpacity(0.7),
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
@@ -475,31 +680,58 @@ class BillsView extends GetView<BillsController> {
   Widget _buildFilterChip(String value, String label, IconData icon) {
     final isSelected = controller.selectedStatus.value == value;
 
-    return InkWell(
+    return GestureDetector(
       onTap: () => controller.setStatusFilter(value),
-      borderRadius: BorderRadius.circular(20),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        duration: const Duration(milliseconds: 250),
+        curve: Curves.easeOutCubic,
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         decoration: BoxDecoration(
-          gradient: isSelected ? AppTheme.selectedGradient : null,
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [AppTheme.primaryBlue, AppTheme.lightBlue],
+                )
+              : null,
           color: isSelected ? null : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: isSelected ? null : Border.all(color: Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected ? Colors.transparent : AppTheme.mediumGrey,
+            width: 1.5,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppTheme.primaryBlue.withOpacity(0.35),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: Row(
           children: [
             Icon(
               icon,
               size: 18,
-              color: isSelected ? Colors.white : Colors.grey.shade600,
+              color: isSelected
+                  ? Colors.white
+                  : AppTheme.charcoal.withOpacity(0.6),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
             Text(
               label,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.grey.shade600,
-                fontWeight: FontWeight.w500,
+              style: GoogleFonts.plusJakartaSans(
+                color: isSelected
+                    ? Colors.white
+                    : AppTheme.charcoal.withOpacity(0.7),
+                fontWeight: FontWeight.w700,
+                fontSize: 13,
               ),
             ),
           ],
@@ -508,45 +740,57 @@ class BillsView extends GetView<BillsController> {
     );
   }
 
-  /// Bill card
+  /// Bill card with premium styling
   Widget _buildBillCard(Bill bill) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppTheme.charcoal.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: InkWell(
         onTap: () => _navigateToDetail(bill),
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(18),
           child: Column(
             children: [
               // Header Row
               Row(
                 children: [
-                  // Type Icon
+                  // Type Icon with gradient
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: _getTypeColor(bill.type).withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(14),
+                      gradient: LinearGradient(
+                        colors: [
+                          _getTypeColor(bill.type),
+                          _getTypeColor(bill.type).withOpacity(0.7),
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _getTypeColor(bill.type).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
                     child: Icon(
                       _getTypeIcon(bill.type),
-                      color: _getTypeColor(bill.type),
+                      color: Colors.white,
                       size: 24,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 14),
                   // Info
                   Expanded(
                     child: Column(
@@ -554,46 +798,60 @@ class BillsView extends GetView<BillsController> {
                       children: [
                         Text(
                           bill.tenantName ?? 'Unknown',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontWeight: FontWeight.w700,
                             fontSize: 16,
-                            color: Color(0xFF2D3748),
+                            color: AppTheme.charcoal,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(
-                              Icons.door_front_door,
-                              size: 14,
-                              color: Colors.grey.shade500,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              'Kamar ${bill.roomNumber ?? '-'}',
-                              style: TextStyle(
-                                color: Colors.grey.shade600,
-                                fontSize: 13,
+                            Container(
+                              padding: const EdgeInsets.all(3),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryBlue.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Icon(
+                                Icons.door_front_door_rounded,
+                                size: 12,
+                                color: AppTheme.primaryBlue,
                               ),
                             ),
-                            const SizedBox(width: 12),
+                            const SizedBox(width: 5),
+                            Flexible(
+                              child: Text(
+                                'Kamar ${bill.roomNumber ?? '-'}',
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: AppTheme.charcoal.withOpacity(0.6),
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 8,
-                                vertical: 2,
+                                vertical: 4,
                               ),
                               decoration: BoxDecoration(
                                 color: _getTypeColor(
                                   bill.type,
-                                ).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
+                                ).withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(
                                 bill.typeLabel,
-                                style: TextStyle(
+                                style: GoogleFonts.plusJakartaSans(
                                   color: _getTypeColor(bill.type),
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
                                 ),
                               ),
                             ),
@@ -602,67 +860,81 @@ class BillsView extends GetView<BillsController> {
                       ],
                     ),
                   ),
+                  const SizedBox(width: 8),
                   // Status Badge
                   _buildStatusBadge(bill.status),
                 ],
               ),
 
-              const Divider(height: 24),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Divider(height: 1, color: AppTheme.mediumGrey),
+              ),
 
               // Amount & Due Date Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Jumlah Tagihan',
-                        style: TextStyle(
-                          color: Colors.grey.shade500,
-                          fontSize: 12,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Jumlah Tagihan',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: AppTheme.charcoal.withOpacity(0.5),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        bill.formattedAmount,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                          color: Color(0xFF2D3748),
+                        const SizedBox(height: 4),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            bill.formattedAmount,
+                            style: GoogleFonts.plusJakartaSans(
+                              fontWeight: FontWeight.w800,
+                              fontSize: 20,
+                              color: AppTheme.charcoal,
+                            ),
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  const SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
                         'Jatuh Tempo',
-                        style: TextStyle(
-                          color: Colors.grey.shade500,
+                        style: GoogleFonts.plusJakartaSans(
+                          color: AppTheme.charcoal.withOpacity(0.5),
                           fontSize: 12,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            Icons.event,
+                            Icons.event_rounded,
                             size: 16,
                             color: bill.isOverdue
-                                ? const Color(0xFFC2185B)
-                                : Colors.grey.shade600,
+                                ? const Color(0xFFE91E63)
+                                : AppTheme.charcoal.withOpacity(0.6),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: 5),
                           Text(
                             bill.formattedDueDate,
-                            style: TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                               color: bill.isOverdue
-                                  ? const Color(0xFFC2185B)
-                                  : const Color(0xFF2D3748),
+                                  ? const Color(0xFFE91E63)
+                                  : AppTheme.charcoal,
                             ),
                           ),
                         ],
@@ -674,40 +946,55 @@ class BillsView extends GetView<BillsController> {
 
               // Progress bar for partial payment
               if (bill.totalPaid > 0 && bill.status != 'paid') ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          'Terbayar: ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(bill.totalPaid)}',
-                          style: TextStyle(
-                            color: Colors.grey.shade600,
-                            fontSize: 12,
+                        Flexible(
+                          child: Text(
+                            'Terbayar: ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(bill.totalPaid)}',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: AppTheme.charcoal.withOpacity(0.6),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        Text(
-                          '${((bill.totalPaid / bill.amount) * 100).toStringAsFixed(0)}%',
-                          style: const TextStyle(
-                            color: Color(0xFF2E7D32),
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4CAF50).withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${((bill.totalPaid / bill.amount) * 100).toStringAsFixed(0)}%',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: const Color(0xFF4CAF50),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 8),
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
+                      borderRadius: BorderRadius.circular(6),
                       child: LinearProgressIndicator(
                         value: bill.totalPaid / bill.amount,
-                        backgroundColor: Colors.grey.shade200,
+                        backgroundColor: AppTheme.mediumGrey,
                         valueColor: const AlwaysStoppedAnimation<Color>(
-                          Color(0xFFB9F3CC),
+                          Color(0xFF4CAF50),
                         ),
-                        minHeight: 6,
+                        minHeight: 8,
                       ),
                     ),
                   ],
@@ -716,41 +1003,43 @@ class BillsView extends GetView<BillsController> {
 
               // Days info
               if (bill.status != 'paid') ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
+                    horizontal: 14,
+                    vertical: 10,
                   ),
                   decoration: BoxDecoration(
                     color: bill.isOverdue
-                        ? const Color(0xFFFCE4EC)
-                        : const Color(0xFFF3F4F6),
-                    borderRadius: BorderRadius.circular(10),
+                        ? const Color(0xFFE91E63).withOpacity(0.1)
+                        : AppTheme.softGrey,
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        bill.isOverdue ? Icons.warning : Icons.schedule,
+                        bill.isOverdue
+                            ? Icons.warning_rounded
+                            : Icons.schedule_rounded,
                         size: 16,
                         color: bill.isOverdue
-                            ? const Color(0xFFC2185B)
-                            : Colors.grey.shade600,
+                            ? const Color(0xFFE91E63)
+                            : AppTheme.charcoal.withOpacity(0.6),
                       ),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       Text(
                         bill.isOverdue
                             ? 'Terlambat ${-bill.daysUntilDue} hari'
                             : bill.daysUntilDue == 0
                             ? 'Jatuh tempo hari ini'
                             : '${bill.daysUntilDue} hari lagi',
-                        style: TextStyle(
+                        style: GoogleFonts.plusJakartaSans(
                           color: bill.isOverdue
-                              ? const Color(0xFFC2185B)
-                              : Colors.grey.shade700,
+                              ? const Color(0xFFE91E63)
+                              : AppTheme.charcoal.withOpacity(0.7),
                           fontSize: 12,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
@@ -772,38 +1061,38 @@ class BillsView extends GetView<BillsController> {
 
     switch (status) {
       case 'paid':
-        bgColor = const Color(0xFFE8F5E9);
+        bgColor = const Color(0xFF4CAF50).withOpacity(0.15);
         textColor = const Color(0xFF2E7D32);
         label = 'Lunas';
-        icon = Icons.check_circle;
+        icon = Icons.check_circle_rounded;
         break;
       case 'verified':
-        bgColor = const Color(0xFFE3F2FD);
-        textColor = const Color(0xFF1565C0);
+        bgColor = AppTheme.primaryBlue.withOpacity(0.15);
+        textColor = AppTheme.primaryBlue;
         label = 'Terverifikasi';
-        icon = Icons.verified;
+        icon = Icons.verified_rounded;
         break;
       case 'pending':
-        bgColor = const Color(0xFFFFF3E0);
+        bgColor = const Color(0xFFFF9800).withOpacity(0.15);
         textColor = const Color(0xFFE65100);
         label = 'Menunggu';
-        icon = Icons.hourglass_empty;
+        icon = Icons.hourglass_empty_rounded;
         break;
       case 'overdue':
-        bgColor = const Color(0xFFFCE4EC);
-        textColor = const Color(0xFFC2185B);
+        bgColor = const Color(0xFFE91E63).withOpacity(0.15);
+        textColor = const Color(0xFFE91E63);
         label = 'Terlambat';
-        icon = Icons.warning;
+        icon = Icons.warning_rounded;
         break;
       default:
-        bgColor = Colors.grey.shade200;
-        textColor = Colors.grey.shade700;
+        bgColor = AppTheme.mediumGrey;
+        textColor = AppTheme.charcoal.withOpacity(0.7);
         label = status;
-        icon = Icons.info;
+        icon = Icons.info_rounded;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(12),
@@ -812,13 +1101,13 @@ class BillsView extends GetView<BillsController> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 14, color: textColor),
-          const SizedBox(width: 4),
+          const SizedBox(width: 5),
           Text(
             label,
-            style: TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               color: textColor,
               fontSize: 12,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
           ),
         ],
@@ -829,51 +1118,51 @@ class BillsView extends GetView<BillsController> {
   Color _getTypeColor(String type) {
     switch (type) {
       case 'sewa':
-        return const Color(0xFFA9C9FF);
+        return AppTheme.primaryBlue;
       case 'listrik':
-        return const Color(0xFFFFD93D);
+        return const Color(0xFFFFB300);
       case 'air':
-        return const Color(0xFF6ECFF6);
+        return const Color(0xFF00ACC1);
       case 'deposit':
-        return const Color(0xFFB9F3CC);
+        return const Color(0xFF4CAF50);
       case 'denda':
-        return const Color(0xFFF7C4D4);
+        return const Color(0xFFE91E63);
       default:
-        return Colors.grey;
+        return AppTheme.charcoal;
     }
   }
 
   IconData _getTypeIcon(String type) {
     switch (type) {
       case 'sewa':
-        return Icons.home;
+        return Icons.home_rounded;
       case 'listrik':
-        return Icons.bolt;
+        return Icons.bolt_rounded;
       case 'air':
-        return Icons.water_drop;
+        return Icons.water_drop_rounded;
       case 'deposit':
-        return Icons.savings;
+        return Icons.savings_rounded;
       case 'denda':
-        return Icons.gavel;
+        return Icons.gavel_rounded;
       default:
-        return Icons.receipt;
+        return Icons.receipt_rounded;
     }
   }
 
   /// Loading shimmer
   Widget _buildLoadingShimmer() {
     return Shimmer.fromColors(
-      baseColor: Colors.grey.shade300,
-      highlightColor: Colors.grey.shade100,
+      baseColor: AppTheme.mediumGrey,
+      highlightColor: Colors.white,
       child: ListView.builder(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(20, 120, 20, 100),
         itemCount: 5,
         itemBuilder: (context, index) => Container(
-          height: 160,
-          margin: const EdgeInsets.only(bottom: 16),
+          height: 170,
+          margin: const EdgeInsets.only(bottom: 18),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(24),
           ),
         ),
       ),
@@ -889,46 +1178,74 @@ class BillsView extends GetView<BillsController> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(32),
               decoration: BoxDecoration(
-                color: AppTheme.pastelBlue.withOpacity(0.2),
+                gradient: LinearGradient(
+                  colors: [
+                    AppTheme.primaryBlue.withOpacity(0.1),
+                    AppTheme.cream.withOpacity(0.2),
+                  ],
+                ),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.receipt_long_outlined,
+                Icons.receipt_long_rounded,
                 size: 64,
-                color: AppTheme.pastelBlue,
+                color: AppTheme.primaryBlue,
               ),
             ),
-            const SizedBox(height: 24),
-            const Text(
+            const SizedBox(height: 28),
+            Text(
               'Belum Ada Tagihan',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2D3748),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
               'Tagihan akan muncul di sini.\nKlik tombol + untuk menambah tagihan.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600, height: 1.5),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoal.withOpacity(0.6),
+                height: 1.6,
+              ),
             ),
-            const SizedBox(height: 24),
-            ElevatedButton.icon(
-              onPressed: () => _navigateToForm(null),
-              icon: const Icon(Icons.add),
-              label: const Text('Tambah Tagihan'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.pastelBlue,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
+            const SizedBox(height: 28),
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [AppTheme.primaryBlue, AppTheme.lightBlue],
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.primaryBlue.withOpacity(0.35),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: ElevatedButton.icon(
+                onPressed: () => _navigateToForm(null),
+                icon: const Icon(Icons.add_rounded, color: Colors.white),
+                label: Text(
+                  'Tambah Tagihan',
+                  style: GoogleFonts.plusJakartaSans(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 14,
+                  ),
                 ),
               ),
             ),
@@ -944,19 +1261,64 @@ class BillsView extends GetView<BillsController> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
-          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE74C3C).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.error_outline_rounded,
+              size: 64,
+              color: const Color(0xFFE74C3C),
+            ),
+          ),
+          const SizedBox(height: 20),
           Obx(
             () => Text(
               controller.errorMessage.value,
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade600),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoal.withOpacity(0.6),
+              ),
             ),
           ),
-          const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: controller.fetchBills,
-            child: const Text('Coba Lagi'),
+          const SizedBox(height: 20),
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppTheme.primaryBlue, AppTheme.lightBlue],
+              ),
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryBlue.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: ElevatedButton.icon(
+              onPressed: controller.fetchBills,
+              icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+              label: Text(
+                'Coba Lagi',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -969,37 +1331,55 @@ class BillsView extends GetView<BillsController> {
       mainAxisSize: MainAxisSize.min,
       children: [
         // Generate Bills Button
-        FloatingActionButton.small(
-          heroTag: 'generate_bills_fab',
-          onPressed: () => _showGenerateBillsDialog(),
-          backgroundColor: const Color(0xFFB9F3CC),
-          child: const Icon(Icons.auto_mode, color: Color(0xFF2E7D32)),
-        ),
-        const SizedBox(height: 12),
-        // Add Bill Button
         Container(
           decoration: BoxDecoration(
             gradient: const LinearGradient(
-              colors: [Color(0xFFA9C9FF), Color(0xFFB9F3CC)],
+              colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
             ),
-            borderRadius: BorderRadius.circular(16),
+            shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFA9C9FF).withOpacity(0.4),
+                color: const Color(0xFF4CAF50).withOpacity(0.4),
                 blurRadius: 12,
-                offset: const Offset(0, 4),
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: FloatingActionButton.small(
+            heroTag: 'generate_bills_fab',
+            onPressed: () => _showGenerateBillsDialog(),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            child: const Icon(Icons.auto_mode_rounded, color: Colors.white),
+          ),
+        ),
+        const SizedBox(height: 14),
+        // Add Bill Button
+        Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [AppTheme.primaryBlue, AppTheme.deepBlue],
+            ),
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryBlue.withOpacity(0.4),
+                blurRadius: 16,
+                offset: const Offset(0, 8),
+                spreadRadius: -2,
               ),
             ],
           ),
           child: FloatingActionButton.extended(
             heroTag: 'bills_fab',
             onPressed: () => _navigateToForm(null),
-            icon: const Icon(Icons.add, color: Colors.white),
-            label: const Text(
+            icon: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+            label: Text(
               'Tambah',
-              style: TextStyle(
+              style: GoogleFonts.plusJakartaSans(
                 color: Colors.white,
-                fontWeight: FontWeight.bold,
+                fontWeight: FontWeight.w700,
+                fontSize: 14,
               ),
             ),
             backgroundColor: Colors.transparent,
@@ -1014,23 +1394,57 @@ class BillsView extends GetView<BillsController> {
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Center(
+              child: Container(
+                width: 48,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: AppTheme.mediumGrey,
+                  borderRadius: BorderRadius.circular(3),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
               'Urutkan Berdasarkan',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Obx(
+              () => Column(
+                children: [
+                  _buildSortOption(
+                    'due_date',
+                    'Jatuh Tempo',
+                    Icons.event_rounded,
+                  ),
+                  _buildSortOption(
+                    'amount',
+                    'Jumlah Tagihan',
+                    Icons.payments_rounded,
+                  ),
+                  _buildSortOption(
+                    'created_at',
+                    'Terbaru',
+                    Icons.access_time_rounded,
+                  ),
+                  _buildSortOption('status', 'Status', Icons.flag_rounded),
+                ],
+              ),
             ),
             const SizedBox(height: 16),
-            _buildSortOption('due_date', 'Jatuh Tempo', Icons.event),
-            _buildSortOption('amount', 'Jumlah Tagihan', Icons.payments),
-            _buildSortOption('created_at', 'Terbaru', Icons.access_time),
-            _buildSortOption('status', 'Status', Icons.flag),
           ],
         ),
       ),
@@ -1040,39 +1454,72 @@ class BillsView extends GetView<BillsController> {
   Widget _buildSortOption(String value, String label, IconData icon) {
     final isSelected = controller.sortBy.value == value;
 
-    return InkWell(
+    return GestureDetector(
       onTap: () {
         controller.setSortBy(value);
         Get.back();
       },
-      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.all(16),
-        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(18),
+        margin: const EdgeInsets.only(bottom: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.pastelBlue.withOpacity(0.1) : null,
-          borderRadius: BorderRadius.circular(12),
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [
+                    AppTheme.primaryBlue.withOpacity(0.1),
+                    AppTheme.lightBlue.withOpacity(0.05),
+                  ],
+                )
+              : null,
+          color: isSelected ? null : AppTheme.softGrey,
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppTheme.pastelBlue : Colors.grey.shade200,
+            color: isSelected
+                ? AppTheme.primaryBlue.withOpacity(0.3)
+                : Colors.transparent,
           ),
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: isSelected ? AppTheme.pastelBlue : Colors.grey.shade600,
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? AppTheme.primaryBlue.withOpacity(0.15)
+                    : AppTheme.mediumGrey.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: isSelected
+                    ? AppTheme.primaryBlue
+                    : AppTheme.charcoal.withOpacity(0.5),
+                size: 20,
+              ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 14),
             Text(
               label,
-              style: TextStyle(
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? AppTheme.pastelBlue : Colors.grey.shade700,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 15,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: isSelected ? AppTheme.primaryBlue : AppTheme.charcoal,
               ),
             ),
             const Spacer(),
             if (isSelected)
-              Icon(Icons.check_circle, color: AppTheme.pastelBlue),
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryBlue,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_rounded,
+                  color: Colors.white,
+                  size: 16,
+                ),
+              ),
           ],
         ),
       ),
@@ -1082,44 +1529,69 @@ class BillsView extends GetView<BillsController> {
   void _showGenerateBillsDialog() {
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
         title: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFB9F3CC).withOpacity(0.3),
-                borderRadius: BorderRadius.circular(10),
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
+                ),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.auto_mode, color: Color(0xFF2E7D32)),
+              child: const Icon(
+                Icons.auto_mode_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
             ),
-            const SizedBox(width: 12),
-            const Text('Generate Tagihan'),
+            const SizedBox(width: 14),
+            Text(
+              'Generate Tagihan',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
+              ),
+            ),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Apakah Anda ingin generate tagihan bulanan otomatis untuk semua penghuni aktif?',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoal.withOpacity(0.7),
+                height: 1.5,
+              ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 18),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF3E0),
-                borderRadius: BorderRadius.circular(12),
+                color: const Color(0xFFFF9800).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(14),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.info, color: Color(0xFFE65100), size: 20),
-                  const SizedBox(width: 8),
+                  const Icon(
+                    Icons.info_rounded,
+                    color: Color(0xFFE65100),
+                    size: 20,
+                  ),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'Tagihan yang sudah ada untuk bulan ini tidak akan di-generate ulang.',
-                      style: TextStyle(
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
+                        fontWeight: FontWeight.w500,
                         color: Colors.orange.shade800,
                       ),
                     ),
@@ -1130,17 +1602,44 @@ class BillsView extends GetView<BillsController> {
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
-          ElevatedButton(
-            onPressed: () {
-              Get.back();
-              controller.generateMonthlyBills();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFB9F3CC),
-              foregroundColor: const Color(0xFF2E7D32),
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.plusJakartaSans(
+                color: AppTheme.charcoal.withOpacity(0.6),
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            child: const Text('Generate'),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ElevatedButton(
+              onPressed: () {
+                Get.back();
+                controller.generateMonthlyBills();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              child: Text(
+                'Generate',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
           ),
         ],
       ),

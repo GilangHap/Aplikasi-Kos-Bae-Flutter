@@ -4,38 +4,37 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../theme/app_theme.dart';
 import 'tenant_form_controller.dart';
 
-/// Add/Edit Tenant Form View
+/// Add/Edit Tenant Form View - Premium UI
 class TenantFormView extends GetView<TenantFormController> {
   const TenantFormView({super.key});
-
-  // Pastel Colors
-  static const Color pastelBlue = Color(0xFFA9C9FF);
-  static const Color softGreen = Color(0xFFB9F3CC);
-  static const Color warmPeach = Color(0xFFFFD6A5);
-  static const Color softPink = Color(0xFFF7C4D4);
-  static const Color lightLavender = Color(0xFFE2CFEA);
-  static const Color creamWhite = Color(0xFFFFFDF7);
-  static const Color darkText = Color(0xFF2D3748);
-  static const Color grayText = Color(0xFF718096);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: creamWhite,
+      backgroundColor: AppTheme.softGrey,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: darkText),
-          onPressed: () => Get.back(),
+        leading: Container(
+          margin: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: AppTheme.softGrey,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            icon: Icon(Icons.close_rounded, color: AppTheme.charcoal),
+            onPressed: () => Get.back(),
+          ),
         ),
         title: Obx(
           () => Text(
             controller.isEditMode.value ? 'Edit Penghuni' : 'Tambah Penghuni',
-            style: const TextStyle(
-              color: darkText,
+            style: GoogleFonts.plusJakartaSans(
+              color: AppTheme.deepBlue,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -44,24 +43,24 @@ class TenantFormView extends GetView<TenantFormController> {
         actions: [
           Obx(
             () => controller.isSaving.value
-                ? const Padding(
-                    padding: EdgeInsets.all(16),
+                ? Padding(
+                    padding: const EdgeInsets.all(16),
                     child: SizedBox(
                       width: 24,
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        color: pastelBlue,
+                        color: AppTheme.primaryBlue,
                       ),
                     ),
                   )
                 : TextButton.icon(
                     onPressed: controller.saveForm,
-                    icon: const Icon(Icons.save_rounded, color: pastelBlue),
-                    label: const Text(
+                    icon: Icon(Icons.save_rounded, color: AppTheme.primaryBlue),
+                    label: Text(
                       'Simpan',
-                      style: TextStyle(
-                        color: pastelBlue,
+                      style: GoogleFonts.plusJakartaSans(
+                        color: AppTheme.primaryBlue,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -71,8 +70,8 @@ class TenantFormView extends GetView<TenantFormController> {
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return const Center(
-            child: CircularProgressIndicator(color: pastelBlue),
+          return Center(
+            child: CircularProgressIndicator(color: AppTheme.primaryBlue),
           );
         }
 
@@ -91,7 +90,7 @@ class TenantFormView extends GetView<TenantFormController> {
                 _buildSectionHeader(
                   'Informasi Pribadi',
                   Icons.person_rounded,
-                  pastelBlue,
+                  AppTheme.primaryBlue,
                 ),
                 const SizedBox(height: 16),
                 _buildPersonalInfoFields(),
@@ -102,7 +101,7 @@ class TenantFormView extends GetView<TenantFormController> {
                   _buildSectionHeader(
                     'Akun Login',
                     Icons.lock_rounded,
-                    softPink,
+                    AppTheme.gold,
                   ),
                   const SizedBox(height: 16),
                   _buildLoginInfoFields(),
@@ -113,7 +112,7 @@ class TenantFormView extends GetView<TenantFormController> {
                 _buildSectionHeader(
                   'Kontrak & Status',
                   Icons.description_rounded,
-                  warmPeach,
+                  AppTheme.lightBlue,
                 ),
                 const SizedBox(height: 16),
                 _buildContractStatusFields(),
@@ -146,12 +145,12 @@ class TenantFormView extends GetView<TenantFormController> {
                   width: 150,
                   height: 150,
                   decoration: BoxDecoration(
-                    color: pastelBlue.withOpacity(0.3),
+                    color: AppTheme.primaryBlue.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: pastelBlue, width: 2),
+                    border: Border.all(color: AppTheme.primaryBlue, width: 2),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: AppTheme.primaryBlue.withOpacity(0.15),
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -168,9 +167,9 @@ class TenantFormView extends GetView<TenantFormController> {
                         ? CachedNetworkImage(
                             imageUrl: controller.displayPhotoUrl!,
                             fit: BoxFit.cover,
-                            placeholder: (context, url) => const Center(
+                            placeholder: (context, url) => Center(
                               child: CircularProgressIndicator(
-                                color: pastelBlue,
+                                color: AppTheme.primaryBlue,
                               ),
                             ),
                             errorWidget: (context, url, error) =>
@@ -206,11 +205,11 @@ class TenantFormView extends GetView<TenantFormController> {
 
   Widget _buildPhotoPlaceholder() {
     return Container(
-      color: pastelBlue.withOpacity(0.3),
+      color: AppTheme.primaryBlue.withOpacity(0.2),
       child: Icon(
         Icons.person_rounded,
         size: 64,
-        color: pastelBlue.withOpacity(0.5),
+        color: AppTheme.primaryBlue.withOpacity(0.5),
       ),
     );
   }
@@ -228,16 +227,23 @@ class TenantFormView extends GetView<TenantFormController> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: pastelBlue.withOpacity(0.5)),
+          border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.3)),
+          boxShadow: [
+            BoxShadow(
+              color: AppTheme.deepBlue.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
-            Icon(icon, size: 18, color: pastelBlue),
+            Icon(icon, size: 18, color: AppTheme.primaryBlue),
             const SizedBox(width: 8),
             Text(
               label,
-              style: const TextStyle(
-                color: darkText,
+              style: GoogleFonts.plusJakartaSans(
+                color: AppTheme.deepBlue,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -253,18 +259,18 @@ class TenantFormView extends GetView<TenantFormController> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.3),
+            color: color.withOpacity(0.15),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, color: darkText, size: 20),
+          child: Icon(icon, color: color, size: 20),
         ),
         const SizedBox(width: 12),
         Text(
           title,
-          style: const TextStyle(
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: darkText,
+            color: AppTheme.deepBlue,
           ),
         ),
       ],
@@ -373,7 +379,7 @@ class TenantFormView extends GetView<TenantFormController> {
                 controller.obscurePassword.value
                     ? Icons.visibility_rounded
                     : Icons.visibility_off_rounded,
-                color: grayText,
+                color: AppTheme.charcoal.withOpacity(0.5),
               ),
               onPressed: () => controller.obscurePassword.toggle(),
             ),
@@ -394,17 +400,21 @@ class TenantFormView extends GetView<TenantFormController> {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: softPink.withOpacity(0.2),
+            color: AppTheme.gold.withOpacity(0.1),
             borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppTheme.gold.withOpacity(0.3)),
           ),
           child: Row(
             children: [
-              Icon(Icons.info_outline_rounded, size: 20, color: darkText),
+              Icon(Icons.info_outline_rounded, size: 20, color: AppTheme.gold),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Isi email & password untuk membuatkan akun login bagi penghuni ini.',
-                  style: TextStyle(fontSize: 12, color: darkText),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    color: AppTheme.deepBlue,
+                  ),
                 ),
               ),
             ],
@@ -432,13 +442,17 @@ class TenantFormView extends GetView<TenantFormController> {
               ),
               ...controller.availableContracts.map((contract) {
                 final room = contract.roomNumber ?? 'N/A';
-                final startDate = DateFormat('dd MMM yyyy').format(contract.startDate);
-                final endDate = DateFormat('dd MMM yyyy').format(contract.endDate);
+                final startDate = DateFormat(
+                  'dd MMM yyyy',
+                ).format(contract.startDate);
+                final endDate = DateFormat(
+                  'dd MMM yyyy',
+                ).format(contract.endDate);
                 return DropdownMenuItem<String>(
                   value: contract.id,
                   child: Text(
                     'Kamar $room ($startDate - $endDate)',
-                    style: const TextStyle(fontSize: 14),
+                    style: GoogleFonts.plusJakartaSans(fontSize: 14),
                   ),
                 );
               }),
@@ -455,22 +469,26 @@ class TenantFormView extends GetView<TenantFormController> {
             return Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: warmPeach.withOpacity(0.2),
+                color: AppTheme.lightBlue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: warmPeach.withOpacity(0.5)),
+                border: Border.all(color: AppTheme.lightBlue.withOpacity(0.3)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.info_outline_rounded, color: darkText, size: 18),
+                      Icon(
+                        Icons.info_outline_rounded,
+                        color: AppTheme.primaryBlue,
+                        size: 18,
+                      ),
                       const SizedBox(width: 8),
-                      const Text(
+                      Text(
                         'Detail Kontrak',
-                        style: TextStyle(
+                        style: GoogleFonts.plusJakartaSans(
                           fontWeight: FontWeight.bold,
-                          color: darkText,
+                          color: AppTheme.deepBlue,
                         ),
                       ),
                     ],
@@ -483,7 +501,9 @@ class TenantFormView extends GetView<TenantFormController> {
                   ),
                   _buildContractDetailRow(
                     'Mulai',
-                    DateFormat('dd MMM yyyy').format(selectedContract.startDate),
+                    DateFormat(
+                      'dd MMM yyyy',
+                    ).format(selectedContract.startDate),
                     Icons.calendar_today_rounded,
                   ),
                   _buildContractDetailRow(
@@ -525,8 +545,8 @@ class TenantFormView extends GetView<TenantFormController> {
                       height: 12,
                       decoration: BoxDecoration(
                         color: option['value'] == 'aktif'
-                            ? softGreen
-                            : softPink,
+                            ? const Color(0xFF48BB78)
+                            : const Color(0xFFE53E3E),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -548,22 +568,22 @@ class TenantFormView extends GetView<TenantFormController> {
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: grayText),
+          Icon(icon, size: 16, color: AppTheme.primaryBlue.withOpacity(0.7)),
           const SizedBox(width: 8),
           Text(
             '$label: ',
-            style: TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 13,
-              color: grayText,
+              color: AppTheme.charcoal.withOpacity(0.7),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: GoogleFonts.plusJakartaSans(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: darkText,
+                color: AppTheme.deepBlue,
               ),
             ),
           ),
@@ -593,13 +613,13 @@ class TenantFormView extends GetView<TenantFormController> {
           children: [
             Text(
               label,
-              style: const TextStyle(
+              style: GoogleFonts.plusJakartaSans(
                 fontWeight: FontWeight.w600,
-                color: darkText,
+                color: AppTheme.deepBlue,
               ),
             ),
             if (isRequired)
-              const Text(' *', style: TextStyle(color: Colors.red)),
+              Text(' *', style: TextStyle(color: Colors.red.shade400)),
           ],
         ),
         const SizedBox(height: 8),
@@ -610,10 +630,13 @@ class TenantFormView extends GetView<TenantFormController> {
           inputFormatters: inputFormatters,
           validator: validator,
           obscureText: obscureText,
+          style: GoogleFonts.plusJakartaSans(color: AppTheme.deepBlue),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: grayText.withOpacity(0.6)),
-            prefixIcon: Icon(icon, color: pastelBlue),
+            hintStyle: GoogleFonts.plusJakartaSans(
+              color: AppTheme.charcoal.withOpacity(0.4),
+            ),
+            prefixIcon: Icon(icon, color: AppTheme.primaryBlue),
             suffixIcon: suffixIcon,
             filled: true,
             fillColor: Colors.white,
@@ -623,11 +646,13 @@ class TenantFormView extends GetView<TenantFormController> {
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: BorderSide(color: pastelBlue.withOpacity(0.3)),
+              borderSide: BorderSide(
+                color: AppTheme.mediumGrey.withOpacity(0.5),
+              ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: pastelBlue, width: 2),
+              borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -657,7 +682,10 @@ class TenantFormView extends GetView<TenantFormController> {
       children: [
         Text(
           label,
-          style: const TextStyle(fontWeight: FontWeight.w600, color: darkText),
+          style: GoogleFonts.plusJakartaSans(
+            fontWeight: FontWeight.w600,
+            color: AppTheme.deepBlue,
+          ),
         ),
         const SizedBox(height: 8),
         Container(
@@ -665,19 +693,21 @@ class TenantFormView extends GetView<TenantFormController> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: pastelBlue.withOpacity(0.3)),
+            border: Border.all(color: AppTheme.mediumGrey.withOpacity(0.5)),
           ),
           child: DropdownButtonHideUnderline(
             child: DropdownButton<T>(
               value: value,
               hint: Text(
                 hint,
-                style: TextStyle(color: grayText.withOpacity(0.6)),
+                style: GoogleFonts.plusJakartaSans(
+                  color: AppTheme.charcoal.withOpacity(0.4),
+                ),
               ),
               isExpanded: true,
-              icon: const Icon(
+              icon: Icon(
                 Icons.keyboard_arrow_down_rounded,
-                color: grayText,
+                color: AppTheme.primaryBlue,
               ),
               items: items,
               onChanged: onChanged,
@@ -691,8 +721,26 @@ class TenantFormView extends GetView<TenantFormController> {
   /// Submit button
   Widget _buildSubmitButton() {
     return Obx(
-      () => SizedBox(
+      () => Container(
         width: double.infinity,
+        height: 54,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: controller.isSaving.value
+                ? [AppTheme.mediumGrey, AppTheme.mediumGrey]
+                : [AppTheme.primaryBlue, AppTheme.lightBlue],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: controller.isSaving.value
+              ? []
+              : [
+                  BoxShadow(
+                    color: AppTheme.primaryBlue.withOpacity(0.4),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+        ),
         child: ElevatedButton.icon(
           onPressed: controller.isSaving.value ? null : controller.saveForm,
           icon: controller.isSaving.value
@@ -715,13 +763,15 @@ class TenantFormView extends GetView<TenantFormController> {
                 : controller.isEditMode.value
                 ? 'Simpan Perubahan'
                 : 'Tambah Penghuni',
+            style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold),
           ),
           style: ElevatedButton.styleFrom(
-            backgroundColor: pastelBlue,
-            foregroundColor: darkText,
+            backgroundColor: Colors.transparent,
+            foregroundColor: Colors.white,
+            shadowColor: Colors.transparent,
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(16),
             ),
             elevation: 0,
           ),

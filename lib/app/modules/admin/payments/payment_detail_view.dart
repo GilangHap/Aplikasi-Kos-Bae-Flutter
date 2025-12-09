@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../models/payment_detail_model.dart';
 import '../../../services/supabase_service.dart';
 import '../../../theme/app_theme.dart';
@@ -62,31 +63,31 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.softGrey,
       body: CustomScrollView(
         slivers: [
           _buildSliverAppBar(),
           SliverPadding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(20),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 _buildPaymentAmountCard(),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _buildTenantInfoCard(),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _buildBillInfoCard(),
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 if (payment.hasProof) ...[
                   _buildProofCard(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                 ],
                 if (payment.notes != null && payment.notes!.isNotEmpty) ...[
                   _buildTenantNotesCard(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                 ],
                 if (payment.isRejected && payment.rejectionReason != null) ...[
                   _buildRejectionReasonCard(),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 20),
                 ],
                 _buildPaymentDetailsCard(),
                 const SizedBox(height: 100),
@@ -100,18 +101,20 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
   }
 
   Widget _buildSliverAppBar() {
+    final statusColors = _getStatusGradient(payment.status);
+
     return SliverAppBar(
-      expandedHeight: 140,
+      expandedHeight: 160,
       pinned: true,
-      backgroundColor: _getStatusColor(payment.status),
+      backgroundColor: statusColors[0],
       leading: Container(
         margin: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.2),
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(14),
         ),
         child: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
           onPressed: () => Get.back(),
         ),
       ),
@@ -121,43 +124,48 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                _getStatusColor(payment.status),
-                _getStatusColor(payment.status).withOpacity(0.8),
-              ],
+              colors: statusColors,
             ),
           ),
           child: SafeArea(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 60, 16, 16),
+              padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(
                     children: [
-                      Icon(
-                        _getStatusIcon(payment.status),
-                        color: Colors.white,
-                        size: 28,
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Icon(
+                          _getStatusIcon(payment.status),
+                          color: Colors.white,
+                          size: 28,
+                        ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               payment.statusLabel,
-                              style: const TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 24,
+                                fontWeight: FontWeight.w800,
                                 color: Colors.white,
                               ),
                             ),
                             Text(
                               payment.formattedCreatedAt,
-                              style: TextStyle(
+                              style: GoogleFonts.plusJakartaSans(
                                 fontSize: 14,
+                                fontWeight: FontWeight.w500,
                                 color: Colors.white.withOpacity(0.9),
                               ),
                             ),
@@ -175,17 +183,37 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
     );
   }
 
+  List<Color> _getStatusGradient(String status) {
+    switch (status) {
+      case 'verified':
+        return [const Color(0xFF4CAF50), const Color(0xFF81C784)];
+      case 'pending':
+        return [const Color(0xFFFF9800), const Color(0xFFFFB74D)];
+      case 'rejected':
+        return [const Color(0xFFE91E63), const Color(0xFFF48FB1)];
+      default:
+        return [const Color(0xFF5B8DB8), const Color(0xFF7BA9CC)];
+    }
+  }
+
   Widget _buildPaymentAmountCard() {
+    const darkCream = Color(0xFFE8D4BA);
+    const primaryBlue = Color(0xFF5B8DB8);
+    const charcoal = Color(0xFF2D3436);
+
+    final statusColors = _getStatusGradient(payment.status);
+
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: darkCream.withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: primaryBlue.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -193,18 +221,26 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
         children: [
           Text(
             'Nominal Pembayaran',
-            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            payment.formattedAmount,
-            style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: _getStatusColor(payment.status),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: charcoal.withOpacity(0.6),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
+          ShaderMask(
+            shaderCallback: (bounds) =>
+                LinearGradient(colors: statusColors).createShader(bounds),
+            child: Text(
+              payment.formattedAmount,
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 38,
+                fontWeight: FontWeight.w800,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -219,11 +255,16 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
   }
 
   Widget _buildMethodBadge() {
+    const cream = Color(0xFFF5E6D3);
+    const darkCream = Color(0xFFE8D4BA);
+    const charcoal = Color(0xFF2D3436);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(colors: [cream, darkCream.withOpacity(0.5)]),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: darkCream),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -231,15 +272,15 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
           Icon(
             _getMethodIcon(payment.method),
             size: 16,
-            color: Colors.grey.shade700,
+            color: charcoal.withOpacity(0.7),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: 8),
           Text(
             payment.methodLabel,
-            style: TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 13,
-              color: Colors.grey.shade700,
-              fontWeight: FontWeight.w500,
+              color: charcoal,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -248,23 +289,32 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
   }
 
   Widget _buildDateBadge() {
+    const cream = Color(0xFFF5E6D3);
+    const darkCream = Color(0xFFE8D4BA);
+    const charcoal = Color(0xFF2D3436);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(colors: [cream, darkCream.withOpacity(0.5)]),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: darkCream),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.calendar_today, size: 16, color: Colors.grey.shade700),
-          const SizedBox(width: 6),
+          Icon(
+            Icons.calendar_today_rounded,
+            size: 16,
+            color: charcoal.withOpacity(0.7),
+          ),
+          const SizedBox(width: 8),
           Text(
             payment.formattedPaymentDate,
-            style: TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 13,
-              color: Colors.grey.shade700,
-              fontWeight: FontWeight.w500,
+              color: charcoal,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -273,42 +323,61 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
   }
 
   Widget _buildTenantInfoCard() {
+    const cream = Color(0xFFF5E6D3);
+    const darkCream = Color(0xFFE8D4BA);
+    const primaryBlue = Color(0xFF5B8DB8);
+    const lightBlue = Color(0xFF7BA9CC);
+    const deepBlue = Color(0xFF2C3E50);
+    const charcoal = Color(0xFF2D3436);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: darkCream.withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: primaryBlue.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Row(
         children: [
-          // Tenant Photo
+          // Tenant Photo with premium styling
           Container(
-            width: 60,
-            height: 60,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
-              color: AppTheme.pastelBlue.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [cream, darkCream],
+              ),
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: darkCream),
             ),
             child: payment.tenantPhoto != null
                 ? ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(17),
                     child: CachedNetworkImage(
                       imageUrl: payment.tenantPhoto!,
                       fit: BoxFit.cover,
-                      placeholder: (_, __) =>
-                          const Icon(Icons.person, color: Colors.black45),
-                      errorWidget: (_, __, ___) =>
-                          const Icon(Icons.person, color: Colors.black45),
+                      placeholder: (_, __) => Icon(
+                        Icons.person_rounded,
+                        color: primaryBlue,
+                        size: 28,
+                      ),
+                      errorWidget: (_, __, ___) => Icon(
+                        Icons.person_rounded,
+                        color: primaryBlue,
+                        size: 28,
+                      ),
                     ),
                   )
-                : const Icon(Icons.person, color: Colors.black45, size: 30),
+                : Icon(Icons.person_rounded, color: primaryBlue, size: 28),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -317,41 +386,58 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
               children: [
                 Text(
                   payment.tenantName ?? 'Unknown',
-                  style: const TextStyle(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    fontWeight: FontWeight.w700,
+                    color: charcoal,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(
-                      Icons.meeting_room,
-                      size: 16,
-                      color: Colors.grey.shade500,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Kamar ${payment.roomNumber ?? '-'}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey.shade600,
+                const SizedBox(height: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: cream.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.meeting_room_rounded,
+                        size: 14,
+                        color: primaryBlue,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 6),
+                      Text(
+                        'Kamar ${payment.roomNumber ?? '-'}',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: deepBlue,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 if (payment.tenantPhone != null) ...[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 6),
                   Row(
                     children: [
-                      Icon(Icons.phone, size: 16, color: Colors.grey.shade500),
+                      Icon(
+                        Icons.phone_rounded,
+                        size: 14,
+                        color: charcoal.withOpacity(0.5),
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         payment.tenantPhone!,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey.shade600,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: charcoal.withOpacity(0.7),
                         ),
                       ),
                     ],
@@ -360,25 +446,39 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
               ],
             ),
           ),
-          IconButton(
-            onPressed: () {
-              if (payment.tenantId != null) {
-                Get.toNamed(
-                  AppRoutes.ADMIN_TENANT_DETAIL,
-                  arguments: {'tenantId': payment.tenantId},
-                );
-              }
-            },
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppTheme.pastelBlue.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(
-                Icons.arrow_forward,
-                size: 18,
-                color: AppTheme.pastelBlue,
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(colors: [primaryBlue, lightBlue]),
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: primaryBlue.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(14),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(14),
+                onTap: () {
+                  if (payment.tenantId != null) {
+                    Get.toNamed(
+                      AppRoutes.ADMIN_TENANT_DETAIL,
+                      arguments: {'tenantId': payment.tenantId},
+                    );
+                  }
+                },
+                child: const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    size: 18,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
           ),
@@ -388,16 +488,22 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
   }
 
   Widget _buildBillInfoCard() {
+    const darkCream = Color(0xFFE8D4BA);
+    const primaryBlue = Color(0xFF5B8DB8);
+    const charcoal = Color(0xFF2D3436);
+    const gold = Color(0xFFD4AF37);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: darkCream.withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: primaryBlue.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -407,29 +513,27 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.warmPeach.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  gradient: LinearGradient(
+                    colors: [gold.withOpacity(0.2), gold.withOpacity(0.1)],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(
-                  Icons.receipt_long,
-                  color: AppTheme.warmPeach,
-                  size: 22,
-                ),
+                child: Icon(Icons.receipt_long_rounded, color: gold, size: 22),
               ),
-              const SizedBox(width: 12),
-              const Text(
+              const SizedBox(width: 14),
+              Text(
                 'Informasi Tagihan',
-                style: TextStyle(
+                style: GoogleFonts.plusJakartaSans(
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  fontWeight: FontWeight.w700,
+                  color: charcoal,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           _buildInfoRow('Jenis Tagihan', payment.billTypeLabel),
           if (payment.billingPeriod != null)
             _buildInfoRow('Periode', payment.billingPeriod!),
@@ -445,21 +549,34 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
   }
 
   Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    const cream = Color(0xFFF5E6D3);
+    const deepBlue = Color(0xFF2C3E50);
+    const charcoal = Color(0xFF2D3436);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 14),
+      decoration: BoxDecoration(
+        color: cream.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             label,
-            style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: charcoal.withOpacity(0.6),
+            ),
           ),
           Text(
             value,
-            style: const TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              fontWeight: FontWeight.w700,
+              color: deepBlue,
             ),
           ),
         ],
@@ -468,16 +585,22 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
   }
 
   Widget _buildProofCard() {
+    const darkCream = Color(0xFFE8D4BA);
+    const primaryBlue = Color(0xFF5B8DB8);
+    const lightBlue = Color(0xFF7BA9CC);
+    const charcoal = Color(0xFF2D3436);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: darkCream.withOpacity(0.5)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: primaryBlue.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
@@ -487,21 +610,26 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: AppTheme.pastelBlue.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(12),
+                  gradient: LinearGradient(
+                    colors: [
+                      primaryBlue.withOpacity(0.2),
+                      lightBlue.withOpacity(0.1),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
                 ),
-                child: Icon(Icons.image, color: AppTheme.pastelBlue, size: 22),
+                child: Icon(Icons.image_rounded, color: primaryBlue, size: 22),
               ),
-              const SizedBox(width: 12),
-              const Expanded(
+              const SizedBox(width: 14),
+              Expanded(
                 child: Text(
                   'Bukti Pembayaran',
-                  style: TextStyle(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    fontWeight: FontWeight.w700,
+                    color: charcoal,
                   ),
                 ),
               ),
@@ -714,15 +842,17 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
   }
 
   Widget _buildActionBar() {
+    const primaryBlue = Color(0xFF5B8DB8);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+            color: primaryBlue.withOpacity(0.1),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
@@ -730,16 +860,41 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
         child: Row(
           children: [
             Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _showRejectDialog,
-                icon: const Icon(Icons.close),
-                label: const Text('Tolak'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red.shade400,
-                  side: BorderSide(color: Colors.red.shade300),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: const Color(0xFFE91E63).withOpacity(0.4),
+                  ),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                  child: InkWell(
                     borderRadius: BorderRadius.circular(16),
+                    onTap: _showRejectDialog,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.close_rounded,
+                            color: Color(0xFFE91E63),
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Tolak',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFFE91E63),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -747,17 +902,48 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
             const SizedBox(width: 16),
             Expanded(
               flex: 2,
-              child: ElevatedButton.icon(
-                onPressed: _showVerifyDialog,
-                icon: const Icon(Icons.check),
-                label: const Text('Verifikasi Pembayaran'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.softGreen,
-                  foregroundColor: Colors.black87,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF4CAF50).withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(16),
+                  child: InkWell(
                     borderRadius: BorderRadius.circular(16),
+                    onTap: _showVerifyDialog,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.check_rounded,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Verifikasi Pembayaran',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -769,42 +955,29 @@ class _PaymentDetailViewState extends State<PaymentDetailView> {
   }
 
   // Helper methods
-  Color _getStatusColor(String status) {
-    switch (status) {
-      case 'verified':
-        return AppTheme.softGreen;
-      case 'pending':
-        return AppTheme.warmPeach;
-      case 'rejected':
-        return AppTheme.softPink;
-      default:
-        return AppTheme.pastelBlue;
-    }
-  }
-
   IconData _getStatusIcon(String status) {
     switch (status) {
       case 'verified':
-        return Icons.check_circle;
+        return Icons.check_circle_rounded;
       case 'pending':
-        return Icons.hourglass_empty;
+        return Icons.hourglass_empty_rounded;
       case 'rejected':
-        return Icons.cancel;
+        return Icons.cancel_rounded;
       default:
-        return Icons.help;
+        return Icons.help_rounded;
     }
   }
 
   IconData _getMethodIcon(String method) {
     switch (method) {
       case 'transfer':
-        return Icons.account_balance;
+        return Icons.account_balance_rounded;
       case 'cash':
-        return Icons.money;
+        return Icons.money_rounded;
       case 'ewallet':
-        return Icons.phone_android;
+        return Icons.phone_android_rounded;
       default:
-        return Icons.payment;
+        return Icons.payment_rounded;
     }
   }
 

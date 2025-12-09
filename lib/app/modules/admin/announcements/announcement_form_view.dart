@@ -19,18 +19,18 @@ class _AnnouncementFormViewState extends State<AnnouncementFormView> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
-  
+
   bool _isRequired = false;
   bool _isLoading = false;
-  
+
   Announcement? _announcement;
   bool get _isEditing => _announcement != null;
-  
+
   // Attachments
   List<String> _existingAttachments = [];
   List<String> _removedAttachments = [];
   List<XFile> _newAttachments = [];
-  
+
   final ImagePicker _picker = ImagePicker();
 
   @override
@@ -60,7 +60,7 @@ class _AnnouncementFormViewState extends State<AnnouncementFormView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.softGrey,
       appBar: _buildAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -262,10 +262,7 @@ class _AnnouncementFormViewState extends State<AnnouncementFormView> {
                 const SizedBox(height: 4),
                 Text(
                   'Tandai jika pengumuman ini penting dan wajib dibaca oleh semua penghuni',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey.shade600,
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
                 ),
               ],
             ),
@@ -318,10 +315,7 @@ class _AnnouncementFormViewState extends State<AnnouncementFormView> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.add_photo_alternate,
-                    color: AppTheme.pastelBlue,
-                  ),
+                  Icon(Icons.add_photo_alternate, color: AppTheme.pastelBlue),
                   const SizedBox(width: 8),
                   Text(
                     'Tambah Lampiran',
@@ -438,11 +432,7 @@ class _AnnouncementFormViewState extends State<AnnouncementFormView> {
                 color: Colors.red,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.close,
-                size: 14,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.close, size: 14, color: Colors.white),
             ),
           ),
         ),
@@ -467,11 +457,7 @@ class _AnnouncementFormViewState extends State<AnnouncementFormView> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.image,
-                color: AppTheme.pastelBlue,
-                size: 32,
-              ),
+              Icon(Icons.image, color: AppTheme.pastelBlue, size: 32),
               const SizedBox(height: 4),
               Text(
                 'New',
@@ -495,11 +481,7 @@ class _AnnouncementFormViewState extends State<AnnouncementFormView> {
                 color: Colors.red,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.close,
-                size: 14,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.close, size: 14, color: Colors.white),
             ),
           ),
         ),
@@ -615,8 +597,9 @@ class _AnnouncementFormViewState extends State<AnnouncementFormView> {
           isRequired: _isRequired,
           existingAttachments: _existingAttachments,
           newAttachments: _newAttachments.isNotEmpty ? _newAttachments : null,
-          removedAttachments:
-              _removedAttachments.isNotEmpty ? _removedAttachments : null,
+          removedAttachments: _removedAttachments.isNotEmpty
+              ? _removedAttachments
+              : null,
         );
       } else {
         success = await controller.createAnnouncement(

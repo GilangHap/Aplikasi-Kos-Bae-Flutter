@@ -58,7 +58,7 @@ class _ContractFormViewState extends State<ContractFormView> {
     final controller = Get.find<ContractsController>();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.softGrey,
       appBar: _buildAppBar(),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -212,16 +212,6 @@ class _ContractFormViewState extends State<ContractFormView> {
           onChanged: (tenant) {
             setState(() {
               _selectedTenant = tenant;
-              // Auto-select tenant's room if available
-              if (tenant?.roomId != null) {
-                final room = controller.rooms.firstWhereOrNull(
-                  (r) => r.id == tenant!.roomId,
-                );
-                if (room != null) {
-                  _selectedRoom = room;
-                  _monthlyRentController.text = room.price.toStringAsFixed(0);
-                }
-              }
             });
           },
           validator: (value) {
@@ -265,7 +255,9 @@ class _ContractFormViewState extends State<ContractFormView> {
           items: rooms.map((room) {
             return DropdownMenuItem<Room>(
               value: room,
-              child: Text('Kamar ${room.roomNumber} - ${_currencyFormat.format(room.price)}'),
+              child: Text(
+                'Kamar ${room.roomNumber} - ${_currencyFormat.format(room.price)}',
+              ),
             );
           }).toList(),
           onChanged: (room) {
@@ -314,13 +306,19 @@ class _ContractFormViewState extends State<ContractFormView> {
           contentPadding: const EdgeInsets.all(16),
           prefixIcon: Icon(Icons.payments, color: AppTheme.pastelBlue),
           prefixText: 'Rp ',
-          suffixIcon: Icon(Icons.lock_outline, color: Colors.grey.shade400, size: 18),
+          suffixIcon: Icon(
+            Icons.lock_outline,
+            color: Colors.grey.shade400,
+            size: 18,
+          ),
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
             return 'Pilih kamar terlebih dahulu';
           }
-          final amount = double.tryParse(value.replaceAll(RegExp(r'[^0-9]'), ''));
+          final amount = double.tryParse(
+            value.replaceAll(RegExp(r'[^0-9]'), ''),
+          );
           if (amount == null || amount <= 0) {
             return 'Harga sewa tidak valid';
           }
@@ -357,7 +355,11 @@ class _ContractFormViewState extends State<ContractFormView> {
                     color: AppTheme.softGreen.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.calendar_today, color: Colors.green.shade600, size: 20),
+                  child: Icon(
+                    Icons.calendar_today,
+                    color: Colors.green.shade600,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -366,7 +368,10 @@ class _ContractFormViewState extends State<ContractFormView> {
                     children: [
                       Text(
                         'Tanggal Mulai',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -398,7 +403,11 @@ class _ContractFormViewState extends State<ContractFormView> {
                     color: AppTheme.softPink.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(Icons.event, color: Colors.red.shade400, size: 20),
+                  child: Icon(
+                    Icons.event,
+                    color: Colors.red.shade400,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -407,7 +416,10 @@ class _ContractFormViewState extends State<ContractFormView> {
                     children: [
                       Text(
                         'Tanggal Berakhir',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       Text(
@@ -432,9 +444,11 @@ class _ContractFormViewState extends State<ContractFormView> {
 
   Widget _buildDurationInfo() {
     final months = ((_endDate.difference(_startDate).inDays) / 30).round();
-    final monthlyRent = double.tryParse(
-      _monthlyRentController.text.replaceAll(RegExp(r'[^0-9]'), ''),
-    ) ?? 0;
+    final monthlyRent =
+        double.tryParse(
+          _monthlyRentController.text.replaceAll(RegExp(r'[^0-9]'), ''),
+        ) ??
+        0;
     final totalValue = monthlyRent * months;
 
     return Container(
@@ -449,7 +463,11 @@ class _ContractFormViewState extends State<ContractFormView> {
           Expanded(
             child: Column(
               children: [
-                Icon(Icons.calendar_month, color: AppTheme.pastelBlue, size: 28),
+                Icon(
+                  Icons.calendar_month,
+                  color: AppTheme.pastelBlue,
+                  size: 28,
+                ),
                 const SizedBox(height: 8),
                 Text(
                   '$months bulan',
@@ -577,7 +595,11 @@ class _ContractFormViewState extends State<ContractFormView> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.picture_as_pdf, color: Colors.red.shade400, size: 32),
+                  Icon(
+                    Icons.picture_as_pdf,
+                    color: Colors.red.shade400,
+                    size: 32,
+                  ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Column(
@@ -821,7 +843,9 @@ class _ContractFormViewState extends State<ContractFormView> {
         startDate: _startDate,
         endDate: _endDate,
         document: _document,
-        notes: _notesController.text.isNotEmpty ? _notesController.text.trim() : null,
+        notes: _notesController.text.isNotEmpty
+            ? _notesController.text.trim()
+            : null,
       );
 
       if (success) {

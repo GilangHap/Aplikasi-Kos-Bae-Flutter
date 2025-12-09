@@ -2,12 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../models/complaint_model.dart';
 import '../../../theme/app_theme.dart';
 import '../../../routes/app_routes.dart';
 import 'complaints_controller.dart';
 
-/// Admin Complaints Management View
+/// Admin Complaints Management View with Premium Design
 class AdminComplaintsView extends StatelessWidget {
   const AdminComplaintsView({Key? key}) : super(key: key);
 
@@ -21,9 +22,12 @@ class AdminComplaintsView extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: controller.refreshData,
-      color: AppTheme.pastelBlue,
+      color: AppTheme.primaryBlue,
       child: CustomScrollView(
         slivers: [
+          // Premium Header
+          SliverToBoxAdapter(child: _buildPremiumHeader()),
+
           // Statistics Cards
           SliverToBoxAdapter(child: _buildStatisticsSection(controller)),
 
@@ -36,8 +40,14 @@ class AdminComplaintsView extends StatelessWidget {
           // Complaints List
           Obx(() {
             if (controller.isLoading.value) {
-              return const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
+              return SliverFillRemaining(
+                child: Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppTheme.primaryBlue,
+                    ),
+                  ),
+                ),
               );
             }
 
@@ -50,7 +60,7 @@ class AdminComplaintsView extends StatelessWidget {
             }
 
             return SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 100),
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate((context, index) {
                   final complaint = controller.filteredComplaints[index];
@@ -64,41 +74,147 @@ class AdminComplaintsView extends StatelessWidget {
     );
   }
 
+  /// Premium Header
+  Widget _buildPremiumHeader() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(24, 60, 24, 28),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppTheme.deepBlue, AppTheme.primaryBlue, AppTheme.lightBlue],
+        ),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(32),
+          bottomRight: Radius.circular(32),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryBlue.withOpacity(0.3),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Decorative circles
+          Positioned(
+            top: -30,
+            right: -30,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.1),
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -20,
+            left: -20,
+            child: Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withOpacity(0.08),
+              ),
+            ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Keluhan Penghuni',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Kelola & tangani keluhan dengan cepat',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.85),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Icon(
+                  Icons.support_agent_rounded,
+                  color: Colors.white,
+                  size: 32,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildStatisticsSection(ComplaintsController controller) {
     return Obx(() {
       final stats = controller.statistics;
 
       return Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Alert banner for pending complaints
             if ((stats['submitted'] ?? 0) > 0)
               Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 18),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      AppTheme.softPink.withOpacity(0.3),
-                      AppTheme.softPink.withOpacity(0.1),
+                      const Color(0xFFE91E63).withOpacity(0.15),
+                      const Color(0xFFE91E63).withOpacity(0.05),
                     ],
                   ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppTheme.softPink, width: 1),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFFE91E63).withOpacity(0.3),
+                    width: 1.5,
+                  ),
                 ),
                 child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppTheme.softPink,
-                        borderRadius: BorderRadius.circular(12),
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFE91E63), Color(0xFFF06292)],
+                        ),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFFE91E63).withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: const Icon(
-                        Icons.report_problem,
-                        color: Colors.black87,
+                        Icons.report_problem_rounded,
+                        color: Colors.white,
                         size: 24,
                       ),
                     ),
@@ -109,80 +225,82 @@ class AdminComplaintsView extends StatelessWidget {
                         children: [
                           Text(
                             '${stats['submitted']} Keluhan Baru',
-                            style: const TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                              fontWeight: FontWeight.w700,
+                              color: AppTheme.charcoal,
                             ),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             'Butuh tindakan segera',
-                            style: TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 13,
-                              color: Colors.black54,
+                              fontWeight: FontWeight.w500,
+                              color: AppTheme.charcoal.withOpacity(0.6),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        controller.setStatusFilter('submitted');
-                      },
-                      child: const Text('Lihat'),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFE91E63), Color(0xFFF06292)],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TextButton(
+                        onPressed: () {
+                          controller.setStatusFilter('submitted');
+                        },
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 8,
+                          ),
+                        ),
+                        child: Text(
+                          'Lihat',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
               ),
 
-            // Stats Row
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    'Total',
-                    '${stats['total']}',
-                    'Semua keluhan',
-                    AppTheme.pastelBlue,
-                    Icons.inbox,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                    'Diajukan',
-                    '${stats['submitted']}',
-                    'Belum diproses',
-                    AppTheme.softPink,
-                    Icons.pending,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildStatCard(
-                    'Diproses',
-                    '${stats['inProgress']}',
-                    'Sedang ditangani',
-                    AppTheme.warmPeach,
-                    Icons.engineering,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _buildStatCard(
-                    'Selesai',
-                    '${stats['resolved']}',
-                    'Telah ditangani',
-                    AppTheme.softGreen,
-                    Icons.check_circle,
-                  ),
-                ),
-              ],
+            // Stats Row - Horizontal Scroll
+            SizedBox(
+              height: 130,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
+                children: [
+                  _buildStatCard('Total', '${stats['total']}', [
+                    AppTheme.primaryBlue,
+                    AppTheme.lightBlue,
+                  ], Icons.inbox_rounded),
+                  const SizedBox(width: 14),
+                  _buildStatCard('Diajukan', '${stats['submitted']}', [
+                    const Color(0xFFE91E63),
+                    const Color(0xFFF06292),
+                  ], Icons.pending_rounded),
+                  const SizedBox(width: 14),
+                  _buildStatCard('Diproses', '${stats['inProgress']}', [
+                    const Color(0xFFFF9800),
+                    const Color(0xFFFFB74D),
+                  ], Icons.engineering_rounded),
+                  const SizedBox(width: 14),
+                  _buildStatCard('Selesai', '${stats['resolved']}', [
+                    const Color(0xFF4CAF50),
+                    const Color(0xFF81C784),
+                  ], Icons.check_circle_rounded),
+                ],
+              ),
             ),
           ],
         ),
@@ -191,55 +309,61 @@ class AdminComplaintsView extends StatelessWidget {
   }
 
   Widget _buildStatCard(
-    String title,
-    String count,
-    String subtitle,
-    Color color,
+    String label,
+    String value,
+    List<Color> gradientColors,
     IconData icon,
   ) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      width: 130,
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: gradientColors,
+        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: gradientColors[0].withOpacity(0.35),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.2),
+              color: Colors.white.withOpacity(0.25),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: color, size: 22),
+            child: Icon(icon, color: Colors.white, size: 18),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                value,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  count,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+              ),
+              Text(
+                label,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white.withOpacity(0.9),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),
@@ -248,31 +372,44 @@ class AdminComplaintsView extends StatelessWidget {
 
   Widget _buildSearchBar(ComplaintsController controller) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 10,
-              offset: const Offset(0, 2),
+              color: AppTheme.charcoal.withOpacity(0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Row(
           children: [
-            Icon(Icons.search, color: Colors.grey.shade400),
-            const SizedBox(width: 12),
+            Container(
+              padding: const EdgeInsets.all(14),
+              child: Icon(
+                Icons.search_rounded,
+                color: AppTheme.primaryBlue,
+                size: 22,
+              ),
+            ),
             Expanded(
               child: TextField(
                 controller: controller.searchController,
                 onChanged: controller.onSearchChanged,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.charcoal,
+                ),
                 decoration: InputDecoration(
                   hintText: 'Cari judul, penghuni, atau kamar...',
-                  hintStyle: TextStyle(color: Colors.grey.shade400),
+                  hintStyle: GoogleFonts.plusJakartaSans(
+                    color: AppTheme.charcoal.withOpacity(0.4),
+                    fontWeight: FontWeight.w500,
+                  ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(vertical: 16),
                 ),
@@ -281,29 +418,66 @@ class AdminComplaintsView extends StatelessWidget {
             Obx(() {
               if (controller.searchQuery.value.isNotEmpty) {
                 return IconButton(
-                  icon: const Icon(Icons.close, size: 20),
+                  icon: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppTheme.mediumGrey,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 16,
+                      color: AppTheme.charcoal.withOpacity(0.6),
+                    ),
+                  ),
                   onPressed: controller.clearSearch,
                 );
               }
               return const SizedBox.shrink();
             }),
             // Tenant filter dropdown
-            PopupMenuButton<String>(
-              icon: Icon(Icons.filter_list, color: Colors.grey.shade600),
-              onSelected: (value) {
-                controller.setTenantFilter(value);
-              },
-              itemBuilder: (context) {
-                return [
-                  const PopupMenuItem(value: '', child: Text('Semua Penghuni')),
-                  ...controller.tenants.map((tenant) {
-                    return PopupMenuItem(
-                      value: tenant.id,
-                      child: Text(tenant.name),
-                    );
-                  }),
-                ];
-              },
+            Container(
+              margin: const EdgeInsets.only(right: 8),
+              decoration: BoxDecoration(
+                color: AppTheme.softGrey,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: PopupMenuButton<String>(
+                icon: Icon(
+                  Icons.filter_list_rounded,
+                  color: AppTheme.primaryBlue,
+                ),
+                onSelected: (value) {
+                  controller.setTenantFilter(value);
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                itemBuilder: (context) {
+                  return [
+                    PopupMenuItem(
+                      value: '',
+                      child: Text(
+                        'Semua Penghuni',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    ...controller.tenants.map((tenant) {
+                      return PopupMenuItem(
+                        value: tenant.id,
+                        child: Text(
+                          tenant.name,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      );
+                    }),
+                  ];
+                },
+              ),
             ),
           ],
         ),
@@ -313,7 +487,7 @@ class AdminComplaintsView extends StatelessWidget {
 
   Widget _buildFilterChips(ComplaintsController controller) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -326,30 +500,64 @@ class AdminComplaintsView extends StatelessWidget {
                   final isSelected =
                       controller.selectedStatus.value == option['value'];
                   return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(option['label']!),
-                      selected: isSelected,
-                      onSelected: (_) {
+                    padding: const EdgeInsets.only(right: 10),
+                    child: GestureDetector(
+                      onTap: () {
                         controller.setStatusFilter(option['value']!);
                       },
-                      backgroundColor: Colors.white,
-                      selectedColor: _getStatusColor(option['value']!),
-                      checkmarkColor: Colors.black87,
-                      labelStyle: TextStyle(
-                        color: isSelected
-                            ? Colors.black87
-                            : Colors.grey.shade600,
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(
-                          color: isSelected
-                              ? _getStatusColor(option['value']!)
-                              : Colors.grey.shade300,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutCubic,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: isSelected
+                              ? LinearGradient(
+                                  colors: [
+                                    _getStatusColor(option['value']!),
+                                    _getStatusColor(
+                                      option['value']!,
+                                    ).withOpacity(0.8),
+                                  ],
+                                )
+                              : null,
+                          color: isSelected ? null : Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected
+                                ? Colors.transparent
+                                : AppTheme.mediumGrey,
+                            width: 1.5,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: _getStatusColor(
+                                      option['value']!,
+                                    ).withOpacity(0.35),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ]
+                              : [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.04),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                        ),
+                        child: Text(
+                          option['label']!,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: isSelected
+                                ? Colors.white
+                                : AppTheme.charcoal.withOpacity(0.7),
+                          ),
                         ),
                       ),
                     ),
@@ -358,7 +566,7 @@ class AdminComplaintsView extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           // Category chips
           Obx(
             () => SingleChildScrollView(
@@ -368,46 +576,78 @@ class AdminComplaintsView extends StatelessWidget {
                   final isSelected =
                       controller.selectedCategory.value == option['value'];
                   return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (option['value'] != 'all')
-                            Padding(
-                              padding: const EdgeInsets.only(right: 4),
-                              child: Icon(
-                                _getCategoryIcon(option['value']!),
-                                size: 14,
-                                color: isSelected
-                                    ? Colors.black87
-                                    : Colors.grey.shade600,
-                              ),
-                            ),
-                          Text(option['label']!),
-                        ],
-                      ),
-                      selected: isSelected,
-                      onSelected: (_) {
+                    padding: const EdgeInsets.only(right: 10),
+                    child: GestureDetector(
+                      onTap: () {
                         controller.setCategoryFilter(option['value']!);
                       },
-                      backgroundColor: Colors.white,
-                      selectedColor: AppTheme.pastelBlue.withOpacity(0.3),
-                      checkmarkColor: Colors.black87,
-                      labelStyle: TextStyle(
-                        color: isSelected
-                            ? Colors.black87
-                            : Colors.grey.shade600,
-                        fontWeight: isSelected
-                            ? FontWeight.w600
-                            : FontWeight.normal,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(
-                          color: isSelected
-                              ? AppTheme.pastelBlue
-                              : Colors.grey.shade300,
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.easeOutCubic,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: isSelected
+                              ? LinearGradient(
+                                  colors: [
+                                    AppTheme.primaryBlue,
+                                    AppTheme.lightBlue,
+                                  ],
+                                )
+                              : null,
+                          color: isSelected ? null : Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: isSelected
+                                ? Colors.transparent
+                                : AppTheme.mediumGrey,
+                            width: 1.5,
+                          ),
+                          boxShadow: isSelected
+                              ? [
+                                  BoxShadow(
+                                    color: AppTheme.primaryBlue.withOpacity(
+                                      0.35,
+                                    ),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ]
+                              : [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.04),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (option['value'] != 'all')
+                              Padding(
+                                padding: const EdgeInsets.only(right: 6),
+                                child: Icon(
+                                  _getCategoryIcon(option['value']!),
+                                  size: 16,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : AppTheme.charcoal.withOpacity(0.6),
+                                ),
+                              ),
+                            Text(
+                              option['label']!,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppTheme.charcoal.withOpacity(0.7),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -426,28 +666,28 @@ class AdminComplaintsView extends StatelessWidget {
     ComplaintsController controller,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: AppTheme.charcoal.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(24),
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           onTap: () {
             Get.toNamed(AppRoutes.ADMIN_COMPLAINT_DETAIL, arguments: complaint);
           },
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(18),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -455,27 +695,38 @@ class AdminComplaintsView extends StatelessWidget {
                 Row(
                   children: [
                     _buildStatusBadge(complaint.status),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     _buildCategoryBadge(complaint.category),
                     const Spacer(),
-                    Text(
-                      complaint.timeSinceCreated,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade500,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppTheme.softGrey,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        complaint.timeSinceCreated,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.charcoal.withOpacity(0.6),
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
 
                 // Title
                 Text(
                   complaint.title,
-                  style: const TextStyle(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.charcoal,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -485,66 +736,80 @@ class AdminComplaintsView extends StatelessWidget {
                 // Description preview
                 Text(
                   complaint.description,
-                  style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: AppTheme.charcoal.withOpacity(0.6),
+                    height: 1.5,
+                  ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
 
-                const Divider(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  child: Divider(height: 1, color: AppTheme.mediumGrey),
+                ),
 
                 // Footer: Tenant info & attachments
                 Row(
                   children: [
                     // Tenant photo
                     Container(
-                      width: 36,
-                      height: 36,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        color: AppTheme.pastelBlue.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(10),
+                        gradient: LinearGradient(
+                          colors: [
+                            AppTheme.primaryBlue.withOpacity(0.2),
+                            AppTheme.cream.withOpacity(0.3),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: complaint.tenantPhoto != null
                           ? ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                               child: CachedNetworkImage(
                                 imageUrl: complaint.tenantPhoto!,
                                 fit: BoxFit.cover,
-                                placeholder: (_, __) => const Icon(
-                                  Icons.person,
-                                  size: 18,
-                                  color: Colors.black45,
+                                placeholder: (_, __) => Icon(
+                                  Icons.person_rounded,
+                                  size: 20,
+                                  color: AppTheme.primaryBlue,
                                 ),
-                                errorWidget: (_, __, ___) => const Icon(
-                                  Icons.person,
-                                  size: 18,
-                                  color: Colors.black45,
+                                errorWidget: (_, __, ___) => Icon(
+                                  Icons.person_rounded,
+                                  size: 20,
+                                  color: AppTheme.primaryBlue,
                                 ),
                               ),
                             )
-                          : const Icon(
-                              Icons.person,
-                              size: 18,
-                              color: Colors.black45,
+                          : Icon(
+                              Icons.person_rounded,
+                              size: 20,
+                              color: AppTheme.primaryBlue,
                             ),
                     ),
-                    const SizedBox(width: 10),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             complaint.tenantName ?? 'Unknown',
-                            style: const TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: AppTheme.charcoal,
                             ),
                           ),
                           Text(
                             'Kamar ${complaint.roomNumber ?? '-'}',
-                            style: TextStyle(
+                            style: GoogleFonts.plusJakartaSans(
                               fontSize: 12,
-                              color: Colors.grey.shade500,
+                              fontWeight: FontWeight.w500,
+                              color: AppTheme.charcoal.withOpacity(0.5),
                             ),
                           ),
                         ],
@@ -553,28 +818,28 @@ class AdminComplaintsView extends StatelessWidget {
                     if (complaint.hasAttachments)
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+                          horizontal: 10,
+                          vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppTheme.pastelBlue.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8),
+                          color: AppTheme.primaryBlue.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              Icons.attach_file,
+                              Icons.attach_file_rounded,
                               size: 14,
-                              color: AppTheme.pastelBlue,
+                              color: AppTheme.primaryBlue,
                             ),
                             const SizedBox(width: 4),
                             Text(
                               '${complaint.attachments.length}',
-                              style: TextStyle(
+                              style: GoogleFonts.plusJakartaSans(
                                 fontSize: 12,
-                                color: AppTheme.pastelBlue,
-                                fontWeight: FontWeight.w500,
+                                color: AppTheme.primaryBlue,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -585,44 +850,94 @@ class AdminComplaintsView extends StatelessWidget {
 
                 // Quick actions for new complaints
                 if (complaint.isSubmitted) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Row(
                     children: [
                       Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            _showUpdateStatusDialog(
-                              complaint,
-                              controller,
-                              'in_progress',
-                            );
-                          },
-                          icon: const Icon(Icons.engineering, size: 18),
-                          label: const Text('Proses'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.warmPeach,
-                            foregroundColor: Colors.black87,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFF9800).withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              _showUpdateStatusDialog(
+                                complaint,
+                                controller,
+                                'in_progress',
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.engineering_rounded,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                            label: Text(
+                              'Proses',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () {
-                            _showResolveDialog(complaint, controller);
-                          },
-                          icon: const Icon(Icons.check_circle, size: 18),
-                          label: const Text('Selesaikan'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppTheme.softGreen,
-                            foregroundColor: Colors.black87,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
+                            ),
+                            borderRadius: BorderRadius.circular(14),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFF4CAF50).withOpacity(0.3),
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              _showResolveDialog(complaint, controller);
+                            },
+                            icon: const Icon(
+                              Icons.check_circle_rounded,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                            label: Text(
+                              'Selesaikan',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
                             ),
                           ),
                         ),
@@ -633,21 +948,46 @@ class AdminComplaintsView extends StatelessWidget {
 
                 // Quick action for in-progress
                 if (complaint.isInProgress) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        _showResolveDialog(complaint, controller);
-                      },
-                      icon: const Icon(Icons.check_circle, size: 18),
-                      label: const Text('Tandai Selesai'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.softGreen,
-                        foregroundColor: Colors.black87,
-                        elevation: 0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
+                        ),
+                        borderRadius: BorderRadius.circular(14),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF4CAF50).withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          _showResolveDialog(complaint, controller);
+                        },
+                        icon: const Icon(
+                          Icons.check_circle_rounded,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                        label: Text(
+                          'Tandai Selesai',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                         ),
                       ),
                     ),
@@ -662,49 +1002,54 @@ class AdminComplaintsView extends StatelessWidget {
   }
 
   Widget _buildStatusBadge(String status) {
-    Color color;
+    Color bgColor;
+    Color textColor;
     String label;
     IconData icon;
 
     switch (status) {
       case 'submitted':
-        color = AppTheme.softPink;
+        bgColor = const Color(0xFFE91E63).withOpacity(0.15);
+        textColor = const Color(0xFFE91E63);
         label = 'Diajukan';
-        icon = Icons.pending;
+        icon = Icons.pending_rounded;
         break;
       case 'in_progress':
-        color = AppTheme.warmPeach;
+        bgColor = const Color(0xFFFF9800).withOpacity(0.15);
+        textColor = const Color(0xFFE65100);
         label = 'Diproses';
-        icon = Icons.engineering;
+        icon = Icons.engineering_rounded;
         break;
       case 'resolved':
-        color = AppTheme.softGreen;
+        bgColor = const Color(0xFF4CAF50).withOpacity(0.15);
+        textColor = const Color(0xFF2E7D32);
         label = 'Selesai';
-        icon = Icons.check_circle;
+        icon = Icons.check_circle_rounded;
         break;
       default:
-        color = Colors.grey;
+        bgColor = AppTheme.mediumGrey;
+        textColor = AppTheme.charcoal;
         label = status;
-        icon = Icons.help;
+        icon = Icons.help_rounded;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(20),
+        color: bgColor,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: Colors.black87),
-          const SizedBox(width: 4),
+          Icon(icon, size: 14, color: textColor),
+          const SizedBox(width: 5),
           Text(
             label,
-            style: const TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.black87,
+              fontWeight: FontWeight.w700,
+              color: textColor,
             ),
           ),
         ],
@@ -714,10 +1059,10 @@ class AdminComplaintsView extends StatelessWidget {
 
   Widget _buildCategoryBadge(String category) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(20),
+        color: AppTheme.softGrey,
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -725,15 +1070,15 @@ class AdminComplaintsView extends StatelessWidget {
           Icon(
             _getCategoryIcon(category),
             size: 14,
-            color: Colors.grey.shade700,
+            color: AppTheme.charcoal.withOpacity(0.7),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: 5),
           Text(
             ComplaintCategory.getLabel(category),
-            style: TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: Colors.grey.shade700,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.charcoal.withOpacity(0.7),
             ),
           ),
         ],
@@ -746,30 +1091,70 @@ class AdminComplaintsView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.error_outline, size: 64, color: Colors.red.shade300),
-          const SizedBox(height: 16),
-          Text(
-            'Gagal Memuat Data',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade700,
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE74C3C).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.error_outline_rounded,
+              size: 64,
+              color: const Color(0xFFE74C3C),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 20),
+          Text(
+            'Gagal Memuat Data',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.charcoal,
+            ),
+          ),
+          const SizedBox(height: 10),
           Text(
             controller.errorMessage.value,
-            style: TextStyle(color: Colors.grey.shade500),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.charcoal.withOpacity(0.6),
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
-          ElevatedButton.icon(
-            onPressed: controller.refreshData,
-            icon: const Icon(Icons.refresh),
-            label: const Text('Coba Lagi'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.pastelBlue,
-              foregroundColor: Colors.black87,
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [AppTheme.primaryBlue, AppTheme.lightBlue],
+              ),
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: AppTheme.primaryBlue.withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: ElevatedButton.icon(
+              onPressed: controller.refreshData,
+              icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+              label: Text(
+                'Coba Lagi',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+              ),
             ),
           ),
         ],
@@ -788,34 +1173,72 @@ class AdminComplaintsView extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            isFiltered ? Icons.filter_alt_off : Icons.inbox_outlined,
-            size: 64,
-            color: Colors.grey.shade300,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            isFiltered ? 'Tidak Ada Hasil' : 'Belum Ada Keluhan',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.grey.shade700,
+          Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppTheme.primaryBlue.withOpacity(0.1),
+                  AppTheme.cream.withOpacity(0.2),
+                ],
+              ),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isFiltered ? Icons.filter_alt_off_rounded : Icons.inbox_rounded,
+              size: 64,
+              color: AppTheme.primaryBlue,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 28),
+          Text(
+            isFiltered ? 'Tidak Ada Hasil' : 'Belum Ada Keluhan',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.charcoal,
+            ),
+          ),
+          const SizedBox(height: 10),
           Text(
             isFiltered
                 ? 'Coba ubah filter atau kata kunci pencarian'
                 : 'Keluhan dari penghuni akan muncul di sini',
-            style: TextStyle(color: Colors.grey.shade500),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.charcoal.withOpacity(0.6),
+            ),
             textAlign: TextAlign.center,
           ),
           if (isFiltered) ...[
             const SizedBox(height: 24),
-            OutlinedButton.icon(
-              onPressed: controller.clearFilters,
-              icon: const Icon(Icons.clear_all),
-              label: const Text('Reset Filter'),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: AppTheme.primaryBlue, width: 2),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: OutlinedButton.icon(
+                onPressed: controller.clearFilters,
+                icon: Icon(
+                  Icons.clear_all_rounded,
+                  color: AppTheme.primaryBlue,
+                ),
+                label: Text(
+                  'Reset Filter',
+                  style: GoogleFonts.plusJakartaSans(
+                    color: AppTheme.primaryBlue,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide.none,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 12,
+                  ),
+                ),
+              ),
             ),
           ],
         ],
@@ -827,32 +1250,32 @@ class AdminComplaintsView extends StatelessWidget {
   Color _getStatusColor(String status) {
     switch (status) {
       case 'submitted':
-        return AppTheme.softPink;
+        return const Color(0xFFE91E63);
       case 'in_progress':
-        return AppTheme.warmPeach;
+        return const Color(0xFFFF9800);
       case 'resolved':
-        return AppTheme.softGreen;
+        return const Color(0xFF4CAF50);
       default:
-        return AppTheme.pastelBlue;
+        return AppTheme.primaryBlue;
     }
   }
 
   IconData _getCategoryIcon(String category) {
     switch (category) {
       case 'fasilitas':
-        return Icons.build;
+        return Icons.build_rounded;
       case 'kebersihan':
-        return Icons.cleaning_services;
+        return Icons.cleaning_services_rounded;
       case 'keamanan':
-        return Icons.security;
+        return Icons.security_rounded;
       case 'listrik':
-        return Icons.electrical_services;
+        return Icons.electrical_services_rounded;
       case 'air':
-        return Icons.water_drop;
+        return Icons.water_drop_rounded;
       case 'lainnya':
-        return Icons.help_outline;
+        return Icons.help_outline_rounded;
       default:
-        return Icons.report_problem;
+        return Icons.report_problem_rounded;
     }
   }
 
@@ -865,45 +1288,116 @@ class AdminComplaintsView extends StatelessWidget {
 
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          newStatus == 'in_progress' ? 'Proses Keluhan' : 'Update Status',
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.engineering_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Text(
+              'Proses Keluhan',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
+              ),
+            ),
+          ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Ubah status keluhan "${complaint.title}"?'),
-            const SizedBox(height: 16),
+            Text(
+              'Ubah status keluhan "${complaint.title}"?',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoal.withOpacity(0.7),
+              ),
+            ),
+            const SizedBox(height: 18),
             TextField(
               controller: notesController,
               maxLines: 3,
+              style: GoogleFonts.plusJakartaSans(fontSize: 14),
               decoration: InputDecoration(
                 labelText: 'Catatan (Opsional)',
+                labelStyle: GoogleFonts.plusJakartaSans(
+                  color: AppTheme.charcoal.withOpacity(0.6),
+                ),
                 hintText: 'Tambahkan catatan...',
+                hintStyle: GoogleFonts.plusJakartaSans(
+                  color: AppTheme.charcoal.withOpacity(0.4),
+                ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: AppTheme.mediumGrey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
                 ),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
-          ElevatedButton(
-            onPressed: () async {
-              Get.back();
-              await controller.updateStatus(
-                complaint,
-                newStatus,
-                notes: notesController.text.trim(),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.warmPeach,
-              foregroundColor: Colors.black87,
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.plusJakartaSans(
+                color: AppTheme.charcoal.withOpacity(0.6),
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            child: const Text('Proses'),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFFFF9800), Color(0xFFFFB74D)],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ElevatedButton(
+              onPressed: () async {
+                Get.back();
+                await controller.updateStatus(
+                  complaint,
+                  newStatus,
+                  notes: notesController.text.trim(),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              child: Text(
+                'Proses',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -918,43 +1412,116 @@ class AdminComplaintsView extends StatelessWidget {
 
     Get.dialog(
       AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Selesaikan Keluhan'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Icon(
+                Icons.check_circle_rounded,
+                color: Colors.white,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Text(
+              'Selesaikan Keluhan',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.charcoal,
+              ),
+            ),
+          ],
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Tandai keluhan "${complaint.title}" sebagai selesai?'),
-            const SizedBox(height: 16),
+            Text(
+              'Tandai keluhan "${complaint.title}" sebagai selesai?',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppTheme.charcoal.withOpacity(0.7),
+              ),
+            ),
+            const SizedBox(height: 18),
             TextField(
               controller: notesController,
               maxLines: 3,
+              style: GoogleFonts.plusJakartaSans(fontSize: 14),
               decoration: InputDecoration(
                 labelText: 'Catatan Penyelesaian',
+                labelStyle: GoogleFonts.plusJakartaSans(
+                  color: AppTheme.charcoal.withOpacity(0.6),
+                ),
                 hintText: 'Jelaskan solusi atau tindakan yang diambil...',
+                hintStyle: GoogleFonts.plusJakartaSans(
+                  color: AppTheme.charcoal.withOpacity(0.4),
+                ),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: AppTheme.mediumGrey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
                 ),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
-          ElevatedButton(
-            onPressed: () async {
-              Get.back();
-              await controller.updateStatus(
-                complaint,
-                'resolved',
-                notes: notesController.text.trim(),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.softGreen,
-              foregroundColor: Colors.black87,
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text(
+              'Batal',
+              style: GoogleFonts.plusJakartaSans(
+                color: AppTheme.charcoal.withOpacity(0.6),
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            child: const Text('Selesaikan'),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ElevatedButton(
+              onPressed: () async {
+                Get.back();
+                await controller.updateStatus(
+                  complaint,
+                  'resolved',
+                  notes: notesController.text.trim(),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
+              ),
+              child: Text(
+                'Selesaikan',
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
           ),
         ],
       ),
