@@ -8,6 +8,7 @@ abstract class AppRoutes {
 
   // Initial and auth routes
   static const INITIAL = '/';
+  static const SPLASH = '/splash';
   static const LOGIN = '/login';
 
   // Admin routes

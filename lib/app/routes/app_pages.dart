@@ -34,6 +34,7 @@ import '../modules/admin/contracts/contract_form_view.dart';
 import '../modules/tenant/tenant_layout/tenant_layout_view.dart';
 import '../modules/tenant/tenant_layout/tenant_layout_binding.dart';
 import '../modules/auth/login/login_view.dart';
+import '../modules/auth/splash/splash_view.dart';
 import '../modules/initial/initial_view.dart';
 import 'app_routes.dart';
 
@@ -44,7 +45,10 @@ class AppPages {
 
   static final routes = [
     // Initial route - determines user role and redirects
-    GetPage(name: AppRoutes.INITIAL, page: () => const InitialView()),
+    GetPage(name: AppRoutes.INITIAL, page: () => const SplashView()),
+
+    // Splash screen with animations
+    GetPage(name: AppRoutes.SPLASH, page: () => const SplashView()),
 
     // Login
     GetPage(name: AppRoutes.LOGIN, page: () => const LoginView()),
