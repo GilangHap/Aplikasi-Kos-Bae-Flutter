@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'dart:math' as math;
 import '../../../theme/app_theme.dart';
 import '../../../routes/app_routes.dart';
+import '../admin_drawer/admin_drawer_controller.dart';
 import 'dashboard_controller.dart';
 
 /// Premium Admin Dashboard View - Luxury Kos Management
@@ -953,19 +954,31 @@ class AdminDashboardView extends GetView<DashboardController> {
           icon: Icons.person_add_rounded,
           label: 'Penghuni',
           color: AppTheme.primaryBlue,
-          onTap: () => Get.toNamed(AppRoutes.ADMIN_TENANT_FORM),
+          onTap: () {
+            // Switch to Tenants tab (index 2) instead of navigating
+            final drawerController = Get.find<AdminDrawerController>();
+            drawerController.selectIndex(2);
+          },
         ),
         _buildActionItem(
           icon: Icons.receipt_long_rounded,
           label: 'Tagihan',
           color: AppTheme.gold,
-          onTap: () => Get.toNamed(AppRoutes.ADMIN_BILL_FORM),
+          onTap: () {
+            // Switch to Bills tab (index 3) instead of navigating
+            final drawerController = Get.find<AdminDrawerController>();
+            drawerController.selectIndex(3);
+          },
         ),
         _buildActionItem(
           icon: Icons.door_front_door_rounded,
           label: 'Kamar',
           color: AppTheme.lightBlue,
-          onTap: () => Get.toNamed(AppRoutes.ADMIN_ROOMS),
+          onTap: () {
+            // Switch to Rooms tab (index 1) instead of navigating
+            final drawerController = Get.find<AdminDrawerController>();
+            drawerController.selectIndex(1);
+          },
         ),
         _buildActionItem(
           icon: Icons.feedback_rounded,
@@ -976,7 +989,11 @@ class AdminDashboardView extends GetView<DashboardController> {
           badge: controller.activeComplaints.value > 0
               ? controller.activeComplaints.value.toString()
               : null,
-          onTap: () => Get.toNamed(AppRoutes.ADMIN_COMPLAINTS),
+          onTap: () {
+            // Switch to Complaints tab (index 5) instead of navigating
+            final drawerController = Get.find<AdminDrawerController>();
+            drawerController.selectIndex(5);
+          },
         ),
       ],
     );
@@ -1156,7 +1173,11 @@ class AdminDashboardView extends GetView<DashboardController> {
                 ],
               ),
               TextButton(
-                onPressed: () => Get.toNamed(AppRoutes.ADMIN_BILLS),
+                onPressed: () {
+                  // Switch to Bills tab (index 3) instead of navigating
+                  final drawerController = Get.find<AdminDrawerController>();
+                  drawerController.selectIndex(3);
+                },
                 style: TextButton.styleFrom(
                   backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
                   shape: RoundedRectangleBorder(

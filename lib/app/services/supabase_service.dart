@@ -1,4 +1,3 @@
-// FILE: lib/app/services/supabase_service.dart
 import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
@@ -8,8 +7,7 @@ import '../models/room_model.dart';
 import '../models/tenant_model.dart';
 import '../models/bill_model.dart';
 
-/// Supabase service for Kos Bae
-/// Handles all database and storage operations
+/// Service untuk operasi database & storage Supabase
 class SupabaseService extends GetxService {
   late final SupabaseClient _client;
 
@@ -17,23 +15,22 @@ class SupabaseService extends GetxService {
   SupabaseClient get client => _client;
   GoTrueClient get auth => _client.auth;
 
-  /// Initialize Supabase service (async version)
+  /// Inisialisasi async
   Future<SupabaseService> init() async {
     _client = Supabase.instance.client;
     print('🔌 SupabaseService initialized');
     return this;
   }
 
-  /// Initialize Supabase service (sync version)
-  /// Use this when Supabase.initialize() has already been called
+  /// Inisialisasi sync (untuk initial binding)
   void initSync() {
     _client = Supabase.instance.client;
     print('🔌 SupabaseService initialized (sync)');
   }
 
-  // ==================== ROOMS CRUD ====================
+  // ========== ROOMS ==========
 
-  /// Fetch all rooms with optional filtering and sorting
+  /// Ambil semua kamar dengan filter & sorting
   Future<List<Room>> fetchRooms({
     String? status,
     String sortBy = 'room_number',
@@ -44,22 +41,17 @@ class SupabaseService extends GetxService {
         '🔍 Fetching rooms: status=$status, sortBy=$sortBy, search=$searchQuery',
       );
 
-      // Build filter query
       PostgrestFilterBuilder query = _client.from('rooms').select();
 
-      // Apply status filter
       if (status != null && status != 'all') {
         query = query.eq('status', status);
       }
 
-      // Apply search filter
       if (searchQuery != null && searchQuery.isNotEmpty) {
         query = query.or(
           'room_number.ilike.%$searchQuery%,description.ilike.%$searchQuery%',
         );
       }
-
-      // Apply sorting and execute
       final ascending = sortBy != 'price';
       final response = await query.order(sortBy, ascending: ascending);
 
@@ -75,7 +67,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Get single room by ID
+  /// Ambil kamar by ID
   Future<Room?> getRoomById(String roomId) async {
     try {
       final response = await _client
@@ -92,18 +84,16 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Create new room
+  /// Buat kamar baru
   Future<Room> createRoom(Room room, {List<XFile>? photos}) async {
     try {
       print('➕ Creating room: ${room.roomNumber}');
 
-      // Upload photos first if provided
       List<String> photoUrls = [];
       if (photos != null && photos.isNotEmpty) {
         photoUrls = await uploadMultipleFiles(photos, folder: 'rooms');
       }
 
-      // Insert room with photo URLs
       final data = room.toJson();
       data['photos'] = photoUrls;
       data['created_by'] = auth.currentUser?.id;
@@ -122,7 +112,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Update existing room
+  /// Update kamar
   Future<Room> updateRoom(
     Room room, {
     List<XFile>? newPhotos,
@@ -131,18 +121,15 @@ class SupabaseService extends GetxService {
     try {
       print('✏️ Updating room: ${room.roomNumber}');
 
-      // Delete removed photos from storage
       if (removedPhotoUrls != null && removedPhotoUrls.isNotEmpty) {
         await deleteMultipleFiles(removedPhotoUrls);
       }
 
-      // Upload new photos
       List<String> newPhotoUrls = [];
       if (newPhotos != null && newPhotos.isNotEmpty) {
         newPhotoUrls = await uploadMultipleFiles(newPhotos, folder: 'rooms');
       }
 
-      // Combine existing photos (minus removed) with new photos
       final existingPhotos = room.photos
           .where((url) => !(removedPhotoUrls?.contains(url) ?? false))
           .toList();
@@ -166,18 +153,16 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Delete room
+  /// Hapus kamar
   Future<void> deleteRoom(String roomId) async {
     try {
       print('🗑️ Deleting room: $roomId');
 
-      // Get room first to delete its photos
       final room = await getRoomById(roomId);
       if (room != null && room.photos.isNotEmpty) {
         await deleteMultipleFiles(room.photos);
       }
 
-      // Delete room record
       await _client.from('rooms').delete().eq('id', roomId);
 
       print('✅ Room deleted successfully');
@@ -187,7 +172,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Get room statistics
+  /// Statistik kamar
   Future<Map<String, int>> getRoomStatistics() async {
     try {
       final rooms = await fetchRooms();
@@ -204,9 +189,9 @@ class SupabaseService extends GetxService {
     }
   }
 
-  // ==================== ROOM HISTORY ====================
+  // ========== ROOM HISTORY ==========
 
-  /// Fetch room history (past tenants)
+  /// Riwayat penghuni kamar
   Future<List<Map<String, dynamic>>> fetchRoomHistory(String roomId) async {
     try {
       print('📜 Fetching history for room: $roomId');
@@ -224,9 +209,9 @@ class SupabaseService extends GetxService {
     }
   }
 
-  // ==================== COMPLAINTS ====================
+  // ========== COMPLAINTS ==========
 
-  /// Fetch complaints by room
+  /// Komplain berdasarkan kamar
   Future<List<Map<String, dynamic>>> fetchComplaintsByRoom(
     String roomId,
   ) async {
@@ -246,9 +231,9 @@ class SupabaseService extends GetxService {
     }
   }
 
-  // ==================== STORAGE ====================
+  // ========== STORAGE ==========
 
-  /// Upload single file to Supabase Storage
+  /// Upload file ke Supabase Storage
   Future<String> uploadFile(XFile file, {String folder = 'rooms'}) async {
     try {
       final fileName = '${DateTime.now().millisecondsSinceEpoch}_${file.name}';
@@ -280,7 +265,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Upload multiple files
+  /// Upload banyak file
   Future<List<String>> uploadMultipleFiles(
     List<XFile> files, {
     String folder = 'rooms',
@@ -293,7 +278,7 @@ class SupabaseService extends GetxService {
     return urls;
   }
 
-  /// Delete file from Supabase Storage
+  /// Hapus file dari Storage
   Future<void> deleteFile(String fileUrl) async {
     try {
       final uri = Uri.parse(fileUrl);
@@ -314,16 +299,16 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Delete multiple files
+  /// Hapus banyak file
   Future<void> deleteMultipleFiles(List<String> fileUrls) async {
     for (final url in fileUrls) {
       await deleteFile(url);
     }
   }
 
-  // ==================== TENANTS CRUD ====================
+  // ========== TENANTS ==========
 
-  /// Fetch all tenants with optional filtering and sorting
+  /// Ambil semua penyewa dengan filter & sorting
   Future<List<Tenant>> fetchTenants({
     String? status,
     String sortBy = 'name',
@@ -381,7 +366,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Get single tenant by ID
+  /// Ambil penyewa by ID
   Future<Tenant?> getTenantById(String tenantId) async {
     try {
       print('🔍 Fetching tenant by ID: $tenantId');
@@ -400,7 +385,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Create new tenant
+  /// Buat penyewa baru
   Future<Tenant> createTenant(Tenant tenant, {XFile? photo}) async {
     try {
       print('➕ Creating tenant: ${tenant.name}');
@@ -455,7 +440,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Update existing tenant
+  /// Update penyewa
   Future<Tenant> updateTenant(
     Tenant tenant, {
     XFile? newPhoto,
@@ -535,7 +520,64 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Delete tenant
+  /// Update tenant profile (tenant self-update - only personal info, no contract/status changes)
+  Future<Tenant> updateTenantProfile({
+    required String tenantId,
+    String? name,
+    String? phone,
+    String? nik,
+    String? address,
+    XFile? newPhoto,
+    bool removePhoto = false,
+  }) async {
+    try {
+      print('✏️ Updating tenant profile: $tenantId');
+
+      // Get existing tenant
+      final existingTenant = await getTenantById(tenantId);
+      if (existingTenant == null) {
+        throw Exception('Tenant not found');
+      }
+
+      // Handle photo changes
+      String? photoUrl = existingTenant.photoUrl;
+      if (removePhoto && photoUrl != null) {
+        await deleteFile(photoUrl);
+        photoUrl = null;
+      } else if (newPhoto != null) {
+        if (photoUrl != null) {
+          await deleteFile(photoUrl);
+        }
+        photoUrl = await uploadFile(newPhoto, folder: 'tenants');
+      }
+
+      // Only update fields that tenant can change
+      final Map<String, dynamic> data = {
+        'updated_at': DateTime.now().toIso8601String(),
+      };
+      
+      if (name != null) data['name'] = name;
+      if (phone != null) data['phone'] = phone;
+      if (nik != null) data['nik'] = nik;
+      if (address != null) data['address'] = address;
+      data['photo_url'] = photoUrl;
+
+      final response = await _client
+          .from('tenants')
+          .update(data)
+          .eq('id', tenantId)
+          .select('*, contracts!tenants_contract_id_fkey(id, room_id, start_date, end_date, rooms!contracts_room_id_fkey(room_number))')
+          .single();
+
+      print('✅ Tenant profile updated successfully');
+      return Tenant.fromJson(response);
+    } catch (e) {
+      print('❌ Error updating tenant profile: $e');
+      rethrow;
+    }
+  }
+
+  /// Hapus penyewa
   Future<void> deleteTenant(String tenantId) async {
     try {
       print('🗑️ Deleting tenant: $tenantId');
@@ -573,7 +615,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Get tenant statistics
+  /// Statistik penyewa
   Future<Map<String, int>> getTenantStatistics() async {
     try {
       final tenants = await fetchTenants();
@@ -590,7 +632,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Get available rooms (empty rooms)
+  /// Kamar yang tersedia (kosong)
   Future<List<Room>> getAvailableRooms() async {
     try {
       final response = await _client
@@ -608,9 +650,9 @@ class SupabaseService extends GetxService {
     }
   }
 
-  // ==================== BILLS CRUD ====================
+  // ========== BILLS ==========
 
-  /// Fetch all bills with optional filtering
+  /// Ambil semua tagihan dengan filter
   Future<List<Bill>> fetchBills({
     String? status,
     String? type,
@@ -681,7 +723,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Get single bill by ID
+  /// Ambil tagihan by ID
   Future<Bill?> getBillById(String billId) async {
     try {
       final response = await _client
@@ -698,7 +740,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Create new bill
+  /// Buat tagihan baru
   Future<Bill> createBill(Bill bill) async {
     try {
       print('➕ Creating bill for tenant: ${bill.tenantId}');
@@ -721,7 +763,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Update existing bill
+  /// Update tagihan
   Future<Bill> updateBill(Bill bill) async {
     try {
       print('✏️ Updating bill: ${bill.id}');
@@ -744,7 +786,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Update bill status
+  /// Update status tagihan
   Future<void> updateBillStatus(String billId, String status) async {
     try {
       await _client
@@ -761,7 +803,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Update bill admin notes
+  /// Update catatan admin di tagihan
   Future<void> updateBillAdminNotes(String billId, String notes) async {
     try {
       await _client
@@ -778,7 +820,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Delete bill
+  /// Hapus tagihan
   Future<void> deleteBill(String billId) async {
     try {
       print('🗑️ Deleting bill: $billId');
@@ -796,9 +838,9 @@ class SupabaseService extends GetxService {
     }
   }
 
-  // ==================== PAYMENTS ====================
+  // ========== PAYMENTS ==========
 
-  /// Add payment to bill
+  /// Tambah pembayaran (admin)
   Future<Payment> addPayment({
     required String billId,
     required double amount,
@@ -839,7 +881,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Submit payment from tenant (Pending Verification)
+  /// Submit pembayaran dari tenant (menunggu verifikasi)
   Future<void> submitTenantPayment({
     required String billId,
     required double amount,
@@ -874,7 +916,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Check if bill is fully paid and update status
+  /// Cek dan update status tagihan jika lunas
   Future<void> _checkAndUpdateBillStatus(String billId) async {
     try {
       final bill = await getBillById(billId);
@@ -888,7 +930,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Verify payment
+  /// Verifikasi pembayaran
   Future<void> verifyPayment(String paymentId) async {
     try {
       final response = await _client
@@ -912,7 +954,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Reject payment
+  /// Tolak pembayaran
   Future<void> rejectPayment(String paymentId) async {
     try {
       await _client
@@ -927,7 +969,7 @@ class SupabaseService extends GetxService {
     }
   }
 
-  /// Get bill statistics
+  /// Statistik tagihan
   Future<Map<String, dynamic>> getBillStatistics({DateTime? month}) async {
     try {
       final bills = await fetchBills(month: month);
@@ -971,6 +1013,44 @@ class SupabaseService extends GetxService {
       };
     } catch (e) {
       print('❌ Error getting bill statistics: $e');
+      rethrow;
+    }
+  }
+
+  // ========== ANNOUNCEMENTS ==========
+
+  /// Fetch all announcements
+  Future<List<Map<String, dynamic>>> fetchAnnouncements() async {
+    try {
+      print('🔍 Fetching announcements');
+      
+      final response = await _client
+          .from('announcements')
+          .select('*, announcement_reads(*)')
+          .order('created_at', ascending: false);
+      
+      print('✅ Fetched ${response.length} announcements');
+      
+      // Convert to Announcement model format
+      return List<Map<String, dynamic>>.from(response);
+    } catch (e) {
+      print('❌ Error fetching announcements: $e');
+      rethrow;
+    }
+  }
+
+  /// Get announcement by ID
+  Future<Map<String, dynamic>?> getAnnouncementById(String id) async {
+    try {
+      final response = await _client
+          .from('announcements')
+          .select('*, announcement_reads(*)')
+          .eq('id', id)
+          .maybeSingle();
+      
+      return response;
+    } catch (e) {
+      print('❌ Error getting announcement: $e');
       rethrow;
     }
   }

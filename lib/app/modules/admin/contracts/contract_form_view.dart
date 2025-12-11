@@ -38,12 +38,21 @@ class _ContractFormViewState extends State<ContractFormView> {
   void initState() {
     super.initState();
     _ensureController();
+    _refreshData();
   }
 
   void _ensureController() {
     if (!Get.isRegistered<ContractsController>()) {
       Get.put(ContractsController());
     }
+  }
+
+  /// Refresh tenants and rooms data when view is opened
+  void _refreshData() {
+    final controller = Get.find<ContractsController>();
+    controller.fetchTenants();
+    controller.fetchRooms();
+    print('🔄 Contract form: Refreshed tenants and rooms data');
   }
 
   @override

@@ -1,12 +1,24 @@
 // FILE: lib/app/models/bill_model.dart
 import 'package:intl/intl.dart';
+import 'package:get/get.dart';
+import '../services/app_settings_service.dart';
 
+/// Helper class to access AppSettingsService from Bill model
+class _AppSettingsServiceHelper {
+  static AppSettingsService? getService() {
+    if (Get.isRegistered<AppSettingsService>()) {
+      return Get.find<AppSettingsService>();
+    }
+    return null;
+  }
+}
 /// Bill model for Kos Bae boarding house management
 class Bill {
   final String id;
   final String tenantId;
   final String? roomId;
-  final String? contractId; // Reference to the contract that generated this bill
+  final String?
+  contractId; // Reference to the contract that generated this bill
   final String? tenantName; // From joined data
   final String? roomNumber; // From joined data
   final double amount;
@@ -174,6 +186,103 @@ class Bill {
 
   /// Get days until due
   int get daysUntilDue => dueDate.difference(DateTime.now()).inDays;
+  
+  /// Calculate late fee based on app settings
+  /// This uses the AppSettingsService to get current late fee settings
+  double calculateLateFee() {
+    try {
+      if (status == 'paid') return 0;
+      
+      // Get settings from service
+      int gracePeriodDays = 3;
+      int lateFeePercentage = 5;
+      bool enableLateFee = true;
+      
+      // Try to get from AppSettingsService if available
+      try {
+        // Use dynamic import to avoid circular dependency
+        final settings = _getSettingsService();
+        if (settings != null) {
+          gracePeriodDays = settings.gracePeriodDays.value;
+          lateFeePercentage = settings.lateFeePercentage.value;
+          enableLateFee = settings.enableLateFee.value;
+        }
+      } catch (_) {}
+      
+      if (!enableLateFee) return 0;
+      
+      final gracePeriodEnd = dueDate.add(Duration(days: gracePeriodDays));
+      if (DateTime.now().isAfter(gracePeriodEnd)) {
+        return amount * (lateFeePercentage / 100);
+      }
+      return 0;
+    } catch (e) {
+      return 0;
+    }
+  }
+  
+  /// Helper to get settings service
+  dynamic _getSettingsService() {
+    try {
+      // Import at runtime to avoid circular dependency
+      return _AppSettingsServiceHelper.getService();
+    } catch (_) {
+      return null;
+    }
+  }
+  
+  /// Get total amount including late fee
+  double get totalWithLateFee => amount + calculateLateFee();
+  
+  /// Check if bill is in grace period
+  bool get isInGracePeriod {
+    final now = DateTime.now();
+    int gracePeriodDays = 3;
+    
+    try {
+      final settings = _getSettingsService();
+      if (settings != null) {
+        gracePeriodDays = settings.gracePeriodDays.value;
+      }
+    } catch (_) {}
+    
+    final gracePeriodEnd = dueDate.add(Duration(days: gracePeriodDays));
+    return now.isAfter(dueDate) && now.isBefore(gracePeriodEnd) && status != 'paid';
+  }
+  
+  /// Check if bill needs reminder (within X days before due date)
+  bool get needsReminder {
+    if (status == 'paid') return false;
+    
+    int reminderDaysBefore = 3;
+    bool enableReminders = true;
+    
+    try {
+      final settings = _getSettingsService();
+      if (settings != null) {
+        reminderDaysBefore = settings.reminderDaysBefore.value;
+        enableReminders = settings.enableReminders.value;
+      }
+    } catch (_) {}
+    
+    if (!enableReminders) return false;
+    
+    final reminderDate = dueDate.subtract(Duration(days: reminderDaysBefore));
+    final now = DateTime.now();
+    return now.isAfter(reminderDate) && now.isBefore(dueDate);
+  }
+  
+  /// Get formatted late fee
+  String get formattedLateFee {
+    final fee = calculateLateFee();
+    if (fee <= 0) return '-';
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
+    return formatter.format(fee);
+  }
 
   /// Get formatted amount
   String get formattedAmount {

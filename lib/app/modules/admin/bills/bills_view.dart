@@ -86,33 +86,8 @@ class BillsView extends GetView<BillsController> {
           ),
         ],
       ),
-      child: Stack(
+      child: Column(
         children: [
-          // Decorative circles
-          Positioned(
-            top: -30,
-            right: -30,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -20,
-            left: -20,
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.08),
-              ),
-            ),
-          ),
           Row(
             children: [
               Expanded(
@@ -152,6 +127,156 @@ class BillsView extends GetView<BillsController> {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 20),
+          // Action Buttons
+          Row(
+            children: [
+              Expanded(
+                child: _buildHeaderActionButton(
+                  icon: Icons.autorenew_rounded,
+                  label: 'Generate Tagihan',
+                  onTap: () => _showGenerateConfirmDialog(),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildHeaderActionButton(
+                  icon: Icons.build_rounded,
+                  label: 'Maintenance',
+                  onTap: () => _showMaintenanceConfirmDialog(),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildHeaderActionButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.white.withOpacity(0.2),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+  
+  void _showGenerateConfirmDialog() {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.green.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.autorenew_rounded, color: Colors.green.shade600),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Generate Tagihan',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Generate tagihan bulan ini untuk semua kontrak aktif yang belum memiliki tagihan?',
+          style: GoogleFonts.plusJakartaSans(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Batal', style: GoogleFonts.plusJakartaSans()),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              controller.generateMonthlyBills();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Generate', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  void _showMaintenanceConfirmDialog() {
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.build_rounded, color: Colors.blue.shade600),
+            ),
+            const SizedBox(width: 12),
+            Text(
+              'Daily Maintenance',
+              style: GoogleFonts.plusJakartaSans(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Jalankan maintenance harian:\n\n• Generate tagihan bulan ini\n• Update kontrak yang sudah berakhir\n• Update kontrak yang akan habis',
+          style: GoogleFonts.plusJakartaSans(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Batal', style: GoogleFonts.plusJakartaSans()),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back();
+              controller.runDailyMaintenance();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            ),
+            child: Text('Jalankan', style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -1001,50 +1126,165 @@ class BillsView extends GetView<BillsController> {
                 ),
               ],
 
-              // Days info
+              // Days info and Late Fee
               if (bill.status != 'paid') ...[
                 const SizedBox(height: 14),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: bill.isOverdue
-                        ? const Color(0xFFE91E63).withOpacity(0.1)
-                        : AppTheme.softGrey,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        bill.isOverdue
-                            ? Icons.warning_rounded
-                            : Icons.schedule_rounded,
-                        size: 16,
-                        color: bill.isOverdue
-                            ? const Color(0xFFE91E63)
-                            : AppTheme.charcoal.withOpacity(0.6),
+                // Late fee info (if overdue past grace period)
+                if (bill.isOverdue && bill.calculateLateFee() > 0) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE91E63).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFFE91E63).withOpacity(0.2),
                       ),
-                      const SizedBox(width: 8),
-                      Text(
-                        bill.isOverdue
-                            ? 'Terlambat ${-bill.daysUntilDue} hari'
-                            : bill.daysUntilDue == 0
-                            ? 'Jatuh tempo hari ini'
-                            : '${bill.daysUntilDue} hari lagi',
-                        style: GoogleFonts.plusJakartaSans(
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.warning_amber_rounded,
+                          size: 20,
+                          color: Color(0xFFE91E63),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Denda Keterlambatan: ${bill.formattedLateFee}',
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: const Color(0xFFE91E63),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Text(
+                                'Total: ${NumberFormat.currency(locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0).format(bill.totalWithLateFee)}',
+                                style: GoogleFonts.plusJakartaSans(
+                                  color: const Color(0xFFC2185B),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
+                // Grace period warning
+                if (bill.isInGracePeriod) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.orange.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.orange.withOpacity(0.2)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(
+                          Icons.timer_outlined,
+                          size: 16,
+                          color: Colors.orange,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Masa tenggang - segera tagih untuk menghindari denda!',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Colors.orange.shade800,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else if (bill.needsReminder) ...[
+                  // Reminder
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.notifications_active_rounded,
+                          size: 16,
+                          color: Colors.amber.shade700,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '${bill.daysUntilDue} hari lagi - perlu pengingat',
+                            style: GoogleFonts.plusJakartaSans(
+                              color: Colors.amber.shade800,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else ...[
+                  // Regular days info
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: bill.isOverdue
+                          ? const Color(0xFFE91E63).withOpacity(0.1)
+                          : AppTheme.softGrey,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          bill.isOverdue
+                              ? Icons.warning_rounded
+                              : Icons.schedule_rounded,
+                          size: 16,
                           color: bill.isOverdue
                               ? const Color(0xFFE91E63)
-                              : AppTheme.charcoal.withOpacity(0.7),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                              : AppTheme.charcoal.withOpacity(0.6),
                         ),
-                      ),
-                    ],
+                        const SizedBox(width: 8),
+                        Text(
+                          bill.isOverdue
+                              ? 'Terlambat ${-bill.daysUntilDue} hari'
+                              : bill.daysUntilDue == 0
+                              ? 'Jatuh tempo hari ini'
+                              : '${bill.daysUntilDue} hari lagi',
+                          style: GoogleFonts.plusJakartaSans(
+                            color: bill.isOverdue
+                                ? const Color(0xFFE91E63)
+                                : AppTheme.charcoal.withOpacity(0.7),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ],
             ],
           ),
@@ -1327,66 +1567,36 @@ class BillsView extends GetView<BillsController> {
 
   /// FAB with menu
   Widget _buildFAB() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // Generate Bills Button
-        Container(
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [Color(0xFF4CAF50), Color(0xFF81C784)],
-            ),
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color: const Color(0xFF4CAF50).withOpacity(0.4),
-                blurRadius: 12,
-                offset: const Offset(0, 6),
-              ),
-            ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppTheme.primaryBlue, AppTheme.deepBlue],
+        ),
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryBlue.withOpacity(0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+            spreadRadius: -2,
           ),
-          child: FloatingActionButton.small(
-            heroTag: 'generate_bills_fab',
-            onPressed: () => _showGenerateBillsDialog(),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            child: const Icon(Icons.auto_mode_rounded, color: Colors.white),
+        ],
+      ),
+      child: FloatingActionButton.extended(
+        heroTag: 'bills_fab',
+        onPressed: () => _navigateToForm(null),
+        icon: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
+        label: Text(
+          'Tambah',
+          style: GoogleFonts.plusJakartaSans(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: 14,
           ),
         ),
-        const SizedBox(height: 14),
-        // Add Bill Button
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [AppTheme.primaryBlue, AppTheme.deepBlue],
-            ),
-            borderRadius: BorderRadius.circular(18),
-            boxShadow: [
-              BoxShadow(
-                color: AppTheme.primaryBlue.withOpacity(0.4),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-                spreadRadius: -2,
-              ),
-            ],
-          ),
-          child: FloatingActionButton.extended(
-            heroTag: 'bills_fab',
-            onPressed: () => _navigateToForm(null),
-            icon: const Icon(Icons.add_rounded, color: Colors.white, size: 22),
-            label: Text(
-              'Tambah',
-              style: GoogleFonts.plusJakartaSans(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
-              ),
-            ),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-          ),
-        ),
-      ],
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
     );
   }
 

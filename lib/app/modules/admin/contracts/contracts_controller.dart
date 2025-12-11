@@ -8,6 +8,7 @@ import '../../../models/contract_model.dart';
 import '../../../models/tenant_model.dart';
 import '../../../models/room_model.dart';
 import '../../../services/supabase_service.dart';
+import '../../../services/app_settings_service.dart';
 
 /// Controller for Contracts Management
 class ContractsController extends GetxController {
@@ -138,11 +139,33 @@ class ContractsController extends GetxController {
     }
   }
 
-  /// Fetch tenants for dropdown
+  /// Fetch tenants for dropdown (only tenants without active contract)
   Future<void> fetchTenants() async {
     try {
-      final result = await _supabaseService.fetchTenants(status: 'aktif');
-      tenants.value = result;
+      // Fetch tenants that are aktif or nonaktif
+      final allTenants = await _supabaseService.client
+          .from('tenants')
+          .select('*')
+          .or('status.eq.aktif,status.eq.nonaktif');
+      
+      // Get all active contract tenant IDs
+      final activeContracts = await _supabaseService.client
+          .from('contracts')
+          .select('tenant_id')
+          .or('status.eq.aktif,status.eq.akan_habis');
+      
+      final activeContractTenantIds = (activeContracts as List)
+          .map((c) => c['tenant_id'] as String)
+          .toSet();
+      
+      // Filter out tenants that already have active contracts
+      final availableTenants = (allTenants as List)
+          .where((t) => !activeContractTenantIds.contains(t['id']))
+          .map((json) => Tenant.fromJson(json as Map<String, dynamic>))
+          .toList();
+      
+      tenants.value = availableTenants;
+      print('✅ Fetched ${availableTenants.length} available tenants without active contract');
     } catch (e) {
       print('❌ Error fetching tenants: $e');
     }
@@ -299,34 +322,48 @@ class ContractsController extends GetxController {
           .single();
 
       final contractId = contractResponse['id'] as String;
+      print('✅ Contract created with ID: $contractId');
 
-      // Update room status to 'terisi'
+      // Update tenant with contract_id and set status to aktif
+      await _supabaseService.client
+          .from('tenants')
+          .update({
+            'contract_id': contractId,
+            'status': 'aktif',
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', tenantId);
+      print('✅ Tenant $tenantId updated with contract_id: $contractId');
+
+      // Update room status to 'terisi' with contract_id
       final tenant = await _supabaseService.getTenantById(tenantId);
       await _supabaseService.client
           .from('rooms')
           .update({
             'status': 'terisi',
             'current_tenant_name': tenant?.name,
+            'contract_id': contractId,
             'updated_at': DateTime.now().toIso8601String(),
           })
           .eq('id', roomId);
+      print('✅ Room $roomId updated with contract_id: $contractId');
 
-      // Generate monthly bills
-      await _generateMonthlyBills(
+      // Generate first month bill only
+      await _generateFirstMonthBill(
         contractId: contractId,
         tenantId: tenantId,
         roomId: roomId,
         monthlyRent: monthlyRent,
         startDate: startDate,
-        endDate: endDate,
       );
 
       await fetchContracts();
       await fetchRooms(); // Refresh rooms list
+      await fetchTenants(); // Refresh tenants list
 
       Get.snackbar(
         'Sukses',
-        'Kontrak berhasil dibuat dan tagihan bulanan telah digenerate',
+        'Kontrak berhasil dibuat dan tagihan bulan pertama telah digenerate',
         backgroundColor: const Color(0xFFB9F3CC),
         colorText: Colors.black87,
         snackPosition: SnackPosition.BOTTOM,
@@ -347,64 +384,47 @@ class ContractsController extends GetxController {
     }
   }
 
-  /// Generate monthly bills for a contract
-  Future<void> _generateMonthlyBills({
+  /// Generate first month bill for a new contract
+  Future<void> _generateFirstMonthBill({
     required String contractId,
     required String tenantId,
     required String roomId,
     required double monthlyRent,
     required DateTime startDate,
-    required DateTime endDate,
   }) async {
     try {
-      // Calculate number of months
-      DateTime current = DateTime(startDate.year, startDate.month, 1);
-      final end = DateTime(endDate.year, endDate.month, 1);
-
-      List<Map<String, dynamic>> bills = [];
-
-      while (current.isBefore(end) || current.isAtSameMomentAs(end)) {
-        // Billing period
-        final periodStart = DateTime(current.year, current.month, 1);
-        final periodEnd = DateTime(
-          current.year,
-          current.month + 1,
-          0,
-        ); // Last day of month
-
-        // Due date is the 10th of the month
-        final dueDate = DateTime(current.year, current.month, 10);
-
-        bills.add({
-          'tenant_id': tenantId,
-          'room_id': roomId,
-          'contract_id': contractId,
-          'amount': monthlyRent,
-          'type': 'sewa',
-          'status': 'pending',
-          'due_date': dueDate.toIso8601String().split('T').first,
-          'billing_period_start': periodStart
-              .toIso8601String()
-              .split('T')
-              .first,
-          'billing_period_end': periodEnd.toIso8601String().split('T').first,
-          'notes':
-              'Tagihan sewa bulan ${_getMonthName(current.month)} ${current.year}',
-          'created_at': DateTime.now().toIso8601String(),
-          'created_by': _supabaseService.auth.currentUser?.id,
-        });
-
-        // Move to next month
-        current = DateTime(current.year, current.month + 1, 1);
+      // Get due date from settings (default 10)
+      int dueDateDay = 10;
+      if (Get.isRegistered<AppSettingsService>()) {
+        dueDateDay = Get.find<AppSettingsService>().dueDateDay.value;
       }
-
-      // Batch insert bills
-      if (bills.isNotEmpty) {
-        await _supabaseService.client.from('bills').insert(bills);
-        print('✅ Generated ${bills.length} monthly bills');
-      }
+      
+      // Use start date's month for billing period
+      final periodStart = DateTime(startDate.year, startDate.month, 1);
+      final periodEnd = DateTime(startDate.year, startDate.month + 1, 0); // Last day of month
+      
+      // Due date is the configured day of the month
+      final dueDate = DateTime(startDate.year, startDate.month, dueDateDay);
+      
+      // Insert single bill for first month
+      await _supabaseService.client.from('bills').insert({
+        'tenant_id': tenantId,
+        'room_id': roomId,
+        'contract_id': contractId,
+        'amount': monthlyRent,
+        'type': 'sewa',
+        'status': 'pending',
+        'due_date': dueDate.toIso8601String().split('T').first,
+        'billing_period_start': periodStart.toIso8601String().split('T').first,
+        'billing_period_end': periodEnd.toIso8601String().split('T').first,
+        'notes': 'Tagihan sewa bulan ${_getMonthName(startDate.month)} ${startDate.year}',
+        'created_at': DateTime.now().toIso8601String(),
+        'created_by': _supabaseService.auth.currentUser?.id,
+      });
+      
+      print('✅ Generated first month bill for contract $contractId');
     } catch (e) {
-      print('❌ Error generating monthly bills: $e');
+      print('❌ Error generating first month bill: $e');
       rethrow;
     }
   }
@@ -488,22 +508,43 @@ class ContractsController extends GetxController {
           .single();
 
       final contractId = contractResponse['id'] as String;
+      print('✅ Renewed contract created with ID: $contractId');
 
-      // Generate new monthly bills
-      await _generateMonthlyBills(
+      // Update tenant with new contract_id
+      await _supabaseService.client
+          .from('tenants')
+          .update({
+            'contract_id': contractId,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', oldContract.tenantId);
+
+      // Update room with new contract_id
+      if (oldContract.roomId != null) {
+        await _supabaseService.client
+            .from('rooms')
+            .update({
+              'contract_id': contractId,
+              'updated_at': DateTime.now().toIso8601String(),
+            })
+            .eq('id', oldContract.roomId!);
+      }
+
+      // Generate first month bill only for the renewed contract
+      await _generateFirstMonthBill(
         contractId: contractId,
         tenantId: oldContract.tenantId,
         roomId: oldContract.roomId!,
         monthlyRent: oldContract.monthlyRent,
         startDate: newStartDate,
-        endDate: newEndDate,
       );
 
       await fetchContracts();
+      await fetchTenants(); // Refresh tenants list
 
       Get.snackbar(
         'Sukses',
-        'Kontrak berhasil diperpanjang dan tagihan bulanan telah digenerate',
+        'Kontrak berhasil diperpanjang dan tagihan bulan pertama telah digenerate',
         backgroundColor: const Color(0xFFB9F3CC),
         colorText: Colors.black87,
         snackPosition: SnackPosition.BOTTOM,
@@ -579,6 +620,16 @@ class ContractsController extends GetxController {
         await _supabaseService.deleteFile(contract.documentUrl!);
       }
 
+      // Update tenant - clear contract_id and set status to nonaktif
+      await _supabaseService.client
+          .from('tenants')
+          .update({
+            'contract_id': null,
+            'status': 'nonaktif',
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', contract.tenantId);
+
       // Update room status back to 'kosong' if room exists
       if (contract.roomId != null) {
         await _supabaseService.client
@@ -586,6 +637,7 @@ class ContractsController extends GetxController {
             .update({
               'status': 'kosong',
               'current_tenant_name': null,
+              'contract_id': null,
               'updated_at': DateTime.now().toIso8601String(),
             })
             .eq('id', contract.roomId!);
@@ -598,6 +650,7 @@ class ContractsController extends GetxController {
           .eq('id', contract.id);
 
       await fetchContracts();
+      await fetchTenants(); // Refresh tenants list
 
       Get.snackbar(
         'Sukses',

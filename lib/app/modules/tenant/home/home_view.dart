@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../theme/app_theme.dart';
+import '../../../routes/app_routes.dart';
 import 'home_controller.dart';
 import '../tenant_nav/tenant_nav_controller.dart';
 
@@ -195,30 +196,49 @@ class TenantHomeView extends GetView<HomeController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Greeting
-                  Text(
-                    _getGreeting(DateTime.now().hour),
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.cream,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
+                  // Top row with greeting and notification button
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        tenant.name.split(' ').first,
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: -0.5,
+                      // Greeting section
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _getGreeting(DateTime.now().hour),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: AppTheme.cream,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    tenant.name.split(' ').first,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.white,
+                                      letterSpacing: -0.5,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                const Text('👋', style: TextStyle(fontSize: 24)),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      const Text('👋', style: TextStyle(fontSize: 24)),
+                      // Notification button
+                      _buildNotificationButton(),
                     ],
                   ),
 
@@ -399,35 +419,53 @@ class TenantHomeView extends GetView<HomeController> {
 
   /// Quick Stats Section
   Widget _buildQuickStats() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(
-            icon: Icons.receipt_long_rounded,
-            label: 'Tagihan',
-            value: controller.unpaidBillsCount.value.toString(),
-            subtitle: 'Belum Dibayar',
-            color: controller.unpaidBillsCount.value > 0
-                ? Colors.orange
-                : Colors.green,
-            onTap: () =>
-                Get.find<TenantNavController>().changeIndex(1),
+    return Obx(() {
+      // Determine bill status color and subtitle
+      Color billColor;
+      String billSubtitle;
+      
+      if (controller.overdueBillsCount.value > 0) {
+        billColor = Colors.red;
+        billSubtitle = '${controller.overdueBillsCount.value} Terlambat';
+      } else if (controller.reminderBillsCount.value > 0) {
+        billColor = Colors.amber;
+        billSubtitle = 'Segera Jatuh Tempo';
+      } else if (controller.unpaidBillsCount.value > 0) {
+        billColor = Colors.orange;
+        billSubtitle = 'Belum Dibayar';
+      } else {
+        billColor = Colors.green;
+        billSubtitle = 'Semua Lunas';
+      }
+      
+      return Row(
+        children: [
+          Expanded(
+            child: _buildStatCard(
+              icon: Icons.receipt_long_rounded,
+              label: 'Tagihan',
+              value: controller.unpaidBillsCount.value.toString(),
+              subtitle: billSubtitle,
+              color: billColor,
+              onTap: () =>
+                  Get.find<TenantNavController>().changeIndex(1),
+            ),
           ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: _buildStatCard(
-            icon: Icons.report_problem_rounded,
-            label: 'Keluhan',
-            value: controller.activeComplaintsCount.value.toString(),
-            subtitle: 'Sedang Proses',
-            color: AppTheme.primaryBlue,
-            onTap: () =>
-                Get.find<TenantNavController>().changeIndex(2),
+          const SizedBox(width: 16),
+          Expanded(
+            child: _buildStatCard(
+              icon: Icons.report_problem_rounded,
+              label: 'Keluhan',
+              value: controller.activeComplaintsCount.value.toString(),
+              subtitle: 'Sedang Proses',
+              color: AppTheme.primaryBlue,
+              onTap: () =>
+                  Get.find<TenantNavController>().changeIndex(2),
+            ),
           ),
-        ),
-      ],
-    );
+        ],
+      );
+    });
   }
 
   Widget _buildStatCard({
@@ -798,6 +836,50 @@ class TenantHomeView extends GetView<HomeController> {
                 fontSize: 14,
                 color: AppTheme.charcoal.withOpacity(0.6),
                 height: 1.5,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Build notification button for header
+  Widget _buildNotificationButton() {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to announcements/notifications page
+        Get.toNamed(AppRoutes.TENANT_ANNOUNCEMENTS);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Colors.white.withOpacity(0.2),
+            width: 1,
+          ),
+        ),
+        child: Stack(
+          children: [
+            Icon(
+              Icons.notifications_outlined,
+              color: Colors.white,
+              size: 24,
+            ),
+            // Badge indicator for unread notifications
+            Positioned(
+              right: 0,
+              top: 0,
+              child: Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: AppTheme.gold,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 1.5),
+                ),
               ),
             ),
           ],

@@ -5,6 +5,7 @@ import '../../../models/bill_model.dart';
 import '../../../models/tenant_model.dart';
 import '../../../models/room_model.dart';
 import '../../../services/supabase_service.dart';
+import '../../../services/app_settings_service.dart';
 
 /// Controller for Bill Form (Add/Edit)
 class BillFormController extends GetxController {
@@ -46,12 +47,21 @@ class BillFormController extends GetxController {
   void onInit() {
     super.onInit();
     _loadData();
+    _initDueDateFromSettings();
 
     // Check if editing
     if (Get.arguments != null && Get.arguments is Bill) {
       existingBill = Get.arguments as Bill;
       isEditMode.value = true;
       _populateForm();
+    }
+  }
+  
+  /// Initialize due date from app settings
+  void _initDueDateFromSettings() {
+    if (Get.isRegistered<AppSettingsService>()) {
+      final settings = Get.find<AppSettingsService>();
+      dueDate.value = settings.getNextDueDate();
     }
   }
 

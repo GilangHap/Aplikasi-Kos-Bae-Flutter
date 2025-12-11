@@ -33,6 +33,10 @@ import '../modules/admin/contracts/contract_detail_view.dart';
 import '../modules/admin/contracts/contract_form_view.dart';
 import '../modules/tenant/tenant_layout/tenant_layout_view.dart';
 import '../modules/tenant/tenant_layout/tenant_layout_binding.dart';
+import '../modules/tenant/announcements/tenant_announcements_view.dart';
+import '../modules/tenant/announcements/tenant_announcements_binding.dart';
+import '../modules/tenant/profile/edit_profile_view.dart';
+import '../modules/tenant/profile/edit_profile_binding.dart';
 import '../modules/auth/login/login_view.dart';
 import '../modules/auth/splash/splash_view.dart';
 import '../modules/initial/initial_view.dart';
@@ -178,6 +182,20 @@ class AppPages {
       name: AppRoutes.TENANT_LAYOUT,
       page: () => const TenantLayoutView(),
       binding: TenantLayoutBinding(),
+    ),
+
+    // Tenant Announcements (accessible from notification button)
+    GetPage(
+      name: AppRoutes.TENANT_ANNOUNCEMENTS,
+      page: () => const TenantAnnouncementsView(),
+      binding: TenantAnnouncementsBinding(),
+    ),
+
+    // Tenant Edit Profile
+    GetPage(
+      name: AppRoutes.TENANT_EDIT_PROFILE,
+      page: () => const EditProfileView(),
+      binding: EditProfileBinding(),
     ),
   ];
 }

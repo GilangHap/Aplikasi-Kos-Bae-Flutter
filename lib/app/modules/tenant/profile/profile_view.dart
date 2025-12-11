@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../theme/app_theme.dart';
+import '../../../routes/app_routes.dart';
 import 'tenant_profile_controller.dart';
 
 /// Minimalist Tenant Profile View - Aesthetic & Clean UI
@@ -258,7 +260,7 @@ class TenantProfileView extends GetView<TenantProfileController> {
                         child: IconButton(
                           icon: const Icon(Icons.settings_rounded,
                               color: Colors.white),
-                          onPressed: () {},
+                          onPressed: () => Get.toNamed(AppRoutes.TENANT_EDIT_PROFILE),
                           constraints: const BoxConstraints.tightFor(
                             width: 44,
                             height: 44,
@@ -304,16 +306,45 @@ class TenantProfileView extends GetView<TenantProfileController> {
                           ),
                         ],
                       ),
-                      child: Center(
-                        child: Text(
-                          tenant.initials,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 40,
-                            fontWeight: FontWeight.w800,
-                            color: AppTheme.primaryBlue,
-                          ),
-                        ),
-                      ),
+                      child: tenant.photoUrl != null
+                          ? ClipOval(
+                              child: CachedNetworkImage(
+                                imageUrl: tenant.photoUrl!,
+                                fit: BoxFit.cover,
+                                width: 100,
+                                height: 100,
+                                placeholder: (context, url) => Center(
+                                  child: Text(
+                                    tenant.initials,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppTheme.primaryBlue,
+                                    ),
+                                  ),
+                                ),
+                                errorWidget: (context, url, error) => Center(
+                                  child: Text(
+                                    tenant.initials,
+                                    style: GoogleFonts.plusJakartaSans(
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppTheme.primaryBlue,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Center(
+                              child: Text(
+                                tenant.initials,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 40,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppTheme.primaryBlue,
+                                ),
+                              ),
+                            ),
                     ),
                   ),
 

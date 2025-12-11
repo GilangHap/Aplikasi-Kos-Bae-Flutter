@@ -1,25 +1,18 @@
-// FILE: lib/app/services/auth_service.dart
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'supabase_service.dart';
 import '../routes/app_routes.dart';
 
-/// Authentication service for Kos Bae
-/// 
-/// TODO: Integrate with Supabase Auth
-/// - supabase.auth.signInWithPassword()
-/// - supabase.auth.signOut()
-/// - supabase.auth.onAuthStateChange
-/// - Read user role from Supabase storage or user metadata
+/// Service untuk autentikasi dan manajemen user session 
 class AuthService extends GetxService {
   final _client = Get.find<SupabaseService>().client;
   final Rx<User?> currentUser = Rx<User?>(null);
   final RxString userRole = ''.obs;
-  
+
   @override
   void onInit() {
     super.onInit();
-    // Listen to auth state changes
+    // Listen perubahan auth state (login/logout)
     _client.auth.onAuthStateChange.listen((data) {
       currentUser.value = data.session?.user;
       if (currentUser.value != null) {
@@ -30,7 +23,7 @@ class AuthService extends GetxService {
     });
   }
 
-  /// Initialize service
+  /// Inisialisasi async
   Future<AuthService> init() async {
     print('🔐 AuthService initialized');
     currentUser.value = _client.auth.currentUser;
@@ -40,7 +33,7 @@ class AuthService extends GetxService {
     return this;
   }
 
-  /// Initialize service (sync version)
+  /// Inisialisasi sync (untuk initial binding)
   void initSync() {
     print('🔐 AuthService initialized (sync)');
     currentUser.value = _client.auth.currentUser;
@@ -48,8 +41,8 @@ class AuthService extends GetxService {
       _fetchUserRole();
     }
   }
-  
-  /// Fetch user role from profiles table
+
+  /// Ambil role user dari tabel profiles
   Future<void> _fetchUserRole() async {
     try {
       final userId = currentUser.value?.id;
@@ -104,6 +97,19 @@ class AuthService extends GetxService {
         colorText: Get.theme.colorScheme.onError,
         snackPosition: SnackPosition.BOTTOM,
       );
+      return false;
+    }
+  }
+
+  /// Change user password
+  Future<bool> changePassword(String newPassword) async {
+    try {
+      print('🔐 Changing password...');
+      await _client.auth.updateUser(UserAttributes(password: newPassword));
+      print('✅ Password changed successfully');
+      return true;
+    } catch (e) {
+      print('❌ Error changing password: $e');
       return false;
     }
   }

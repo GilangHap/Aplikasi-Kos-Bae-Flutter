@@ -43,4 +43,6 @@ abstract class AppRoutes {
   static const TENANT_BILLS = '/tenant/bills';
   static const TENANT_COMPLAINTS = '/tenant/complaints';
   static const TENANT_PROFILE = '/tenant/profile';
+  static const TENANT_ANNOUNCEMENTS = '/tenant/announcements';
+  static const TENANT_EDIT_PROFILE = '/tenant/profile/edit';
 }

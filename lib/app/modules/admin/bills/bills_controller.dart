@@ -247,79 +247,28 @@ class BillsController extends GetxController {
     await fetchBills();
   }
 
-  /// Generate monthly bills for all active tenants
+  /// Generate monthly bills for all active contracts by calling database function
   Future<bool> generateMonthlyBills() async {
     try {
       isLoading.value = true;
 
-      // Get all active tenants with rooms
-      final tenants = await _supabaseService.fetchTenants(status: 'aktif');
-
-      int generated = 0;
-      final now = DateTime.now();
-      final periodStart = DateTime(now.year, now.month, 1);
-      final periodEnd = DateTime(now.year, now.month + 1, 0);
-      final dueDate = DateTime(now.year, now.month, 10); // Due on 10th
-
-      for (final tenant in tenants) {
-        // Skip if tenant doesn't have a contract
-        if (tenant.contractId == null) continue;
-
-        // Check if bill already exists for this month
-        final existingBill = bills.firstWhereOrNull(
-          (b) =>
-              b.tenantId == tenant.id &&
-              b.type == 'sewa' &&
-              b.billingPeriodStart.month == periodStart.month &&
-              b.billingPeriodStart.year == periodStart.year,
-        );
-
-        if (existingBill != null) continue;
-
-        try {
-          // Get contract to find room and price
-          final contract = await _supabaseService.client
-              .from('contracts')
-              .select('room_id, monthly_rent')
-              .eq('id', tenant.contractId!)
-              .single();
-
-          if (contract['room_id'] == null) continue;
-
-          final roomId = contract['room_id'] as String;
-          final monthlyRent = (contract['monthly_rent'] as num).toDouble();
-
-          // Create bill
-          final bill = Bill(
-            id: '',
-            tenantId: tenant.id,
-            roomId: roomId,
-            amount: monthlyRent,
-            type: 'sewa',
-            status: 'pending',
-            dueDate: dueDate,
-            billingPeriodStart: periodStart,
-            billingPeriodEnd: periodEnd,
-            notes: 'Tagihan sewa bulan ${periodStart.month}/${periodStart.year}',
-            createdAt: DateTime.now(),
-          );
-
-          await _supabaseService.createBill(bill);
-          generated++;
-        } catch (e) {
-          print('Error creating bill for tenant ${tenant.name}: $e');
-          continue;
-        }
-      }
+      // Call the database function to generate bills
+      final result = await _supabaseService.client
+          .rpc('generate_monthly_bills');
+      
+      final message = result != null && result.isNotEmpty 
+          ? result[0]['message'] ?? 'Selesai'
+          : 'Tagihan bulan ini telah digenerate';
 
       await fetchBills();
 
       Get.snackbar(
         'Sukses',
-        'Berhasil generate $generated tagihan bulanan',
+        message,
         backgroundColor: const Color(0xFFB9F3CC),
         colorText: const Color(0xFF2D3748),
-        snackPosition: SnackPosition.TOP,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
       );
 
       return true;
@@ -327,10 +276,56 @@ class BillsController extends GetxController {
       errorMessage.value = 'Gagal generate tagihan: ${e.toString()}';
       Get.snackbar(
         'Error',
-        'Gagal generate tagihan: $e',
+        'Gagal generate tagihan. Pastikan function database sudah dibuat.',
         backgroundColor: const Color(0xFFF7C4D4),
         colorText: const Color(0xFF2D3748),
-        snackPosition: SnackPosition.TOP,
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+  
+  /// Run daily maintenance (update expired contracts and generate bills)
+  Future<bool> runDailyMaintenance() async {
+    try {
+      isLoading.value = true;
+
+      // Call the database function for daily maintenance
+      final result = await _supabaseService.client
+          .rpc('run_daily_maintenance');
+      
+      String summary = 'Maintenance selesai:\n';
+      if (result != null && result is List) {
+        for (var row in result) {
+          summary += '• ${row['operation']}: ${row['result']}\n';
+        }
+      }
+
+      await fetchBills();
+
+      Get.snackbar(
+        'Sukses',
+        summary,
+        backgroundColor: const Color(0xFFB9F3CC),
+        colorText: const Color(0xFF2D3748),
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 5),
+      );
+
+      return true;
+    } catch (e) {
+      errorMessage.value = 'Gagal menjalankan maintenance: ${e.toString()}';
+      Get.snackbar(
+        'Error',
+        'Gagal menjalankan maintenance. Pastikan function database sudah dibuat.',
+        backgroundColor: const Color(0xFFF7C4D4),
+        colorText: const Color(0xFF2D3748),
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
       );
       return false;
     } finally {

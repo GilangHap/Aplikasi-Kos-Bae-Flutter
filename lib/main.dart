@@ -8,6 +8,7 @@ import 'app/bindings/initial_binding.dart';
 import 'app/routes/app_pages.dart';
 import 'app/routes/app_routes.dart';
 import 'app/theme/app_theme.dart';
+import 'app/core/logger/app_logger.dart';
 
 /// Main entry point for Kos Bae application
 ///
@@ -29,8 +30,13 @@ void main() async {
     url: dotenv.env['SUPABASE_URL'] ?? '',
     anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
   );
+  
+  AppLogger.success('App initialization complete', tag: 'Main');
 
   runApp(const KosBaeApp());
+  
+  // Initialize async services after app starts
+  ServiceInitializer.initAsyncServices();
 }
 
 class KosBaeApp extends StatelessWidget {
@@ -41,10 +47,17 @@ class KosBaeApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Kos Bae',
       debugShowCheckedModeBanner: false,
+      // Theme configuration - Light mode only
       theme: AppTheme.getTheme(),
+      
       initialBinding: InitialBinding(),
       initialRoute: AppRoutes.INITIAL,
       getPages: AppPages.routes,
+      
+      // Default transition
+      defaultTransition: Transition.cupertino,
+      transitionDuration: const Duration(milliseconds: 300),
     );
   }
 }
+

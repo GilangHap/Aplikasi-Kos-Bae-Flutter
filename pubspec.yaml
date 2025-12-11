@@ -1,46 +1,76 @@
 name: kos_bae
-description: "A new Flutter project."
-publish_to: 'none'
-version: 0.1.0
+description: "Aplikasi manajemen kos-kosan berbasis Flutter dengan Supabase backend"
+publish_to: 'none' 
+version: 0.1.0     
 
 environment:
-  sdk: ^3.9.2
+  sdk: ^3.9.2 
 
 dependencies:
   flutter:
     sdk: flutter
-  get: ^4.6.6
-  supabase_flutter: ^2.8.0
-  image_picker: ^1.1.2
-  cached_network_image: ^3.4.1
-  flutter_dotenv: ^5.2.1
-  intl: ^0.19.0
-  shimmer: ^3.0.0
-  url_launcher: ^6.2.5
-  file_picker: ^8.0.0
-  google_fonts: ^6.1.0
 
+  # State Management & Routing
+  get: ^4.6.6                    
+
+  # Backend & Database
+  supabase_flutter: ^2.8.0       
+
+  # Media & File Handling
+  image_picker: ^1.1.2           
+  cached_network_image: ^3.4.1   
+  file_picker: ^8.0.0            
+
+  # Utilities
+  flutter_dotenv: ^5.2.1         
+  intl: ^0.19.0                  
+  url_launcher: ^6.2.5           
+
+  # UI Components
+  shimmer: ^3.0.0                
+  google_fonts: ^6.1.0           
+
+  # Image Compression
+  flutter_image_compress: ^2.3.0
+
+  # Offline Caching
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.2
+  connectivity_plus: ^6.0.3
+
+  # PDF Generation
+  pdf: ^3.10.8
+  printing: ^5.12.0
+
+# Dependensi Development
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
-  flutter_launcher_icons: ^0.13.1
+  flutter_lints: ^5.0.0          
+  flutter_launcher_icons: ^0.13.1 
 
 flutter:
-  uses-material-design: true
-  assets:
-    - .env
-    - assets/image/
+  uses-material-design: true 
 
+  assets:
+    - .env              
+    - assets/image/     
+
+# App Icons
 flutter_launcher_icons:
-  image_path: "assets/image/logo_new.png"
+  image_path: "assets/image/logo_new.png" 
+
   android:
-    notification_icon: "ic_notification"
-  ios: true
+    notification_icon: "ic_notification"  
+
+  ios: true          
+
   macos:
-    generate: true
+    generate: true   
+
   web:
     generate: true
     image_path: "assets/image/logo_new.png"
-    background_color: "#5B8DB8"
-    theme_color: "#5B8DB8"
+    background_color: "#5B8DB8"  
+    theme_color: "#5B8DB8"       

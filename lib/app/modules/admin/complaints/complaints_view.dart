@@ -373,48 +373,50 @@ class AdminComplaintsView extends StatelessWidget {
   Widget _buildSearchBar(ComplaintsController controller) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          boxShadow: [
-            BoxShadow(
-              color: AppTheme.charcoal.withOpacity(0.06),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(14),
-              child: Icon(
-                Icons.search_rounded,
-                color: AppTheme.primaryBlue,
-                size: 22,
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.charcoal.withOpacity(0.06),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
               ),
-            ),
-            Expanded(
-              child: TextField(
-                controller: controller.searchController,
-                onChanged: controller.onSearchChanged,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.charcoal,
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(14),
+                child: Icon(
+                  Icons.search_rounded,
+                  color: AppTheme.primaryBlue,
+                  size: 22,
                 ),
-                decoration: InputDecoration(
-                  hintText: 'Cari judul, penghuni, atau kamar...',
-                  hintStyle: GoogleFonts.plusJakartaSans(
-                    color: AppTheme.charcoal.withOpacity(0.4),
+              ),
+              Expanded(
+                child: TextField(
+                  controller: controller.searchController,
+                  onChanged: controller.onSearchChanged,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 14,
                     fontWeight: FontWeight.w500,
+                    color: AppTheme.charcoal,
                   ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: InputDecoration(
+                    hintText: 'Cari judul, penghuni, atau kamar...',
+                    hintStyle: GoogleFonts.plusJakartaSans(
+                      color: AppTheme.charcoal.withOpacity(0.4),
+                      fontWeight: FontWeight.w500,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
                 ),
               ),
-            ),
             Obx(() {
               if (controller.searchQuery.value.isNotEmpty) {
                 return IconButton(
@@ -480,6 +482,7 @@ class AdminComplaintsView extends StatelessWidget {
               ),
             ),
           ],
+        ),
         ),
       ),
     );
@@ -1317,43 +1320,46 @@ class AdminComplaintsView extends StatelessWidget {
             ),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Ubah status keluhan "${complaint.title}"?',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.charcoal.withOpacity(0.7),
-              ),
-            ),
-            const SizedBox(height: 18),
-            TextField(
-              controller: notesController,
-              maxLines: 3,
-              style: GoogleFonts.plusJakartaSans(fontSize: 14),
-              decoration: InputDecoration(
-                labelText: 'Catatan (Opsional)',
-                labelStyle: GoogleFonts.plusJakartaSans(
-                  color: AppTheme.charcoal.withOpacity(0.6),
-                ),
-                hintText: 'Tambahkan catatan...',
-                hintStyle: GoogleFonts.plusJakartaSans(
-                  color: AppTheme.charcoal.withOpacity(0.4),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: AppTheme.mediumGrey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
+        content: Material(
+          color: Colors.transparent,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Ubah status keluhan "${complaint.title}"?',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.charcoal.withOpacity(0.7),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 18),
+              TextField(
+                controller: notesController,
+                maxLines: 3,
+                style: GoogleFonts.plusJakartaSans(fontSize: 14),
+                decoration: InputDecoration(
+                  labelText: 'Catatan (Opsional)',
+                  labelStyle: GoogleFonts.plusJakartaSans(
+                    color: AppTheme.charcoal.withOpacity(0.6),
+                  ),
+                  hintText: 'Tambahkan catatan...',
+                  hintStyle: GoogleFonts.plusJakartaSans(
+                    color: AppTheme.charcoal.withOpacity(0.4),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(color: AppTheme.mediumGrey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -1441,43 +1447,46 @@ class AdminComplaintsView extends StatelessWidget {
             ),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Tandai keluhan "${complaint.title}" sebagai selesai?',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: AppTheme.charcoal.withOpacity(0.7),
-              ),
-            ),
-            const SizedBox(height: 18),
-            TextField(
-              controller: notesController,
-              maxLines: 3,
-              style: GoogleFonts.plusJakartaSans(fontSize: 14),
-              decoration: InputDecoration(
-                labelText: 'Catatan Penyelesaian',
-                labelStyle: GoogleFonts.plusJakartaSans(
-                  color: AppTheme.charcoal.withOpacity(0.6),
-                ),
-                hintText: 'Jelaskan solusi atau tindakan yang diambil...',
-                hintStyle: GoogleFonts.plusJakartaSans(
-                  color: AppTheme.charcoal.withOpacity(0.4),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: AppTheme.mediumGrey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
+        content: Material(
+          color: Colors.transparent,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Tandai keluhan "${complaint.title}" sebagai selesai?',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: AppTheme.charcoal.withOpacity(0.7),
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 18),
+              TextField(
+                controller: notesController,
+                maxLines: 3,
+                style: GoogleFonts.plusJakartaSans(fontSize: 14),
+                decoration: InputDecoration(
+                  labelText: 'Catatan Penyelesaian',
+                  labelStyle: GoogleFonts.plusJakartaSans(
+                    color: AppTheme.charcoal.withOpacity(0.6),
+                  ),
+                  hintText: 'Jelaskan solusi atau tindakan yang diambil...',
+                  hintStyle: GoogleFonts.plusJakartaSans(
+                    color: AppTheme.charcoal.withOpacity(0.4),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(color: AppTheme.mediumGrey),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide(color: AppTheme.primaryBlue, width: 2),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
