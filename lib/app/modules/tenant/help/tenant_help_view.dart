@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../theme/app_theme.dart';
 
 class TenantHelpView extends StatelessWidget {
@@ -11,7 +12,10 @@ class TenantHelpView extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text('Pusat Bantuan'),
+        title: Text(
+          'Pusat Bantuan',
+          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
+        ),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
@@ -25,20 +29,24 @@ class TenantHelpView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Section
+            // Header Section with Kos Bae Branding
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF6B8EFF), Color(0xFF4A6FFF)],
+                gradient: LinearGradient(
+                  colors: [
+                    AppTheme.deepBlue,
+                    AppTheme.primaryBlue,
+                    AppTheme.lightBlue,
+                  ],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: BorderRadius.circular(24),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF4A6FFF).withOpacity(0.3),
+                    color: AppTheme.primaryBlue.withOpacity(0.3),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -46,33 +54,89 @@ class TenantHelpView extends StatelessWidget {
               ),
               child: Column(
                 children: [
+                  // Kos Bae Logo
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 10,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                    ),
+                    child: Image.asset(
+                      'assets/image/logo_new.png',
+                      width: 48,
+                      height: 48,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.apartment_rounded,
+                        size: 48,
+                        color: AppTheme.primaryBlue,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'KOS BAE',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w900,
+                      color: Colors.white,
+                      letterSpacing: 2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      'Premium Living Management',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white.withOpacity(0.9),
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.15),
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(
                       Icons.support_agent_rounded,
-                      size: 48,
+                      size: 32,
                       color: Colors.white,
                     ),
                   ),
-                  const SizedBox(height: 16),
-                  const Text(
+                  const SizedBox(height: 12),
+                  Text(
                     'Butuh Bantuan?',
-                    style: TextStyle(
-                      fontSize: 24,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Kami siap membantu Anda 24/7. Temukan jawaban atau hubungi kami langsung.',
+                  Text(
+                    'Kami siap membantu Anda 24/7.\nTemukan jawaban atau hubungi kami langsung.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
                       color: Colors.white70,
                       height: 1.5,
                     ),
@@ -99,7 +163,9 @@ class TenantHelpView extends StatelessWidget {
                     icon: Icons.chat_bubble_rounded,
                     label: 'WhatsApp',
                     color: const Color(0xFF25D366),
-                    onTap: () => _launchUrl('https://wa.me/6281234567890'), // Replace with actual number
+                    onTap: () => _launchUrl(
+                      'https://wa.me/6281234567890',
+                    ), // Replace with actual number
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -159,7 +225,10 @@ class TenantHelpView extends StatelessWidget {
                       color: Colors.red.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: Icon(Icons.warning_rounded, color: Colors.red.shade400),
+                    child: Icon(
+                      Icons.warning_rounded,
+                      color: Colors.red.shade400,
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -188,6 +257,48 @@ class TenantHelpView extends StatelessWidget {
                   IconButton(
                     icon: Icon(Icons.call, color: Colors.red.shade400),
                     onPressed: () => _launchUrl('tel:081100001111'),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 32),
+
+            // Kos Bae Footer Branding
+            Center(
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/image/logo_new.png',
+                        width: 24,
+                        height: 24,
+                        errorBuilder: (_, __, ___) => Icon(
+                          Icons.apartment_rounded,
+                          size: 24,
+                          color: AppTheme.primaryBlue.withOpacity(0.5),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'KOS BAE',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.charcoal.withOpacity(0.4),
+                          letterSpacing: 1,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '© 2025 Kos Bae. All rights reserved.',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      color: AppTheme.charcoal.withOpacity(0.35),
+                    ),
                   ),
                 ],
               ),

@@ -53,15 +53,20 @@ class TenantProfileView extends GetView<TenantProfileController> {
                       const SizedBox(height: 28),
 
                       // Rental Information Section
-                      _buildSectionTitle('Informasi Sewa', Icons.calendar_today_rounded),
+                      _buildSectionTitle(
+                        'Informasi Sewa',
+                        Icons.calendar_today_rounded,
+                      ),
                       const SizedBox(height: 16),
                       _buildInfoSection([
                         _buildInfoRow(
                           Icons.calendar_today_rounded,
                           'Mulai Sewa',
                           tenant.contractStartDate != null
-                              ? DateFormat('dd MMM yyyy', 'id_ID')
-                                  .format(tenant.contractStartDate!)
+                              ? DateFormat(
+                                  'dd MMM yyyy',
+                                  'id_ID',
+                                ).format(tenant.contractStartDate!)
                               : '-',
                           AppTheme.primaryBlue,
                         ),
@@ -69,8 +74,10 @@ class TenantProfileView extends GetView<TenantProfileController> {
                           Icons.event_busy_rounded,
                           'Berakhir',
                           tenant.contractEndDate != null
-                              ? DateFormat('dd MMM yyyy', 'id_ID')
-                                  .format(tenant.contractEndDate!)
+                              ? DateFormat(
+                                  'dd MMM yyyy',
+                                  'id_ID',
+                                ).format(tenant.contractEndDate!)
                               : '-',
                           AppTheme.primaryBlue,
                         ),
@@ -86,7 +93,10 @@ class TenantProfileView extends GetView<TenantProfileController> {
                       const SizedBox(height: 28),
 
                       // Personal Information Section
-                      _buildSectionTitle('Informasi Pribadi', Icons.person_rounded),
+                      _buildSectionTitle(
+                        'Informasi Pribadi',
+                        Icons.person_rounded,
+                      ),
                       const SizedBox(height: 16),
                       _buildInfoSection([
                         _buildInfoRow(
@@ -131,7 +141,12 @@ class TenantProfileView extends GetView<TenantProfileController> {
                         ),
                       ),
 
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 32),
+
+                      // Kos Bae Branding Footer
+                      _buildKosBaeFooter(),
+
+                      const SizedBox(height: 24),
                     ],
                   ),
                 ),
@@ -171,12 +186,21 @@ class TenantProfileView extends GetView<TenantProfileController> {
                   height: 50,
                   child: CircularProgressIndicator(
                     strokeWidth: 3,
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(AppTheme.primaryBlue),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppTheme.primaryBlue,
+                    ),
                   ),
                 ),
-                Icon(Icons.person_rounded,
-                    color: AppTheme.primaryBlue, size: 24),
+                Image.asset(
+                  'assets/image/logo_new.png',
+                  width: 30,
+                  height: 30,
+                  errorBuilder: (_, __, ___) => Icon(
+                    Icons.person_rounded,
+                    color: AppTheme.primaryBlue,
+                    size: 24,
+                  ),
+                ),
               ],
             ),
           ),
@@ -244,10 +268,64 @@ class TenantProfileView extends GetView<TenantProfileController> {
               padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
               child: Column(
                 children: [
-                  // Settings button at top right
+                  // Kos Bae Branding + Settings button
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      // Kos Bae Logo & Name
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: Image.asset(
+                              'assets/image/logo_new.png',
+                              width: 28,
+                              height: 28,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.apartment_rounded,
+                                size: 28,
+                                color: AppTheme.primaryBlue,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'KOS BAE',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                              Text(
+                                'Premium Living',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white.withOpacity(0.7),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      // Settings button
                       Container(
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.15),
@@ -258,9 +336,12 @@ class TenantProfileView extends GetView<TenantProfileController> {
                           ),
                         ),
                         child: IconButton(
-                          icon: const Icon(Icons.settings_rounded,
-                              color: Colors.white),
-                          onPressed: () => Get.toNamed(AppRoutes.TENANT_EDIT_PROFILE),
+                          icon: const Icon(
+                            Icons.settings_rounded,
+                            color: Colors.white,
+                          ),
+                          onPressed: () =>
+                              Get.toNamed(AppRoutes.TENANT_EDIT_PROFILE),
                           constraints: const BoxConstraints.tightFor(
                             width: 44,
                             height: 44,
@@ -380,8 +461,11 @@ class TenantProfileView extends GetView<TenantProfileController> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.apartment_rounded,
-                            color: AppTheme.cream, size: 16),
+                        Icon(
+                          Icons.apartment_rounded,
+                          color: AppTheme.cream,
+                          size: 16,
+                        ),
                         const SizedBox(width: 8),
                         Text(
                           'Kamar ${tenant.roomNumber ?? '-'}',
@@ -450,9 +534,7 @@ class TenantProfileView extends GetView<TenantProfileController> {
           ),
         ],
       ),
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
 
@@ -523,9 +605,7 @@ class TenantProfileView extends GetView<TenantProfileController> {
     Get.dialog(
       AlertDialog(
         backgroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Konfirmasi Logout',
           style: GoogleFonts.plusJakartaSans(
@@ -560,9 +640,7 @@ class TenantProfileView extends GetView<TenantProfileController> {
             icon: const Icon(Icons.logout_rounded),
             label: Text(
               'Logout',
-              style: GoogleFonts.plusJakartaSans(
-                fontWeight: FontWeight.w600,
-              ),
+              style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.w600),
             ),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.shade400,
@@ -570,6 +648,123 @@ class TenantProfileView extends GetView<TenantProfileController> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Kos Bae Footer Branding - Premium Design
+  Widget _buildKosBaeFooter() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.primaryBlue.withOpacity(0.05),
+            AppTheme.lightBlue.withOpacity(0.03),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: AppTheme.primaryBlue.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          // Logo and App Name Row
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primaryBlue.withOpacity(0.1),
+                      blurRadius: 10,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: Image.asset(
+                  'assets/image/logo_new.png',
+                  width: 32,
+                  height: 32,
+                  errorBuilder: (_, __, ___) => Icon(
+                    Icons.apartment_rounded,
+                    size: 32,
+                    color: AppTheme.primaryBlue,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  ShaderMask(
+                    shaderCallback: (bounds) => LinearGradient(
+                      colors: [AppTheme.deepBlue, AppTheme.primaryBlue],
+                    ).createShader(bounds),
+                    child: Text(
+                      'KOS BAE',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w900,
+                        color: Colors.white,
+                        letterSpacing: 2,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'Premium Living Management',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                      color: AppTheme.charcoal.withOpacity(0.5),
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Divider
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.transparent,
+                  AppTheme.primaryBlue.withOpacity(0.2),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Version and Copyright
+          Text(
+            'Versi 1.0.0',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.charcoal.withOpacity(0.4),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '© 2025 Kos Bae. All rights reserved.',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 10,
+              color: AppTheme.charcoal.withOpacity(0.35),
             ),
           ),
         ],

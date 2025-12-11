@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../theme/app_theme.dart';
 import '../../../services/app_settings_service.dart';
 import 'tenant_bills_controller.dart';
@@ -39,10 +40,7 @@ class TenantBillsView extends GetView<TenantBillsController> {
             ),
             Expanded(
               child: TabBarView(
-                children: [
-                  _buildUnpaidBillsList(),
-                  _buildHistoryBillsList(),
-                ],
+                children: [_buildUnpaidBillsList(), _buildHistoryBillsList()],
               ),
             ),
           ],
@@ -58,7 +56,10 @@ class TenantBillsView extends GetView<TenantBillsController> {
       }
 
       if (controller.unpaidBills.isEmpty) {
-        return _buildEmptyState('Tidak ada tagihan aktif', Icons.check_circle_outline);
+        return _buildEmptyState(
+          'Tidak ada tagihan aktif',
+          Icons.check_circle_outline,
+        );
       }
 
       return ListView.separated(
@@ -101,14 +102,14 @@ class TenantBillsView extends GetView<TenantBillsController> {
     final now = DateTime.now();
     final billStatus = bill['status']?.toString() ?? '';
     final isPaid = isHistory || billStatus == 'paid';
-    
+
     // Get settings from AppSettingsService
     int gracePeriodDays = 3;
     int lateFeePercentage = 5;
     int reminderDaysBefore = 3;
     bool enableLateFee = true;
     bool enableReminders = true;
-    
+
     if (Get.isRegistered<AppSettingsService>()) {
       final settings = Get.find<AppSettingsService>();
       gracePeriodDays = settings.gracePeriodDays.value;
@@ -117,17 +118,25 @@ class TenantBillsView extends GetView<TenantBillsController> {
       enableLateFee = settings.enableLateFee.value;
       enableReminders = settings.enableReminders.value;
     }
-    
+
     // Grace period calculation using settings - ONLY for unpaid bills
     final gracePeriodEnd = dueDate.add(Duration(days: gracePeriodDays));
-    final isInGracePeriod = !isPaid && now.isAfter(dueDate) && now.isBefore(gracePeriodEnd);
+    final isInGracePeriod =
+        !isPaid && now.isAfter(dueDate) && now.isBefore(gracePeriodEnd);
     final isOverdue = !isPaid && now.isAfter(gracePeriodEnd);
-    final needsReminder = enableReminders && !isPaid && !isOverdue && !isInGracePeriod && 
-        now.isAfter(dueDate.subtract(Duration(days: reminderDaysBefore))) && now.isBefore(dueDate);
+    final needsReminder =
+        enableReminders &&
+        !isPaid &&
+        !isOverdue &&
+        !isInGracePeriod &&
+        now.isAfter(dueDate.subtract(Duration(days: reminderDaysBefore))) &&
+        now.isBefore(dueDate);
     final hasPendingPayment = bill['has_pending_payment'] == true;
-    
+
     // Calculate late fee using settings - ONLY for unpaid bills
-    final lateFee = (enableLateFee && isOverdue && !isPaid) ? amount * (lateFeePercentage / 100) : 0.0;
+    final lateFee = (enableLateFee && isOverdue && !isPaid)
+        ? amount * (lateFeePercentage / 100)
+        : 0.0;
     final totalWithLateFee = amount + lateFee;
 
     Color statusColor;
@@ -171,7 +180,9 @@ class TenantBillsView extends GetView<TenantBillsController> {
             offset: const Offset(0, 4),
           ),
         ],
-        border: isOverdue ? Border.all(color: Colors.red.withOpacity(0.3), width: 1) : null,
+        border: isOverdue
+            ? Border.all(color: Colors.red.withOpacity(0.3), width: 1)
+            : null,
       ),
       child: Column(
         children: [
@@ -207,8 +218,12 @@ class TenantBillsView extends GetView<TenantBillsController> {
                             'Jatuh Tempo: ${DateFormat('dd MMM yyyy').format(dueDate)}',
                             style: TextStyle(
                               fontSize: 12,
-                              color: isOverdue || isInGracePeriod ? Colors.red : Colors.grey.shade500,
-                              fontWeight: isOverdue ? FontWeight.bold : FontWeight.normal,
+                              color: isOverdue || isInGracePeriod
+                                  ? Colors.red
+                                  : Colors.grey.shade500,
+                              fontWeight: isOverdue
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
                             ),
                           ),
                         ],
@@ -218,7 +233,11 @@ class TenantBillsView extends GetView<TenantBillsController> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0).format(amount),
+                          NumberFormat.currency(
+                            locale: 'id',
+                            symbol: 'Rp ',
+                            decimalDigits: 0,
+                          ).format(amount),
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -227,7 +246,10 @@ class TenantBillsView extends GetView<TenantBillsController> {
                         ),
                         const SizedBox(height: 4),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: statusColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
@@ -257,7 +279,11 @@ class TenantBillsView extends GetView<TenantBillsController> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.warning_amber_rounded, color: Colors.red.shade400, size: 20),
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          color: Colors.red.shade400,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Column(
@@ -298,7 +324,11 @@ class TenantBillsView extends GetView<TenantBillsController> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.timer, color: Colors.orange.shade600, size: 20),
+                        Icon(
+                          Icons.timer,
+                          color: Colors.orange.shade600,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -325,7 +355,11 @@ class TenantBillsView extends GetView<TenantBillsController> {
                     ),
                     child: Row(
                       children: [
-                        Icon(Icons.notifications_active, color: Colors.amber.shade700, size: 20),
+                        Icon(
+                          Icons.notifications_active,
+                          color: Colors.amber.shade700,
+                          size: 20,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
@@ -344,10 +378,7 @@ class TenantBillsView extends GetView<TenantBillsController> {
             ),
           ),
           if (!isHistory && !hasPendingPayment) ...[
-            Container(
-              height: 1,
-              color: Colors.grey.shade100,
-            ),
+            Container(height: 1, color: Colors.grey.shade100),
             InkWell(
               onTap: () => _showPaymentSheet(bill),
               borderRadius: const BorderRadius.only(
@@ -375,18 +406,58 @@ class TenantBillsView extends GetView<TenantBillsController> {
   }
 
   Widget _buildEmptyState(String message, IconData icon) {
+    final isSuccess = icon == Icons.check_circle_outline;
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 64, color: Colors.grey.shade300),
-          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: isSuccess
+                  ? Colors.green.withOpacity(0.1)
+                  : AppTheme.primaryBlue.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              size: 56,
+              color: isSuccess ? Colors.green.shade400 : AppTheme.primaryBlue,
+            ),
+          ),
+          const SizedBox(height: 24),
           Text(
             message,
-            style: TextStyle(
+            style: GoogleFonts.plusJakartaSans(
               fontSize: 16,
-              color: Colors.grey.shade500,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.charcoal.withOpacity(0.7),
             ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(
+                'assets/image/logo_new.png',
+                width: 16,
+                height: 16,
+                errorBuilder: (_, __, ___) => Icon(
+                  Icons.apartment_rounded,
+                  size: 16,
+                  color: AppTheme.primaryBlue.withOpacity(0.4),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Kos Bae',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppTheme.primaryBlue.withOpacity(0.5),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -413,27 +484,36 @@ class TenantBillsView extends GetView<TenantBillsController> {
             children: [
               const Text(
                 'Konfirmasi Pembayaran',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 24),
-              _buildPaymentDetailRow('Total Tagihan', 
-                  NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0).format(amount)),
+              _buildPaymentDetailRow(
+                'Total Tagihan',
+                NumberFormat.currency(
+                  locale: 'id',
+                  symbol: 'Rp ',
+                  decimalDigits: 0,
+                ).format(amount),
+              ),
               const SizedBox(height: 16),
               const Text(
                 'Metode Pembayaran',
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
-              Obx(() => Row(
-                children: [
-                  _buildMethodChip('Transfer Bank', 'transfer', paymentMethod),
-                  const SizedBox(width: 12),
-                  _buildMethodChip('E-Wallet', 'ewallet', paymentMethod),
-                ],
-              )),
+              Obx(
+                () => Row(
+                  children: [
+                    _buildMethodChip(
+                      'Transfer Bank',
+                      'transfer',
+                      paymentMethod,
+                    ),
+                    const SizedBox(width: 12),
+                    _buildMethodChip('E-Wallet', 'ewallet', paymentMethod),
+                  ],
+                ),
+              ),
               const SizedBox(height: 16),
               Obx(() => _buildPaymentInfo(paymentMethod.value)),
               const SizedBox(height: 24),
@@ -442,77 +522,104 @@ class TenantBillsView extends GetView<TenantBillsController> {
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 12),
-              Obx(() => GestureDetector(
-                onTap: () async {
-                  final ImagePicker picker = ImagePicker();
-                  final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-                  if (image != null) {
-                    selectedImage.value = image;
-                  }
-                },
-                child: Container(
-                  height: 150,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+              Obx(
+                () => GestureDetector(
+                  onTap: () async {
+                    final ImagePicker picker = ImagePicker();
+                    final XFile? image = await picker.pickImage(
+                      source: ImageSource.gallery,
+                    );
+                    if (image != null) {
+                      selectedImage.value = image;
+                    }
+                  },
+                  child: Container(
+                    height: 150,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.grey.shade300,
+                        style: BorderStyle.solid,
+                      ),
+                    ),
+                    child: selectedImage.value != null
+                        ? ClipRRect(
+                            borderRadius: BorderRadius.circular(16),
+                            child: kIsWeb
+                                ? Image.network(
+                                    selectedImage.value!.path,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.file(
+                                    File(selectedImage.value!.path),
+                                    fit: BoxFit.cover,
+                                  ),
+                          )
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.camera_alt_rounded,
+                                size: 40,
+                                color: Colors.grey.shade400,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Upload Foto Bukti',
+                                style: TextStyle(color: Colors.grey.shade500),
+                              ),
+                            ],
+                          ),
                   ),
-                  child: selectedImage.value != null
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: kIsWeb 
-                              ? Image.network(selectedImage.value!.path, fit: BoxFit.cover)
-                              : Image.file(File(selectedImage.value!.path), fit: BoxFit.cover),
-                        )
-                      : Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.camera_alt_rounded, size: 40, color: Colors.grey.shade400),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Upload Foto Bukti',
-                              style: TextStyle(color: Colors.grey.shade500),
-                            ),
-                          ],
-                        ),
                 ),
-              )),
+              ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
-                child: Obx(() => ElevatedButton(
-                  onPressed: controller.isSubmitting.value
-                      ? null
-                      : () {
-                          if (selectedImage.value == null) {
-                            Get.snackbar('Error', 'Mohon upload bukti pembayaran');
-                            return;
-                          }
-                          controller.payBill(
-                            billId: billId,
-                            amount: amount.toDouble(),
-                            method: paymentMethod.value,
-                            proofFile: selectedImage.value!,
-                          ).then((success) {
-                            if (success) Get.back();
-                          });
-                        },
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                child: Obx(
+                  () => ElevatedButton(
+                    onPressed: controller.isSubmitting.value
+                        ? null
+                        : () {
+                            if (selectedImage.value == null) {
+                              Get.snackbar(
+                                'Error',
+                                'Mohon upload bukti pembayaran',
+                              );
+                              return;
+                            }
+                            controller
+                                .payBill(
+                                  billId: billId,
+                                  amount: amount.toDouble(),
+                                  method: paymentMethod.value,
+                                  proofFile: selectedImage.value!,
+                                )
+                                .then((success) {
+                                  if (success) Get.back();
+                                });
+                          },
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      backgroundColor: AppTheme.pastelBlue,
                     ),
-                    backgroundColor: AppTheme.pastelBlue,
+                    child: controller.isSubmitting.value
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text('Kirim Pembayaran'),
                   ),
-                  child: controller.isSubmitting.value
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                        )
-                      : const Text('Kirim Pembayaran'),
-                )),
+                ),
               ),
             ],
           ),
@@ -529,10 +636,7 @@ class TenantBillsView extends GetView<TenantBillsController> {
         Text(label, style: TextStyle(color: Colors.grey.shade600)),
         Text(
           value,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ],
     );
@@ -546,7 +650,9 @@ class TenantBillsView extends GetView<TenantBillsController> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.pastelBlue.withOpacity(0.1) : Colors.transparent,
+          color: isSelected
+              ? AppTheme.pastelBlue.withOpacity(0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected ? AppTheme.pastelBlue : Colors.grey.shade300,
@@ -593,7 +699,10 @@ class TenantBillsView extends GetView<TenantBillsController> {
                   children: [
                     Text(
                       'BCA 1234567890',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                     Text(
                       'a.n Kos Bae Official',
@@ -631,11 +740,17 @@ class TenantBillsView extends GetView<TenantBillsController> {
                   children: [
                     Text(
                       'GoPay / OVO / Dana',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
                     Text(
                       '0812-3456-7890 (Kos Bae)',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
                     ),
                   ],
                 ),

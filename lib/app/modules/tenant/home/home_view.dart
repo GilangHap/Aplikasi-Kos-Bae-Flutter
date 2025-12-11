@@ -76,12 +76,21 @@ class TenantHomeView extends GetView<HomeController> {
                   height: 50,
                   child: CircularProgressIndicator(
                     strokeWidth: 3,
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(AppTheme.primaryBlue),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppTheme.primaryBlue,
+                    ),
                   ),
                 ),
-                Icon(Icons.home_rounded,
-                    color: AppTheme.primaryBlue, size: 24),
+                Image.asset(
+                  'assets/image/logo_new.png',
+                  width: 30,
+                  height: 30,
+                  errorBuilder: (_, __, ___) => Icon(
+                    Icons.home_rounded,
+                    color: AppTheme.primaryBlue,
+                    size: 24,
+                  ),
+                ),
               ],
             ),
           ),
@@ -196,49 +205,102 @@ class TenantHomeView extends GetView<HomeController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top row with greeting and notification button
+                  // Kos Bae Mini Branding + Notification
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Greeting section
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _getGreeting(DateTime.now().hour),
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: AppTheme.cream,
-                                letterSpacing: 0.5,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    tenant.name.split(' ').first,
-                                    style: GoogleFonts.plusJakartaSans(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.white,
-                                      letterSpacing: -0.5,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                      // Kos Bae Logo & Name
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 8,
+                                  spreadRadius: 1,
                                 ),
-                                const SizedBox(width: 8),
-                                const Text('👋', style: TextStyle(fontSize: 24)),
                               ],
                             ),
-                          ],
-                        ),
+                            child: Image.asset(
+                              'assets/image/logo_new.png',
+                              width: 28,
+                              height: 28,
+                              errorBuilder: (_, __, ___) => Icon(
+                                Icons.apartment_rounded,
+                                size: 28,
+                                color: AppTheme.primaryBlue,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'KOS BAE',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w900,
+                                  color: Colors.white,
+                                  letterSpacing: 1.5,
+                                ),
+                              ),
+                              Text(
+                                'Premium Living',
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white.withOpacity(0.7),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                       // Notification button
                       _buildNotificationButton(),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Greeting section
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _getGreeting(DateTime.now().hour),
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppTheme.cream,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              tenant.name.split(' ').first,
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                                letterSpacing: -0.5,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text('👋', style: TextStyle(fontSize: 24)),
+                        ],
+                      ),
                     ],
                   ),
 
@@ -338,7 +400,10 @@ class TenantHomeView extends GetView<HomeController> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.green.shade50,
                   borderRadius: BorderRadius.circular(20),
@@ -346,8 +411,11 @@ class TenantHomeView extends GetView<HomeController> {
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.check_circle_rounded,
-                        color: Colors.green.shade600, size: 14),
+                    Icon(
+                      Icons.check_circle_rounded,
+                      color: Colors.green.shade600,
+                      size: 14,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       'Aktif',
@@ -379,8 +447,11 @@ class TenantHomeView extends GetView<HomeController> {
                     color: AppTheme.primaryBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(Icons.calendar_today_rounded,
-                      color: AppTheme.primaryBlue, size: 18),
+                  child: Icon(
+                    Icons.calendar_today_rounded,
+                    color: AppTheme.primaryBlue,
+                    size: 18,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -423,7 +494,7 @@ class TenantHomeView extends GetView<HomeController> {
       // Determine bill status color and subtitle
       Color billColor;
       String billSubtitle;
-      
+
       if (controller.overdueBillsCount.value > 0) {
         billColor = Colors.red;
         billSubtitle = '${controller.overdueBillsCount.value} Terlambat';
@@ -437,7 +508,7 @@ class TenantHomeView extends GetView<HomeController> {
         billColor = Colors.green;
         billSubtitle = 'Semua Lunas';
       }
-      
+
       return Row(
         children: [
           Expanded(
@@ -447,8 +518,7 @@ class TenantHomeView extends GetView<HomeController> {
               value: controller.unpaidBillsCount.value.toString(),
               subtitle: billSubtitle,
               color: billColor,
-              onTap: () =>
-                  Get.find<TenantNavController>().changeIndex(1),
+              onTap: () => Get.find<TenantNavController>().changeIndex(1),
             ),
           ),
           const SizedBox(width: 16),
@@ -459,8 +529,7 @@ class TenantHomeView extends GetView<HomeController> {
               value: controller.activeComplaintsCount.value.toString(),
               subtitle: 'Sedang Proses',
               color: AppTheme.primaryBlue,
-              onTap: () =>
-                  Get.find<TenantNavController>().changeIndex(2),
+              onTap: () => Get.find<TenantNavController>().changeIndex(2),
             ),
           ),
         ],
@@ -554,8 +623,11 @@ class TenantHomeView extends GetView<HomeController> {
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(Icons.flash_on_rounded,
-                  color: AppTheme.primaryBlue, size: 20),
+              child: Icon(
+                Icons.flash_on_rounded,
+                color: AppTheme.primaryBlue,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 12),
             Text(
@@ -608,7 +680,11 @@ class TenantHomeView extends GetView<HomeController> {
   }
 
   Widget _buildMenuButton(
-      String label, IconData icon, Color color, VoidCallback onTap) {
+    String label,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
+  ) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
@@ -716,129 +792,161 @@ class TenantHomeView extends GetView<HomeController> {
   }
 
   Widget _buildInactiveView() {
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.all(32),
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.orange.withOpacity(0.1),
-              blurRadius: 20,
-              spreadRadius: 5,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                color: Colors.orange.shade50,
-                shape: BoxShape.circle,
+    return SingleChildScrollView(
+      child: Center(
+        child: Container(
+          margin: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.orange.withOpacity(0.1),
+                blurRadius: 20,
+                spreadRadius: 5,
               ),
-              child: Icon(
-                Icons.hourglass_top_rounded,
-                size: 64,
-                color: Colors.orange.shade400,
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Menunggu Aktivasi',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.charcoal,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Akun Anda sedang dalam proses verifikasi. Silakan hubungi admin jika butuh bantuan.',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                color: AppTheme.charcoal.withOpacity(0.6),
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 32),
-            ElevatedButton.icon(
-              onPressed: controller.refreshData,
-              icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Cek Status'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange.shade400,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 12,
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Kos Bae Branding
+              _buildKosBaeBranding(),
+              const SizedBox(height: 32),
+              // Status Icon
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade50,
+                  shape: BoxShape.circle,
                 ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                child: Icon(
+                  Icons.hourglass_top_rounded,
+                  size: 48,
+                  color: Colors.orange.shade400,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 24),
+              Text(
+                'Menunggu Aktivasi',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.charcoal,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                'Akun Anda sedang dalam proses verifikasi.\nSilakan hubungi admin jika butuh bantuan.',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  color: AppTheme.charcoal.withOpacity(0.6),
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: controller.refreshData,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Cek Status'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange.shade400,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildLeftView() {
-    return Center(
-      child: Container(
-        margin: const EdgeInsets.all(32),
-        padding: const EdgeInsets.all(32),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.red.withOpacity(0.1),
-              blurRadius: 20,
-              spreadRadius: 5,
-            ),
-          ],
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(32),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                shape: BoxShape.circle,
+    return SingleChildScrollView(
+      child: Center(
+        child: Container(
+          margin: const EdgeInsets.all(32),
+          padding: const EdgeInsets.all(32),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryBlue.withOpacity(0.1),
+                blurRadius: 20,
+                spreadRadius: 5,
               ),
-              child: Icon(
-                Icons.waving_hand_rounded,
-                size: 64,
-                color: Colors.red.shade400,
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Kos Bae Branding
+              _buildKosBaeBranding(),
+              const SizedBox(height: 32),
+              // Goodbye Emoji
+              Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.pink.shade50, Colors.orange.shade50],
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: const Text('👋', style: TextStyle(fontSize: 48)),
               ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Sampai Jumpa!',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 20,
-                fontWeight: FontWeight.w700,
-                color: AppTheme.charcoal,
+              const SizedBox(height: 24),
+              Text(
+                'Sampai Jumpa!',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.charcoal,
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Terima kasih telah menjadi bagian dari Kos Bae. Semoga sukses selalu!',
-              textAlign: TextAlign.center,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                color: AppTheme.charcoal.withOpacity(0.6),
-                height: 1.5,
+              const SizedBox(height: 12),
+              Text(
+                'Terima kasih telah menjadi bagian dari',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  color: AppTheme.charcoal.withOpacity(0.7),
+                  height: 1.5,
+                ),
               ),
-            ),
-          ],
+              ShaderMask(
+                shaderCallback: (bounds) => LinearGradient(
+                  colors: [AppTheme.primaryBlue, AppTheme.lightBlue],
+                ).createShader(bounds),
+                child: Text(
+                  'Kos Bae',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Semoga sukses selalu! ✨',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  color: AppTheme.charcoal.withOpacity(0.6),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -856,18 +964,11 @@ class TenantHomeView extends GetView<HomeController> {
         decoration: BoxDecoration(
           color: Colors.white.withOpacity(0.15),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: Colors.white.withOpacity(0.2),
-            width: 1,
-          ),
+          border: Border.all(color: Colors.white.withOpacity(0.2), width: 1),
         ),
         child: Stack(
           children: [
-            Icon(
-              Icons.notifications_outlined,
-              color: Colors.white,
-              size: 24,
-            ),
+            Icon(Icons.notifications_outlined, color: Colors.white, size: 24),
             // Badge indicator for unread notifications
             Positioned(
               right: 0,
@@ -897,5 +998,101 @@ class TenantHomeView extends GetView<HomeController> {
 
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
+  }
+
+  /// Kos Bae Branding Widget - Premium Design
+  Widget _buildKosBaeBranding() {
+    return Column(
+      children: [
+        // Logo Container with gradient border
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            gradient: LinearGradient(
+              colors: [
+                AppTheme.primaryBlue.withOpacity(0.3),
+                AppTheme.gold.withOpacity(0.3),
+              ],
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppTheme.primaryBlue.withOpacity(0.2),
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
+            ],
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Image.asset(
+              'assets/image/logo_new.png',
+              width: 80,
+              height: 80,
+              errorBuilder: (_, __, ___) => Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryBlue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Icon(
+                  Icons.apartment_rounded,
+                  size: 48,
+                  color: AppTheme.primaryBlue,
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        // App Name with gradient
+        ShaderMask(
+          shaderCallback: (bounds) => LinearGradient(
+            colors: [AppTheme.deepBlue, AppTheme.primaryBlue],
+          ).createShader(bounds),
+          child: Text(
+            'KOS BAE',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 28,
+              fontWeight: FontWeight.w900,
+              color: Colors.white,
+              letterSpacing: 3,
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        // Tagline Badge
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppTheme.primaryBlue.withOpacity(0.1),
+                AppTheme.lightBlue.withOpacity(0.05),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: AppTheme.primaryBlue.withOpacity(0.2),
+              width: 1,
+            ),
+          ),
+          child: Text(
+            '✨ Premium Living Management',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.primaryBlue,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }

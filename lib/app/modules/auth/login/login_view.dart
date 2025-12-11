@@ -166,12 +166,7 @@ class _LoginViewState extends State<LoginView>
                             // Login form card
                             _buildLoginCard(),
 
-                            const SizedBox(height: 24),
-
-                            // Dev hint (for development)
-                            _buildDevHint(),
-
-                            const SizedBox(height: 32),
+                            const SizedBox(height: 40),
                           ],
                         ),
                       ),
@@ -190,41 +185,35 @@ class _LoginViewState extends State<LoginView>
     return Hero(
       tag: 'app_logo',
       child: Container(
-        width: 100,
-        height: 100,
+        width: 120,
+        height: 120,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [AppTheme.primaryBlue, AppTheme.deepBlue],
-          ),
-          borderRadius: BorderRadius.circular(28),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.primaryBlue.withOpacity(0.35),
-              blurRadius: 25,
-              offset: const Offset(0, 12),
+              color: AppTheme.primaryBlue.withOpacity(0.2),
+              blurRadius: 30,
+              offset: const Offset(0, 15),
+              spreadRadius: 0,
+            ),
+            BoxShadow(
+              color: AppTheme.charcoal.withOpacity(0.1),
+              blurRadius: 20,
+              offset: const Offset(0, 5),
               spreadRadius: -5,
             ),
           ],
         ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Subtle inner glow
-            Container(
-              width: 85,
-              height: 85,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
-                  width: 1.5,
-                ),
-              ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(32),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Image.asset(
+              'assets/image/logo_new.png',
+              fit: BoxFit.contain,
             ),
-            const Icon(Icons.home_rounded, size: 48, color: Colors.white),
-          ],
+          ),
         ),
       ),
     );
@@ -236,13 +225,36 @@ class _LoginViewState extends State<LoginView>
         Text(
           'Kos Bae',
           style: GoogleFonts.plusJakartaSans(
-            fontSize: 36,
-            fontWeight: FontWeight.w800,
+            fontSize: 40,
+            fontWeight: FontWeight.w900,
             color: AppTheme.charcoal,
-            letterSpacing: -1,
+            letterSpacing: -1.5,
+            height: 1.2,
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppTheme.primaryBlue.withOpacity(0.1),
+                AppTheme.lightBlue.withOpacity(0.05),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            'Premium Living Management',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppTheme.primaryBlue,
+              letterSpacing: 0.5,
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
         Text(
           'Selamat datang kembali',
           style: GoogleFonts.plusJakartaSans(
@@ -542,119 +554,6 @@ class _LoginViewState extends State<LoginView>
                   ),
                 ],
               ),
-      ),
-    );
-  }
-
-  Widget _buildDevHint() {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppTheme.cream.withOpacity(0.5),
-            AppTheme.darkCream.withOpacity(0.3),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppTheme.gold.withOpacity(0.3), width: 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: AppTheme.gold.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(Icons.code_rounded, color: AppTheme.gold, size: 16),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                'Mode Pengembangan',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w700,
-                  color: AppTheme.charcoal.withOpacity(0.8),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 14),
-          _buildCredentialRow(
-            Icons.admin_panel_settings_rounded,
-            'admin@kosbae.com',
-            'Admin',
-          ),
-          const SizedBox(height: 8),
-          _buildCredentialRow(
-            Icons.person_rounded,
-            'tenant@kosbae.com',
-            'Tenant',
-          ),
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(
-                Icons.vpn_key_rounded,
-                size: 14,
-                color: AppTheme.charcoal.withOpacity(0.5),
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Password: password123',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppTheme.charcoal.withOpacity(0.6),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCredentialRow(IconData icon, String email, String role) {
-    return GestureDetector(
-      onTap: () {
-        _emailController.text = email;
-        _passwordController.text = 'password123';
-      },
-      child: Row(
-        children: [
-          Icon(icon, size: 14, color: AppTheme.primaryBlue.withOpacity(0.7)),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              email,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.primaryBlue,
-              ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: AppTheme.primaryBlue.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              role,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: AppTheme.primaryBlue,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

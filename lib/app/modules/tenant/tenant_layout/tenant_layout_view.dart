@@ -58,12 +58,21 @@ class TenantLayoutView extends GetView<TenantLayoutController> {
                   height: 50,
                   child: CircularProgressIndicator(
                     strokeWidth: 3,
-                    valueColor:
-                        AlwaysStoppedAnimation<Color>(AppTheme.primaryBlue),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      AppTheme.primaryBlue,
+                    ),
                   ),
                 ),
-                Icon(Icons.home_rounded,
-                    color: AppTheme.primaryBlue, size: 24),
+                Image.asset(
+                  'assets/image/logo_new.png',
+                  width: 30,
+                  height: 30,
+                  errorBuilder: (_, __, ___) => Icon(
+                    Icons.home_rounded,
+                    color: AppTheme.primaryBlue,
+                    size: 24,
+                  ),
+                ),
               ],
             ),
           ),
@@ -84,54 +93,56 @@ class TenantLayoutView extends GetView<TenantLayoutController> {
 
   /// Premium bottom navigation bar with modern design
   Widget _buildPremiumBottomNavBar(TenantNavController navController) {
-    return Obx(() => Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
-            blurRadius: 16,
-            offset: const Offset(0, -2),
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildNavItem(
-                icon: Icons.home_rounded,
-                label: 'Home',
-                index: 0,
-                navController: navController,
-              ),
-              _buildNavItem(
-                icon: Icons.receipt_long_rounded,
-                label: 'Tagihan',
-                index: 1,
-                navController: navController,
-              ),
-              _buildNavItem(
-                icon: Icons.report_problem_rounded,
-                label: 'Keluhan',
-                index: 2,
-                navController: navController,
-              ),
-              _buildNavItem(
-                icon: Icons.person_rounded,
-                label: 'Profil',
-                index: 3,
-                navController: navController,
-              ),
-            ],
+    return Obx(
+      () => Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 16,
+              offset: const Offset(0, -2),
+              spreadRadius: 0,
+            ),
+          ],
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildNavItem(
+                  icon: Icons.home_rounded,
+                  label: 'Home',
+                  index: 0,
+                  navController: navController,
+                ),
+                _buildNavItem(
+                  icon: Icons.receipt_long_rounded,
+                  label: 'Tagihan',
+                  index: 1,
+                  navController: navController,
+                ),
+                _buildNavItem(
+                  icon: Icons.report_problem_rounded,
+                  label: 'Keluhan',
+                  index: 2,
+                  navController: navController,
+                ),
+                _buildNavItem(
+                  icon: Icons.person_rounded,
+                  label: 'Profil',
+                  index: 3,
+                  navController: navController,
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ));
+    );
   }
 
   /// Individual navigation item

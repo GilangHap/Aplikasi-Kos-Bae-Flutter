@@ -182,60 +182,35 @@ class _SplashViewState extends State<SplashView> with TickerProviderStateMixin {
                         child: Transform.scale(
                           scale: _logoScale.value,
                           child: Container(
-                            width: 140,
-                            height: 140,
+                            width: 160,
+                            height: 160,
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(35),
+                              borderRadius: BorderRadius.circular(40),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.2),
-                                  blurRadius: 30,
-                                  offset: const Offset(0, 15),
+                                  color: Colors.black.withOpacity(0.25),
+                                  blurRadius: 40,
+                                  offset: const Offset(0, 20),
                                   spreadRadius: 0,
                                 ),
                                 BoxShadow(
-                                  color: AppTheme.gold.withOpacity(0.3),
-                                  blurRadius: 40,
-                                  offset: const Offset(0, 5),
-                                  spreadRadius: -10,
+                                  color: AppTheme.gold.withOpacity(0.4),
+                                  blurRadius: 50,
+                                  offset: const Offset(0, 10),
+                                  spreadRadius: -5,
                                 ),
                               ],
                             ),
-                            child: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                // Gold accent ring
-                                Container(
-                                  width: 120,
-                                  height: 120,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(28),
-                                    border: Border.all(
-                                      color: AppTheme.gold.withOpacity(0.3),
-                                      width: 2,
-                                    ),
-                                  ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(40),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Image.asset(
+                                  'assets/image/logo_new.png',
+                                  fit: BoxFit.contain,
                                 ),
-                                // Icon
-                                ShaderMask(
-                                  shaderCallback: (Rect bounds) {
-                                    return LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        AppTheme.primaryBlue,
-                                        AppTheme.deepBlue,
-                                      ],
-                                    ).createShader(bounds);
-                                  },
-                                  child: const Icon(
-                                    Icons.home_rounded,
-                                    size: 70,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                         ),

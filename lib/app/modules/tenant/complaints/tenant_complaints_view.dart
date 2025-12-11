@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../theme/app_theme.dart';
 import 'tenant_complaints_controller.dart';
 
@@ -62,31 +63,56 @@ class TenantComplaintsView extends GetView<TenantComplaintsController> {
                 Container(
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    color: AppTheme.pastelBlue.withOpacity(0.1),
+                    color: Colors.green.withOpacity(0.1),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
-                    Icons.assignment_turned_in_outlined,
-                    size: 64,
-                    color: AppTheme.pastelBlue,
+                    Icons.check_circle_rounded,
+                    size: 56,
+                    color: Colors.green.shade400,
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
-                  'Belum Ada Keluhan',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                Text(
+                  'Tidak Ada Keluhan',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppTheme.charcoal,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Semua fasilitas kamar berfungsi dengan baik.',
-                  style: TextStyle(
+                  style: GoogleFonts.plusJakartaSans(
                     fontSize: 14,
-                    color: Colors.black54,
+                    color: AppTheme.charcoal.withOpacity(0.6),
                   ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Image.asset(
+                      'assets/image/logo_new.png',
+                      width: 16,
+                      height: 16,
+                      errorBuilder: (_, __, ___) => Icon(
+                        Icons.apartment_rounded,
+                        size: 16,
+                        color: AppTheme.primaryBlue.withOpacity(0.4),
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Kos Bae',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.primaryBlue.withOpacity(0.5),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -113,7 +139,7 @@ class TenantComplaintsView extends GetView<TenantComplaintsController> {
 
   Widget _buildComplaintCard(Map<String, dynamic> complaint) {
     final status = complaint['status'] as String;
-    
+
     Color statusColor;
     String statusLabel;
     IconData statusIcon;
@@ -163,7 +189,10 @@ class TenantComplaintsView extends GetView<TenantComplaintsController> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: statusColor.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -187,10 +216,7 @@ class TenantComplaintsView extends GetView<TenantComplaintsController> {
                   const Spacer(),
                   Text(
                     _formatDate(DateTime.parse(complaint['created_at'])),
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade500,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                   ),
                 ],
               ),
@@ -255,10 +281,7 @@ class TenantComplaintsView extends GetView<TenantComplaintsController> {
                 children: [
                   const Text(
                     'Buat Keluhan Baru',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
@@ -311,12 +334,15 @@ class TenantComplaintsView extends GetView<TenantComplaintsController> {
                         child: FutureBuilder<Uint8List>(
                           future: selectedPhoto.value!.readAsBytes(),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return Container(
                                 height: 150,
                                 width: double.infinity,
                                 color: Colors.grey.shade100,
-                                child: const Center(child: CircularProgressIndicator()),
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               );
                             }
                             if (snapshot.hasError || !snapshot.hasData) {
@@ -353,7 +379,9 @@ class TenantComplaintsView extends GetView<TenantComplaintsController> {
                 return InkWell(
                   onTap: () async {
                     final ImagePicker picker = ImagePicker();
-                    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+                    final XFile? image = await picker.pickImage(
+                      source: ImageSource.gallery,
+                    );
                     if (image != null) {
                       selectedPhoto.value = image;
                     }
@@ -363,14 +391,21 @@ class TenantComplaintsView extends GetView<TenantComplaintsController> {
                     height: 100,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+                      border: Border.all(
+                        color: Colors.grey.shade300,
+                        style: BorderStyle.solid,
+                      ),
                       borderRadius: BorderRadius.circular(12),
                       color: Colors.grey.shade50,
                     ),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.add_a_photo, color: Colors.grey.shade400, size: 32),
+                        Icon(
+                          Icons.add_a_photo,
+                          color: Colors.grey.shade400,
+                          size: 32,
+                        ),
                         const SizedBox(height: 8),
                         Text(
                           'Tap untuk upload foto',
@@ -385,35 +420,41 @@ class TenantComplaintsView extends GetView<TenantComplaintsController> {
               SizedBox(
                 width: double.infinity,
                 height: 50,
-                child: Obx(() => ElevatedButton(
-                  onPressed: controller.isSubmitting.value
-                      ? null
-                      : () async {
-                          if (titleController.text.isEmpty || descController.text.isEmpty) {
-                            Get.snackbar('Error', 'Judul dan deskripsi wajib diisi');
-                            return;
-                          }
-                          
-                          final success = await controller.createComplaint(
-                            title: titleController.text,
-                            description: descController.text,
-                            photo: selectedPhoto.value,
-                          );
-                          
-                          if (success) {
-                            Get.back(); // Close sheet
-                          }
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.pastelBlue,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                child: Obx(
+                  () => ElevatedButton(
+                    onPressed: controller.isSubmitting.value
+                        ? null
+                        : () async {
+                            if (titleController.text.isEmpty ||
+                                descController.text.isEmpty) {
+                              Get.snackbar(
+                                'Error',
+                                'Judul dan deskripsi wajib diisi',
+                              );
+                              return;
+                            }
+
+                            final success = await controller.createComplaint(
+                              title: titleController.text,
+                              description: descController.text,
+                              photo: selectedPhoto.value,
+                            );
+
+                            if (success) {
+                              Get.back(); // Close sheet
+                            }
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.pastelBlue,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
+                    child: controller.isSubmitting.value
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Kirim Keluhan'),
                   ),
-                  child: controller.isSubmitting.value
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('Kirim Keluhan'),
-                )),
+                ),
               ),
               const SizedBox(height: 16), // Bottom padding
             ],
