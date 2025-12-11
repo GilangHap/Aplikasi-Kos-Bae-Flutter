@@ -70,7 +70,6 @@ class RoomsController extends GetxController {
         final newRoom = Room.fromJson(payload.newRecord);
         rooms.add(newRoom);
         _sortRooms();
-        _showUpdateSnackbar('Kamar baru ditambahkan: ${newRoom.roomNumber}', isNew: true);
         break;
         
       case PostgresChangeEvent.update:
@@ -80,18 +79,13 @@ class RoomsController extends GetxController {
         if (index != -1) {
           rooms[index] = updatedRoom;
           _sortRooms();
-          _showUpdateSnackbar('Kamar ${updatedRoom.roomNumber} diperbarui', isNew: false);
         }
         break;
         
       case PostgresChangeEvent.delete:
         // Remove deleted room
         final deletedId = payload.oldRecord['id'] as String;
-        final deletedRoom = rooms.firstWhereOrNull((r) => r.id == deletedId);
         rooms.removeWhere((r) => r.id == deletedId);
-        if (deletedRoom != null) {
-          _showUpdateSnackbar('Kamar ${deletedRoom.roomNumber} dihapus', isDelete: true);
-        }
         break;
         
       default:

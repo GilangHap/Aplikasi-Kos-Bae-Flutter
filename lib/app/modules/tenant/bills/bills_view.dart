@@ -480,6 +480,7 @@ class TenantBillsView extends GetView<TenantBillsController> {
               ],
             ),
           ),
+          // Show "Bayar Sekarang" for unpaid bills without pending payment
           if (!isHistory && !hasPendingPayment) ...[
             Container(height: 1, color: Colors.grey.shade100),
             InkWell(
@@ -498,6 +499,41 @@ class TenantBillsView extends GetView<TenantBillsController> {
                       color: AppTheme.pastelBlue,
                       fontWeight: FontWeight.bold,
                     ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+          // Show "Lihat Detail" for pending verification or history bills
+          if (isHistory || hasPendingPayment) ...[
+            Container(height: 1, color: Colors.grey.shade100),
+            InkWell(
+              onTap: () => _showBillDetailSheet(bill, isHistory: isHistory),
+              borderRadius: const BorderRadius.only(
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20),
+              ),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Center(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.receipt_long,
+                        size: 18,
+                        color: isHistory ? Colors.green : AppTheme.pastelBlue,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Lihat Detail',
+                        style: TextStyle(
+                          color: isHistory ? Colors.green : AppTheme.pastelBlue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -563,6 +599,274 @@ class TenantBillsView extends GetView<TenantBillsController> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  void _showBillDetailSheet(Map<String, dynamic> bill, {required bool isHistory}) {
+    final amount = bill['amount'] as num;
+    final dueDate = DateTime.parse(bill['due_date']);
+    final billType = bill['type']?.toString() ?? 'sewa';
+    final status = bill['status']?.toString() ?? '';
+    
+    // Get payments list from bill
+    final payments = bill['payments'] as List? ?? [];
+    
+    // Get latest payment info
+    Map<String, dynamic>? latestPayment;
+    if (payments.isNotEmpty) {
+      // Sort by created_at descending and get latest
+      final sortedPayments = List<Map<String, dynamic>>.from(payments);
+      sortedPayments.sort((a, b) {
+        final aDate = DateTime.parse(a['created_at'] ?? a['payment_date']);
+        final bDate = DateTime.parse(b['created_at'] ?? b['payment_date']);
+        return bDate.compareTo(aDate);
+      });
+      latestPayment = sortedPayments.first;
+    }
+    
+    final paymentProof = latestPayment?['proof_url']?.toString();
+    final paymentMethod = latestPayment?['method']?.toString();
+    final paidAt = latestPayment?['payment_date'] != null 
+        ? DateTime.parse(latestPayment!['payment_date']) 
+        : null;
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(24),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isHistory
+                          ? Colors.green.withOpacity(0.1)
+                          : Colors.blue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(
+                      isHistory ? Icons.check_circle : Icons.hourglass_top,
+                      color: isHistory ? Colors.green : Colors.blue,
+                      size: 28,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Tagihan ${billType.capitalizeFirst}',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isHistory
+                                ? Colors.green.withOpacity(0.1)
+                                : Colors.blue.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            isHistory ? 'Lunas' : 'Menunggu Verifikasi',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isHistory ? Colors.green : Colors.blue,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Get.back(),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              
+              // Bill Info
+              _buildDetailRow('Jumlah Tagihan', NumberFormat.currency(
+                locale: 'id',
+                symbol: 'Rp ',
+                decimalDigits: 0,
+              ).format(amount)),
+              const SizedBox(height: 12),
+              _buildDetailRow('Jatuh Tempo', DateFormat('dd MMMM yyyy').format(dueDate)),
+              if (paymentMethod != null) ...[
+                const SizedBox(height: 12),
+                _buildDetailRow('Metode Pembayaran', paymentMethod == 'transfer' ? 'Transfer Bank' : 'E-Wallet'),
+              ],
+              if (paidAt != null) ...[
+                const SizedBox(height: 12),
+                _buildDetailRow('Tanggal Bayar', DateFormat('dd MMMM yyyy, HH:mm').format(paidAt)),
+              ],
+              
+              // Payment Proof
+              if (paymentProof != null && paymentProof.isNotEmpty) ...[
+                const SizedBox(height: 24),
+                const Text(
+                  'Bukti Pembayaran',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                GestureDetector(
+                  onTap: () => _showFullImage(paymentProof),
+                  child: Container(
+                    width: double.infinity,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade200),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.network(
+                        paymentProof,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) => Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.broken_image, size: 48, color: Colors.grey.shade400),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Gagal memuat gambar',
+                                style: TextStyle(color: Colors.grey.shade500),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Center(
+                  child: Text(
+                    'Ketuk untuk memperbesar',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                ),
+              ] else ...[
+                const SizedBox(height: 24),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.image_not_supported, color: Colors.grey.shade400),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Bukti pembayaran tidak tersedia',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
+      isScrollControlled: true,
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(color: Colors.grey.shade600)),
+        Text(
+          value,
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
+      ],
+    );
+  }
+
+  void _showFullImage(String imageUrl) {
+    Get.dialog(
+      Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            InteractiveViewer(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: Colors.black54,
+                    child: const Center(
+                      child: Icon(Icons.broken_image, size: 64, color: Colors.white),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: GestureDetector(
+                onTap: () => Get.back(),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.close, size: 24),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -685,24 +989,106 @@ class TenantBillsView extends GetView<TenantBillsController> {
                   () => ElevatedButton(
                     onPressed: controller.isSubmitting.value
                         ? null
-                        : () {
+                        : () async {
                             if (selectedImage.value == null) {
                               Get.snackbar(
                                 'Error',
                                 'Mohon upload bukti pembayaran',
+                                backgroundColor: const Color(0xFFF7C4D4),
+                                colorText: Colors.black87,
                               );
                               return;
                             }
-                            controller
-                                .payBill(
-                                  billId: billId,
-                                  amount: amount.toDouble(),
-                                  method: paymentMethod.value,
-                                  proofFile: selectedImage.value!,
-                                )
-                                .then((success) {
-                                  if (success) Get.back();
-                                });
+                            final success = await controller.payBill(
+                              billId: billId,
+                              amount: amount.toDouble(),
+                              method: paymentMethod.value,
+                              proofFile: selectedImage.value!,
+                            );
+                            if (success) {
+                              // Close bottom sheet first
+                              Get.back();
+                              
+                              // Show success dialog
+                              await Get.dialog(
+                                AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFFB9F3CC),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.check_circle,
+                                          color: Color(0xFF2E7D32),
+                                          size: 48,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      const Text(
+                                        'Pembayaran Terkirim!',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Bukti pembayaran Anda sedang diverifikasi oleh admin. Anda akan mendapat notifikasi setelah diverifikasi.',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed: () => Get.back(),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF4CAF50),
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(vertical: 14),
+                                        ),
+                                        child: const Text(
+                                          'OK',
+                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                barrierDismissible: false,
+                              );
+                              
+                              // Show snackbar
+                              Get.snackbar(
+                                'Sukses',
+                                'Pembayaran berhasil dikirim!',
+                                backgroundColor: const Color(0xFFB9F3CC),
+                                colorText: Colors.black87,
+                                snackPosition: SnackPosition.BOTTOM,
+                                margin: const EdgeInsets.all(16),
+                                borderRadius: 12,
+                                icon: const Icon(
+                                  Icons.check_circle,
+                                  color: Color(0xFF2E7D32),
+                                ),
+                              );
+                            }
                           },
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),

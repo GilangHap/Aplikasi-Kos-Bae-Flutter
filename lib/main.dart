@@ -1,4 +1,3 @@
-// FILE: lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -10,19 +9,12 @@ import 'app/routes/app_routes.dart';
 import 'app/theme/app_theme.dart';
 import 'app/core/logger/app_logger.dart';
 
-/// Main entry point for Kos Bae application
-///
-/// Setup instructions:
-/// 1. Run: flutter pub get
-/// 2. Create .env file with SUPABASE_URL and SUPABASE_ANON_KEY
-/// 3. Run: flutter run
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Load environment variables
   await dotenv.load(fileName: ".env");
 
-  // Initialize date formatting for Indonesian locale
   await initializeDateFormatting('id_ID', null);
 
   // Initialize Supabase
@@ -47,7 +39,7 @@ class KosBaeApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Kos Bae',
       debugShowCheckedModeBanner: false,
-      // Theme configuration - Light mode only
+      // Theme configuration
       theme: AppTheme.getTheme(),
       
       initialBinding: InitialBinding(),

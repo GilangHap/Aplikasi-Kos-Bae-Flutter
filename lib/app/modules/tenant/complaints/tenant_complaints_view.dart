@@ -559,7 +559,88 @@ class TenantComplaintsView extends GetView<TenantComplaintsController> {
                             );
 
                             if (success) {
-                              Get.back(); // Close sheet
+                              // Close bottom sheet first
+                              Get.back();
+                              
+                              // Show success dialog
+                              await Get.dialog(
+                                AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFFB9F3CC),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Icon(
+                                          Icons.check_circle,
+                                          color: Color(0xFF2E7D32),
+                                          size: 48,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      const Text(
+                                        'Keluhan Terkirim!',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Keluhan Anda telah dikirim dan akan segera ditindaklanjuti oleh admin.',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed: () => Get.back(),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF4CAF50),
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(vertical: 14),
+                                        ),
+                                        child: const Text(
+                                          'OK',
+                                          style: TextStyle(fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                barrierDismissible: false,
+                              );
+                              
+                              // Show snackbar
+                              Get.snackbar(
+                                'Sukses',
+                                'Keluhan berhasil dikirim!',
+                                backgroundColor: const Color(0xFFB9F3CC),
+                                colorText: Colors.black87,
+                                snackPosition: SnackPosition.BOTTOM,
+                                margin: const EdgeInsets.all(16),
+                                borderRadius: 12,
+                                icon: const Icon(
+                                  Icons.check_circle,
+                                  color: Color(0xFF2E7D32),
+                                ),
+                              );
                             }
                           },
                     style: ElevatedButton.styleFrom(

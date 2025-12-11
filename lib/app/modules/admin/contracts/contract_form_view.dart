@@ -197,8 +197,27 @@ class _ContractFormViewState extends State<ContractFormView> {
       ),
       child: Obx(() {
         final tenants = controller.tenants.toList();
+        
+        // Validate that _selectedTenant exists in the current list
+        Tenant? validSelectedTenant;
+        if (_selectedTenant != null) {
+          validSelectedTenant = tenants.cast<Tenant?>().firstWhere(
+            (t) => t?.id == _selectedTenant!.id,
+            orElse: () => null,
+          );
+          if (validSelectedTenant == null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  _selectedTenant = null;
+                });
+              }
+            });
+          }
+        }
+        
         return DropdownButtonFormField<Tenant>(
-          value: _selectedTenant,
+          value: validSelectedTenant,
           decoration: InputDecoration(
             hintText: 'Pilih penghuni',
             hintStyle: TextStyle(color: Colors.grey.shade400),
@@ -246,8 +265,30 @@ class _ContractFormViewState extends State<ContractFormView> {
       ),
       child: Obx(() {
         final rooms = controller.rooms.toList();
+        
+        // Validate that _selectedRoom exists in the current rooms list
+        // This prevents assertion errors when realtime updates change the list
+        Room? validSelectedRoom;
+        if (_selectedRoom != null) {
+          validSelectedRoom = rooms.cast<Room?>().firstWhere(
+            (r) => r?.id == _selectedRoom!.id,
+            orElse: () => null,
+          );
+          // If not found, reset selection
+          if (validSelectedRoom == null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  _selectedRoom = null;
+                  _monthlyRentController.clear();
+                });
+              }
+            });
+          }
+        }
+        
         return DropdownButtonFormField<Room>(
-          value: _selectedRoom,
+          value: validSelectedRoom,
           decoration: InputDecoration(
             hintText: 'Pilih kamar',
             hintStyle: TextStyle(color: Colors.grey.shade400),
@@ -856,13 +897,91 @@ class _ContractFormViewState extends State<ContractFormView> {
             : null,
       );
 
-      if (success) {
+      if (success && mounted) {
+        // Show success dialog
+        await Get.dialog(
+          AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFB9F3CC),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.check_circle,
+                    color: Color(0xFF2E7D32),
+                    size: 48,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Kontrak Berhasil Dibuat!',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Kontrak untuk ${_selectedTenant?.name ?? ''} di Kamar ${_selectedRoom?.roomNumber ?? ''} telah berhasil dibuat.',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            actions: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Get.back(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4CAF50),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          barrierDismissible: false,
+        );
+        
+        // Navigate back to contracts list
         Get.back(result: true);
+        
+        // Show snackbar
+        Get.snackbar(
+          'Sukses',
+          'Kontrak baru berhasil dibuat',
+          backgroundColor: const Color(0xFFB9F3CC),
+          colorText: Colors.black87,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(16),
+          borderRadius: 12,
+          icon: const Icon(Icons.check_circle, color: Color(0xFF2E7D32)),
+        );
       }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 }

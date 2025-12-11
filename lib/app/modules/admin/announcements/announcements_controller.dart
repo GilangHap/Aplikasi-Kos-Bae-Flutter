@@ -237,8 +237,7 @@ class AnnouncementsController extends GetxController {
         'created_by': _supabaseService.auth.currentUser?.id,
       });
 
-      await fetchAnnouncements();
-
+      // Show success message first
       Get.snackbar(
         'Sukses',
         'Pengumuman berhasil dibuat',
@@ -246,6 +245,10 @@ class AnnouncementsController extends GetxController {
         colorText: Colors.black87,
         snackPosition: SnackPosition.BOTTOM,
       );
+
+      // Refresh in background (don't await - realtime will also handle it)
+      fetchAnnouncements();
+
       return true;
     } catch (e) {
       Get.snackbar(

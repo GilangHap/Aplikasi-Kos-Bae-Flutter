@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../models/announcement_model.dart';
+import '../../../routes/app_routes.dart';
 import '../../../theme/app_theme.dart';
 import 'announcements_controller.dart';
 
@@ -609,12 +610,101 @@ class _AnnouncementFormViewState extends State<AnnouncementFormView> {
         );
       }
 
-      if (success) {
-        // Data sudah di-refresh oleh createAnnouncement/updateAnnouncement
-        // Langsung kembali ke list
+      if (success && mounted) {
+        final title = _titleController.text.trim();
+        final isEdit = _isEditing;
+        
+        // Show success dialog
+        await Get.dialog(
+          AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFB9F3CC),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    isEdit ? Icons.edit_note : Icons.campaign,
+                    color: const Color(0xFF2E7D32),
+                    size: 48,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  isEdit ? 'Pengumuman Diperbarui!' : 'Pengumuman Berhasil Dibuat!',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '"$title"',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey.shade600,
+                    fontStyle: FontStyle.italic,
+                  ),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+            actions: [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Get.back(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF4CAF50),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                  child: const Text(
+                    'OK',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          barrierDismissible: false,
+        );
+        
+        // Navigate back to announcements list
         Get.back(result: true);
+        
+        // Show snackbar
+        Get.snackbar(
+          'Sukses',
+          isEdit ? 'Pengumuman berhasil diperbarui' : 'Pengumuman baru berhasil dibuat',
+          backgroundColor: const Color(0xFFB9F3CC),
+          colorText: Colors.black87,
+          snackPosition: SnackPosition.BOTTOM,
+          margin: const EdgeInsets.all(16),
+          borderRadius: 12,
+          icon: Icon(
+            isEdit ? Icons.edit_note : Icons.campaign,
+            color: const Color(0xFF2E7D32),
+          ),
+        );
+        return;
       }
-    } finally {
+    } catch (e) {
+      print('❌ Error in _submitForm: $e');
+    }
+    
+    // Only update loading state if we didn't navigate away
+    if (mounted) {
       setState(() {
         _isLoading = false;
       });
