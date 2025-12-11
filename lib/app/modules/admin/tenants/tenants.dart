@@ -1,6 +1,3 @@
-// FILE: lib/app/modules/admin/tenants/tenants.dart
-/// Barrel file for Tenants Management module
-
 export 'tenants_controller.dart';
 export 'tenants_binding.dart';
 export 'tenants_view.dart';

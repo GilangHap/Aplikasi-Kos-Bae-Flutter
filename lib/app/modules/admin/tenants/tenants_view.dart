@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/tenants/tenants_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,8 +8,7 @@ import '../../../models/tenant_model.dart';
 import '../../../theme/app_theme.dart';
 import 'tenants_controller.dart';
 
-/// Modern Tenant Management View for Admin
-/// Features: Search, Sort, Filter, Cards with photo/name/phone/room/status
+/// Tenant Management View
 class TenantsView extends GetView<TenantsController> {
   const TenantsView({super.key});
 
@@ -33,7 +31,7 @@ class TenantsView extends GetView<TenantsController> {
           color: AppTheme.primaryBlue,
           child: CustomScrollView(
             slivers: [
-              // Premium Header
+              // Header
               SliverToBoxAdapter(child: _buildPremiumHeader()),
 
               // Statistics Cards
@@ -63,7 +61,7 @@ class TenantsView extends GetView<TenantsController> {
     );
   }
 
-  /// Premium Header with gradient
+  /// Header with gradient
   Widget _buildPremiumHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 60, 24, 28),

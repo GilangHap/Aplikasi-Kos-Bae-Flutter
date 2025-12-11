@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/rooms_management/rooms_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shimmer/shimmer.dart';
@@ -7,7 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'rooms_controller.dart';
 import '../../../theme/app_theme.dart';
 
-/// Premium Rooms Management View - Luxury Design
+///Rooms Management View 
 class RoomsView extends GetView<RoomsController> {
   const RoomsView({Key? key}) : super(key: key);
 
@@ -26,7 +25,7 @@ class RoomsView extends GetView<RoomsController> {
           backgroundColor: Colors.white,
           child: CustomScrollView(
             slivers: [
-              // Premium Header
+              // Header
               SliverToBoxAdapter(child: _buildPremiumHeader()),
 
               // Statistics Cards
@@ -56,7 +55,7 @@ class RoomsView extends GetView<RoomsController> {
     );
   }
 
-  /// Premium Header Section
+  /// Header Section
   Widget _buildPremiumHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
@@ -134,7 +133,7 @@ class RoomsView extends GetView<RoomsController> {
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       child: Column(
         children: [
-          // Stats cards - Premium horizontal scrollable
+          // Stats cards 
           SizedBox(
             height: 130,
             child: Obx(

@@ -1,4 +1,3 @@
-// FILE: lib/app/utils/validators/tenant_validator.dart
 import '../../models/tenant_model.dart';
 import 'validation_result.dart';
 

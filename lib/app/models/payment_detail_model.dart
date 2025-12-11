@@ -1,4 +1,3 @@
-// FILE: lib/app/models/payment_detail_model.dart
 import 'package:intl/intl.dart';
 
 class PaymentDetail {

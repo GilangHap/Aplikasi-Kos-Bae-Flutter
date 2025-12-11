@@ -1,10 +1,6 @@
-// FILE: lib/app/theme/app_theme.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-/// Kos Bae App Theme
-/// Premium Blue & Cream color palette inspired by logo
-/// Supports both light and dark modes
 class AppTheme {
   AppTheme._();
 

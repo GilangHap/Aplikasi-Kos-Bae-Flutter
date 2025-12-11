@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/tenant/complaints/tenant_complaints_view.dart
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'package:get/get.dart';

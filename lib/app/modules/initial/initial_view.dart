@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/initial/initial_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../services/auth_service.dart';

@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/contracts/contract_form_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';

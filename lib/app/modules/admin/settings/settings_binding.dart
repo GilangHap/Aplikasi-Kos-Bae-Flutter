@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/settings/settings_binding.dart
 import 'package:get/get.dart';
 import 'settings_controller.dart';
 

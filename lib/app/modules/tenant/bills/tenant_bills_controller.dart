@@ -49,7 +49,7 @@ class TenantBillsController extends GetxController {
         final payments = bill['payments'] as List?;
         final hasPendingPayment = payments?.any((p) => p['status'] == 'pending') ?? false;
 
-        // Add 'has_pending_payment' flag to bill for UI
+        // Add 'has_pending_payment' flag to bill 
         bill['has_pending_payment'] = hasPendingPayment;
 
         if (status == 'paid') {

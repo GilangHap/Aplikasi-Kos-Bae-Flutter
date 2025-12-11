@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/admin_layout/admin_layout_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,8 +29,6 @@ import '../settings/settings_view.dart';
 import '../../../theme/app_theme.dart';
 import 'admin_layout_controller.dart';
 
-/// Admin layout with drawer navigation
-/// Uses IndexedStack to preserve state when switching between pages
 class AdminLayoutView extends GetView<AdminLayoutController> {
   const AdminLayoutView({Key? key}) : super(key: key);
 

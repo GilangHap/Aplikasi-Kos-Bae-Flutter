@@ -1,7 +1,5 @@
-// FILE: lib/app/models/contract_model.dart
 import 'package:intl/intl.dart';
 
-/// Contract model for Kos Bae boarding house management
 class Contract {
   final String id;
   final String tenantId;
@@ -212,13 +210,13 @@ class Contract {
   String get statusColor {
     switch (status) {
       case 'aktif':
-        return '#B9F3CC'; // softGreen
+        return '#B9F3CC'; 
       case 'akan_habis':
-        return '#FFD6A5'; // warmPeach
+        return '#FFD6A5'; 
       case 'berakhir':
-        return '#F7C4D4'; // softPink
+        return '#F7C4D4'; 
       default:
-        return '#A9C9FF'; // pastelBlue
+        return '#A9C9FF'; 
     }
   }
 

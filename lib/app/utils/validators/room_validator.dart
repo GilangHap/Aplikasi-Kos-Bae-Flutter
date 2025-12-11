@@ -1,4 +1,3 @@
-// FILE: lib/app/utils/validators/room_validator.dart
 import '../../models/room_model.dart';
 import 'validation_result.dart';
 

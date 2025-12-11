@@ -1,4 +1,3 @@
-// FILE: lib/app/utils/validators/contract_validator.dart
 import '../../models/contract_model.dart';
 import 'validation_result.dart';
 

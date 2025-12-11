@@ -20,7 +20,6 @@ class TenantBillsView extends GetView<TenantBillsController> {
         length: 2,
         child: Column(
           children: [
-            // Premium Header with Logo
             _buildPremiumHeader(),
 
             Container(

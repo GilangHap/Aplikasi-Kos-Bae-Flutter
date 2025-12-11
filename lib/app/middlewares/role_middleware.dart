@@ -4,7 +4,6 @@ import '../services/auth_service.dart';
 import '../routes/app_routes.dart';
 import '../core/logger/app_logger.dart';
 
-/// Middleware untuk proteksi route berdasarkan autentikasi dan role
 class RoleMiddleware extends GetMiddleware {
   @override
   int? get priority => 1;

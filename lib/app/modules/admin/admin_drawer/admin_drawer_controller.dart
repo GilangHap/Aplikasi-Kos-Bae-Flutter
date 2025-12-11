@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/admin_drawer/admin_drawer_controller.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../services/auth_service.dart';

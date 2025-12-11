@@ -1,4 +1,3 @@
-// FILE: lib/app/core/exceptions/app_exceptions.dart
 /// Base exception class for Kos Bae application
 abstract class AppException implements Exception {
   final String userMessage;

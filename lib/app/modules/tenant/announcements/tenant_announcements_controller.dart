@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/tenant/announcements/tenant_announcements_controller.dart
 import 'package:get/get.dart';
 import '../../../models/announcement_model.dart';
 import '../../../services/supabase_service.dart';

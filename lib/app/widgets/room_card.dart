@@ -1,10 +1,8 @@
-// FILE: lib/app/widgets/room_card.dart
 import 'package:flutter/material.dart';
 // import 'package:cached_network_image/cached_network_image.dart';
 import '../models/room_model.dart';
 import 'status_badge.dart';
 
-/// Reusable Room Card Widget
 class RoomCard extends StatelessWidget {
   final Room room;
   final VoidCallback? onTap;

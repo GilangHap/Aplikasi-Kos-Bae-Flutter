@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/admin_layout/admin_layout_binding.dart
 import 'package:get/get.dart';
 import 'admin_layout_controller.dart';
 import '../dashboard/dashboard_controller.dart';

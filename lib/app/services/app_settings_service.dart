@@ -1,4 +1,3 @@
-// FILE: lib/app/services/app_settings_service.dart
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/logger/app_logger.dart';

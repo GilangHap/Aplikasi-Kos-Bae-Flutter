@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/auth/login/login_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,7 +5,6 @@ import '../../../theme/app_theme.dart';
 import '../../../services/auth_service.dart';
 import '../../../routes/app_routes.dart';
 
-/// Premium Login View - Elegant, Clean, Luxury
 class LoginView extends StatefulWidget {
   const LoginView({Key? key}) : super(key: key);
 

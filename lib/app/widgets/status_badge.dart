@@ -1,4 +1,3 @@
-// FILE: lib/app/widgets/status_badge.dart
 import 'package:flutter/material.dart';
 import '../models/room_model.dart';
 

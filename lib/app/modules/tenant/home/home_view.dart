@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/tenant/home/home_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -7,7 +6,7 @@ import '../../../routes/app_routes.dart';
 import 'home_controller.dart';
 import '../tenant_nav/tenant_nav_controller.dart';
 
-/// Minimalist Tenant Dashboard - Aesthetic & Clean UI
+/// Minimalist Tenant Dashboard 
 class TenantHomeView extends GetView<HomeController> {
   const TenantHomeView({Key? key}) : super(key: key);
 

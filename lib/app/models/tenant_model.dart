@@ -1,5 +1,3 @@
-// FILE: lib/app/models/tenant_model.dart
-/// Tenant model for Kos Bae boarding house management
 class Tenant {
   final String id;
   final String name;

@@ -1,8 +1,6 @@
-// FILE: lib/app/models/complaint_model.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-/// Complaint model for Kos Bae maintenance tickets
 class Complaint {
   final String id;
   final String tenantId;

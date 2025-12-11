@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/rooms_management/room_detail_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -9,7 +8,7 @@ import '../../../services/supabase_service.dart';
 import '../../../routes/app_routes.dart';
 import '../../../theme/app_theme.dart';
 
-/// Room Detail View dengan tampilan menarik
+/// Room Detail View
 class RoomDetailView extends StatefulWidget {
   const RoomDetailView({Key? key}) : super(key: key);
 

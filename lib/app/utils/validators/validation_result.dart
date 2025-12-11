@@ -1,4 +1,3 @@
-// FILE: lib/app/utils/validators/validation_result.dart
 /// Result of validation process
 class ValidationResult {
   final bool isValid;

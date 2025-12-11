@@ -1,10 +1,6 @@
-// FILE: lib/app/widgets/menu_item_widget.dart
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
-
-/// Premium menu item widget for drawer navigation
-/// Features gradient background, animated transitions, and modern styling
 class MenuItemWidget extends StatelessWidget {
   final IconData icon;
   final String label;

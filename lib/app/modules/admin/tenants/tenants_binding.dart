@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/tenants/tenants_binding.dart
 import 'package:get/get.dart';
 import 'tenants_controller.dart';
 

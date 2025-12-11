@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/tenants/tenant_form_view.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -8,7 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../theme/app_theme.dart';
 import 'tenant_form_controller.dart';
 
-/// Add/Edit Tenant Form View - Premium UI
+/// Add/Edit Tenant Form View
 class TenantFormView extends GetView<TenantFormController> {
   const TenantFormView({super.key});
 

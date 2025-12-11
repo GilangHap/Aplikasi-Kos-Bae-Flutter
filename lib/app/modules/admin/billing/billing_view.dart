@@ -1,7 +1,5 @@
-// FILE: lib/app/modules/admin/billing/billing_view.dart
 import 'package:flutter/material.dart';
 
-/// Admin billing placeholder view
 class AdminBillingView extends StatelessWidget {
   const AdminBillingView({Key? key}) : super(key: key);
 

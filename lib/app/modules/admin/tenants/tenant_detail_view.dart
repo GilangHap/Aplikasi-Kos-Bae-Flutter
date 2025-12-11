@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/tenants/tenant_detail_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -8,7 +7,7 @@ import '../../../models/contract_model.dart';
 import '../../../services/supabase_service.dart';
 import 'tenants_controller.dart';
 
-/// Tenant Detail Page - Shows full biodata, room info, dates
+/// Tenant Detail Page
 class TenantDetailView extends StatefulWidget {
   const TenantDetailView({super.key});
 

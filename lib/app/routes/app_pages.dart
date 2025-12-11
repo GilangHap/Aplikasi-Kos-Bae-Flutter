@@ -1,4 +1,3 @@
-// FILE: lib/app/routes/app_pages.dart
 import 'package:get/get.dart';
 import '../middlewares/role_middleware.dart';
 import '../modules/admin/admin_layout/admin_layout_view.dart';
@@ -43,7 +42,6 @@ import '../modules/initial/initial_view.dart';
 import 'app_routes.dart';
 
 /// GetX pages configuration
-/// Maps route names to page views with bindings and middlewares
 class AppPages {
   AppPages._();
 

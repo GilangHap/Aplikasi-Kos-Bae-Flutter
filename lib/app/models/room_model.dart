@@ -1,5 +1,3 @@
-// FILE: lib/app/models/room_model.dart
-/// Room model for Kos Bae boarding house management
 class Room {
   final String id;
   final String roomNumber;
@@ -106,7 +104,6 @@ class Room {
     }
   }
 
-  /// Get status label in Indonesian
   String get statusLabel {
     switch (status) {
       case 'kosong':

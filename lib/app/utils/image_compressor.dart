@@ -1,4 +1,3 @@
-// FILE: lib/app/utils/image_compressor.dart
 import 'dart:io';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:image_picker/image_picker.dart';

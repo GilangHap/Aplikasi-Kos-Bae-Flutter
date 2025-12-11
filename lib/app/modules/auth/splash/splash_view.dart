@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/auth/splash/splash_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,7 +5,7 @@ import '../../../theme/app_theme.dart';
 import '../../../services/auth_service.dart';
 import '../../../routes/app_routes.dart';
 
-/// Premium Splash Screen with elegant animations
+/// Premium Splash Screen 
 class SplashView extends StatefulWidget {
   const SplashView({Key? key}) : super(key: key);
 

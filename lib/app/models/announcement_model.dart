@@ -1,13 +1,11 @@
-// FILE: lib/app/models/announcement_model.dart
 import 'package:intl/intl.dart';
 
-/// Announcement model for Kos Bae announcements
 class Announcement {
   final String id;
   final String title;
   final String content;
   final List<String> attachments;
-  final bool isRequired; // Wajib dibaca
+  final bool isRequired; 
   final DateTime createdAt;
   final DateTime? updatedAt;
   final String? createdBy;
@@ -29,7 +27,6 @@ class Announcement {
     this.totalReaders = 0,
   });
 
-  /// Create from Supabase JSON
   factory Announcement.fromJson(Map<String, dynamic> json) {
     // Parse attachments
     List<String> attachments = [];
@@ -39,7 +36,6 @@ class Announcement {
       }
     }
 
-    // Parse read by list
     List<AnnouncementRead> readBy = [];
     if (json['announcement_reads'] != null &&
         json['announcement_reads'] is List) {

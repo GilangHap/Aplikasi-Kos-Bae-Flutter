@@ -1,4 +1,3 @@
-// FILE: lib/app/core/logger/app_logger.dart
 import 'package:flutter/foundation.dart';
 
 /// Centralized logging service for Kos Bae application
@@ -42,11 +41,6 @@ class AppLogger {
         debugPrint('   StackTrace: $stackTrace');
       }
     }
-    
-    // TODO: Add crash reporting service integration (Firebase Crashlytics, Sentry)
-    // if (!kDebugMode) {
-    //   CrashReportingService.logError(message, error, stackTrace);
-    // }
   }
   
   /// Log debug message (only in debug mode)

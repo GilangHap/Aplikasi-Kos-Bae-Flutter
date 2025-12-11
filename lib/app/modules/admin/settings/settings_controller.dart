@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/settings/settings_controller.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../services/supabase_service.dart';

@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/tenants/tenant_form_controller.dart
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -12,9 +11,6 @@ import '../../../services/supabase_service.dart';
 /// Controller for Add/Edit Tenant Form
 class TenantFormController extends GetxController {
   final _supabaseService = Get.find<SupabaseService>();
-
-  // ... (rest of the file until _createAuthUser)
-
 
   // Form key
   final formKey = GlobalKey<FormState>();

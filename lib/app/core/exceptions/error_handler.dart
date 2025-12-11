@@ -1,4 +1,3 @@
-// FILE: lib/app/core/exceptions/error_handler.dart
 import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'app_exceptions.dart';

@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/tenant/tenant_layout/tenant_layout_view.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -6,8 +5,6 @@ import '../../../theme/app_theme.dart';
 import '../tenant_nav/tenant_nav_controller.dart';
 import 'tenant_layout_controller.dart';
 
-/// Minimalist Tenant Layout with Premium Bottom Navigation
-/// Uses IndexedStack to preserve state when switching between tabs
 class TenantLayoutView extends GetView<TenantLayoutController> {
   const TenantLayoutView({Key? key}) : super(key: key);
 

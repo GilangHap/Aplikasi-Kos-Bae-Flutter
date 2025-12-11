@@ -1,13 +1,9 @@
-// FILE: lib/app/utils/validators/bill_validator.dart
 import '../../models/bill_model.dart';
 import 'validation_result.dart';
 
-/// Validator for Bill model
 class BillValidator {
-  /// Valid bill types
   static const List<String> validTypes = ['sewa', 'listrik', 'air', 'deposit', 'denda', 'lainnya'];
   
-  /// Valid bill statuses
   static const List<String> validStatuses = ['pending', 'verified', 'paid', 'overdue'];
   
   /// Validate bill data

@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/contracts/contracts_binding.dart
 import 'package:get/get.dart';
 import 'contracts_controller.dart';
 

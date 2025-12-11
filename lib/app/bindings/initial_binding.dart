@@ -6,7 +6,6 @@ import '../services/connectivity_service.dart';
 import '../services/app_settings_service.dart';
 import '../core/logger/app_logger.dart';
 
-/// Binding untuk inisialisasi global services saat aplikasi dimulai
 class InitialBinding extends Bindings {
   @override
   void dependencies() {
@@ -22,7 +21,6 @@ class InitialBinding extends Bindings {
   }
 }
 
-/// Async service initializer - call this after app starts
 class ServiceInitializer {
   static Future<void> initAsyncServices() async {
     try {

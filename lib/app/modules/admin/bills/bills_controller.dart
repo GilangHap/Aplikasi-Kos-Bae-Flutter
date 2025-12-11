@@ -1,4 +1,3 @@
-// FILE: lib/app/modules/admin/bills/bills_controller.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

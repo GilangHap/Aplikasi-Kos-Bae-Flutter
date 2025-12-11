@@ -1,8 +1,6 @@
-// FILE: lib/app/modules/admin/announcements/announcements_binding.dart
 import 'package:get/get.dart';
 import 'announcements_controller.dart';
 
-/// Binding for Announcements module
 class AnnouncementsBinding extends Bindings {
   @override
   void dependencies() {

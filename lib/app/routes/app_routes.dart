@@ -1,8 +1,3 @@
-// FILE: lib/app/routes/app_routes.dart
-/// Route name constants for Kos Bae application
-///
-/// Admin routes start with /admin
-/// Tenant routes start with /tenant
 abstract class AppRoutes {
   AppRoutes._();
 

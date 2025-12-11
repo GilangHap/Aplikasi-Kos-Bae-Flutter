@@ -1,4 +1,3 @@
-// FILE: lib/app/models/bill_model.dart
 import 'package:intl/intl.dart';
 import 'package:get/get.dart';
 import '../services/app_settings_service.dart';
@@ -12,15 +11,14 @@ class _AppSettingsServiceHelper {
     return null;
   }
 }
-/// Bill model for Kos Bae boarding house management
+/// Bill model 
 class Bill {
   final String id;
   final String tenantId;
   final String? roomId;
-  final String?
-  contractId; // Reference to the contract that generated this bill
-  final String? tenantName; // From joined data
-  final String? roomNumber; // From joined data
+  final String? contractId;
+  final String? tenantName;
+  final String? roomNumber;
   final double amount;
   final String type; // sewa, listrik, air, deposit, denda, lainnya
   final String status; // pending, verified, paid, overdue
