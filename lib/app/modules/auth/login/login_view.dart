@@ -355,37 +355,6 @@ class _LoginViewState extends State<LoginView>
             },
           ),
 
-          const SizedBox(height: 12),
-
-          // Forgot password link
-          Align(
-            alignment: Alignment.centerRight,
-            child: TextButton(
-              onPressed: () {
-                // TODO: Implement forgot password
-                Get.snackbar(
-                  'Info',
-                  'Fitur reset password akan segera hadir',
-                  backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
-                  colorText: AppTheme.primaryBlue,
-                );
-              },
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.zero,
-                minimumSize: Size.zero,
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              ),
-              child: Text(
-                'Lupa password?',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppTheme.primaryBlue,
-                ),
-              ),
-            ),
-          ),
-
           const SizedBox(height: 28),
 
           // Login button
